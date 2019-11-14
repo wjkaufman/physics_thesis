@@ -3,21 +3,34 @@
 
 \usepackage{kaufman}
 
-\title{Machine Learning Techniques for Hamiltonian Learning for Quantum Systems}
-\author{Will Kaufman}
+\title{Pulse Sequence Design using Machine Learning Techniques for Hamiltonian Engineering}
+\author{Will Kaufman \\ Physics Department, Dartmouth College\thanks{Thesis Advisor Chandrasekhar Ramanathan}}
 
 \begin{document}
 \maketitle
 
 \begin{abstract}
 
-This is the abstract.
-% start big: state of field right now
 
+
+% high level
+
+% machine learning for optimizing pulse sequences designed for Hamiltonian engineering
+%
+% studying the solution space for unitary operators, including metrics on the space and ideas of robustness
+%
+%
+
+In a variety of quantum systems methods have been developed for altering the effective Hamiltonian of the system.
+%For nuclear or electronic systems, % need to specify?
+For certain systems,
+applying a time-dependent external magnetic field can be used to alter the system's Hamiltonian, allowing the system to evolve under a desired ``effective'' Hamiltonian that may eliminate the effects of certain interactions or lead to new phenomena not typically observed in nature. Average Hamiltonian Theory provides a framework in which the effective Hamiltonian can be built by a sequence of magnetic field pulses. The system observed at ``window times'' at the end of each pulse sequence appears to evolve under the effective (average) Hamiltonian. Several pulse sequences of varying lengths have been designed and are used extensively.
 % my project
+In this thesis, applying machine learning techniques for optimizing pulse sequences will be studied. This includes exploring different metrics on unitary operators, optimizing over the parameter space for pulse sequences to obtain the desired Hamiltonian, as well as understanding the robustness of solutions. Simulations of small-scale quantum systems will primarily be used to explore these techniques, and extensions to experimental systems with large ensembles of spins will also be considered.
 % scope of project
-
+% ???
 % who cares?
+This work will improve our ability to control and measure quantum systems, with applications in solid state NMR, quantum sensing, and quantum computing.
 
 \end{abstract}
 
