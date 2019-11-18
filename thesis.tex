@@ -20,13 +20,15 @@
 % studying the solution space for unitary operators, including metrics on the space and ideas of robustness
 %
 %
-
+Quantum simulation permits the study of quantum systems that are difficult to observe experimentally and intractable to simulate on classical computers. To perform quantum simulations, the ``effective Hamiltonian'' must be engineered to match the desired quantum system.
+% include quantum simulation as high-level motivation
+% TODO fill in
 In a variety of quantum systems methods have been developed for altering the effective Hamiltonian of the system.
 %For nuclear or electronic systems, % need to specify?
 For certain systems,
-applying a time-dependent external magnetic field can be used to alter the system's Hamiltonian, allowing the system to evolve under a desired ``effective'' Hamiltonian that may eliminate the effects of certain interactions or lead to new phenomena not typically observed in nature. Average Hamiltonian Theory provides a framework in which the effective Hamiltonian can be built by a sequence of magnetic field pulses. The system observed at ``window times'' at the end of each pulse sequence appears to evolve under the effective (average) Hamiltonian. Several pulse sequences of varying lengths have been designed and are used extensively.
+applying a time-dependent external magnetic field can be used to alter the system's Hamiltonian, allowing the system to evolve under a desired ``effective'' Hamiltonian that may eliminate the effects of certain interactions or lead to new phenomena not typically observed in nature. Average Hamiltonian Theory provides a framework in which the effective Hamiltonian can be built by a periodic sequence of magnetic field pulses. The system, observed at ``window times'' within each period appears to evolve under the average effective Hamiltonian.
 % my project
-In this thesis, applying machine learning techniques for optimizing pulse sequences will be studied. This includes exploring different metrics on unitary operators, optimizing over the parameter space for pulse sequences to obtain the desired Hamiltonian, as well as understanding the robustness of solutions. Simulations of small-scale quantum systems will primarily be used to explore these techniques, and extensions to experimental systems with large ensembles of spins will also be considered.
+In this thesis, applying machine learning techniques for optimizing pulse sequences will be studied. This includes exploring different metrics to quantify the fidelity of unitary operators, optimizing over the parameter space for pulse sequences to obtain the desired Hamiltonian, as well as understanding the robustness of solutions. Simulations of small-scale quantum systems will primarily be used to explore these techniques, and extensions to experimental systems with large ensembles of spins will also be considered.
 % scope of project
 % ???
 % who cares?
