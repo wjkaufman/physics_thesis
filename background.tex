@@ -1,6 +1,27 @@
 %!TEX root=thesis.tex
 \chapter{Background}
 
+% intro to quantum ideas
+
+Some physicists believe that quantum physics is on the cusp of ``second quantum revolution''\cite{quantum-rev}. The ability to probe and control quantum systems at the individual level, as opposed to using emergent phenomena that arise due to quantum mechanics, has potential to radically transform many different areas, from sensing problems to quantum computing.
+
+% new section?
+The fundamentals of quantum mechanics are comprised of postulates that describe how systems are represented, how measurement behaves, and how systems evolve in time.
+% TODO
+% state of system <-> density operator (write when I learn about)
+Given a density operator $\rho$ for some quantum system, the time evolution of $\rho$ is given by the Liouville-Von Neumann equation
+\begin{equation}
+    i\hbar \ddt{\rho} = [\hham, \rho]
+\end{equation}
+Which can be solved to get the time-dependent density operator
+\begin{equation}
+    \rho(t) = U(t) \rho(t=0) U(t)^\dagger
+\end{equation}
+where $U$ is the ``propagator'' defined by $i\hbar \ddt{U} = [\hham, U]$ with initial condition $U(t=0) = \identity$.
+% time evolution
+% quantum control idea
+% time-dependent hamiltonians
+
 \section{Average Hamiltonian Theory}
 
 % asdf
