@@ -14,15 +14,28 @@ Given a density operator $\rho$ for some quantum system, the time evolution of $
     i\hbar \ddt{\rho} = [\hham, \rho]
 \end{equation}
 Which can be solved to get the time-dependent density operator
-\begin{equation}
+\begin{equation}\label{eq:density-time}
     \rho(t) = U(t) \rho(t=0) U(t)^\dagger
 \end{equation}
-where $U$ is the ``propagator'' defined by $i\hbar \ddt{U} = [\hham, U]$ with initial condition $U(t=0) = \identity$.
-% time evolution
-% quantum control idea
-% time-dependent hamiltonians
+where $U$ is the ``propagator'' defined by
+\begin{equation}\label{eq:propagator-de}
+    i\hbar \ddt{U} = \hham U, U(t=0) = \identity
+\end{equation}
 
-\section{Average Hamiltonian Theory}
+When the Hamiltonian is independent of time, equation~\ref{eq:propagator-de} can be easily solved to obtain the propagator
+\[
+U(t) = e^{-i/\hbar \hham t}
+\]
+However, when the Hamiltonian depends on time, the operator will not necessarily commute with itself, so the equation
+\[
+U'(t) = e^{\int_0^t \hham(t') dt'}
+\]
+is not valid. This difficulty with time-dependent Hamiltonians is further discussed in~\ref{sec:AHT}.
+
+
+% quantum control idea
+
+\section{Average Hamiltonian Theory}\label{sec:AHT}
 
 % asdf
 
