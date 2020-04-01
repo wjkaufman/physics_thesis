@@ -2,42 +2,53 @@
 \chapter{Background}
 
 % TODO delete this subsection, for outline only
-\subsection{Foundations of Quantum Mechanics}
+\section{Foundations of Quantum Mechanics}
 
 
 % intro to quantum ideas
 
-Some physicists believe that quantum physics is on the cusp of ``second quantum revolution''\cite{quantum-rev}. The ability to probe and control quantum systems at the individual level, as opposed to using emergent phenomena that arise due to quantum mechanics, has potential to radically transform many different areas, from sensing problems to quantum computing.
+Some physicists believe that quantum physics is on the cusp of a ``second quantum revolution''\cite{quantum-rev}. The ability to probe and control quantum systems at the individual level, as opposed to using emergent phenomena that arise due to quantum mechanics, has potential to radically transform many different areas, from sensing problems to quantum computing.
 
-% new section?
-The fundamentals of quantum mechanics are comprised of postulates that describe how systems are represented, how measurement behaves, and how systems evolve in time.
-% TODO
-% state of system <-> density operator (write when I learn about)
-Given a density operator $\rho$ for some quantum system, the time evolution of $\rho$ is given by the Liouville-Von Neumann equation
-\begin{equation}
-    i\hbar \ddt{\rho} = [\hham, \rho]
-\end{equation}
-Which can be solved to get the time-dependent density operator
+% state of system <-> density operator
+Given a quantum system, a general state can be represented by a density operator $\rho(t)$. The density operator encapsulates all known information about the quantum system, specifically the expectation values associated with well-defined observable. For an observable $A$, the expectation is given by
+\[
+\langle A \rangle = \Tr{\rho A}
+\]
+
+The time evolution of the density operator is given by
 \begin{equation}\label{eq:density-time}
-    \rho(t) = U(t) \rho(t=0) U(t)^\dagger
+    \rho(t) = U(t) \rho(0) U(t)^\dagger
 \end{equation}
-where $U$ is the ``propagator'' defined by
+where the unitary operator $U$ is the ``propagator'' defined by
 \begin{equation}\label{eq:propagator-de}
-    i\hbar \ddt{U} = \hham U, U(t=0) = \identity
+    i\hbar \ddt{U(t)} = H(t) U(t), U(0) = \identity
+\end{equation}
+% TODO decide to include this?
+The two equations above can be combined to yield the Liouville-Von Neumann equation, which explicitly shows the density operator's dependence on the system Hamiltonian.
+\begin{equation}
+    i\hbar \ddt{\rho(t)} = [H(t), \rho(t)]
 \end{equation}
 
-When the Hamiltonian is independent of time, equation~\ref{eq:propagator-de} can be easily solved to obtain the propagator
+When the Hamiltonian is time-independent or if the Hamiltonian commutes with itself at different points in time (i.e. $[H(t_1), H(t_2)] = 0$), equation~\ref{eq:propagator-de} can be solved to obtain the propagator
 \[
-U(t) = e^{-i/\hbar \hham t}
+U(t) = \text{exp}\left[ {-i/\hbar \int_0^t H(t') dt'} \right]
 \]
-However, when the Hamiltonian depends on time, the operator will not necessarily commute with itself, so the equation
-\[
-U'(t) = e^{\int_0^t \hham(t') dt'}
-\]
-is not valid. This difficulty with time-dependent Hamiltonians is further discussed in~\ref{sec:AHT}.
+However, if the Hamiltonian is time-dependent and doesn't commute with itself at different times, then the above equation is not valid. This difficulty with time-dependent Hamiltonians and methods with dealing with them are further discussed in~\ref{sec:AHT}.
 
+% quantum control and quantum sensing
+Two important active fields of research are quantum control and quantum sensing. Quantum control involves
+% TODO keep explaining this, high-level
 
-% quantum control idea
+\section{NMR Systems}
+
+% TODO Discuss NMR system, general overview
+
+\begin{align}\label{eq:nmr-ham}
+    H_\text{total}(t) &= H_0 + H_\text{CS} + H_D + H_\text{rf}(t) \\
+    H_0 &= \sum_i \omega_i I_z^{(i)} \\
+    H_\text{CS} &= ???????????????? \\
+    H_D &= \sum_{i,j} d_{ij} \left( 3I_z^{(i)}I_z^{(j)} - \mathbf{I^{(i)}} \cdot \mathbf{I^{(j)}} \right)
+\end{align}
 
 \section{Average Hamiltonian Theory}\label{sec:AHT}
 
