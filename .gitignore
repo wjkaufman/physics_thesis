@@ -1,0 +1,26 @@
+# LaTeX files
+*.aux
+*.log
+*.pdf
+*.synctex.gz
+*.bbl
+*.bcf
+*.blg
+*.toc
+*.fdb_latexmk
+*.fls
+*.run.xml
+
+# MATLAB files
+*.mat
+*.fig
+*.m~
+
+# all data files
+data/*
+
+# Other
+*.txt
+*.DS_Store
+*.zip
+*.pptx
