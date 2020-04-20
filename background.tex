@@ -35,12 +35,16 @@ U(t) = \text{exp}\left[ {-i/\hbar \int_0^t H(t') dt'} \right]
 \]
 However, if the Hamiltonian is time-dependent and doesn't commute with itself at different times, then the above equation is not valid. This difficulty with time-dependent Hamiltonians and methods with dealing with them are further discussed in~\ref{sec:AHT}.
 
+% TODO add section on toggling frames, how that works... (How does it work?)
+
 % quantum control and quantum sensing
-Two important active fields of research are quantum control and quantum sensing. Quantum control involves
-% TODO keep explaining this, high-level
+Two important active fields of research are quantum control and quantum sensing. Quantum control investigates the ability to transform an initial state $\rho(0)$ to a specified final state and time $\rho(T)$, or the ability to create a specified propagator $U(T)$, using some set of controls on the system.\cite{Dong_2010} Systems can be controlled by manipulating parameters in the Hamiltonian, such as the strength or orientation of an external magnetic field.
+Quantum sensing leverages quantized energy levels, coherence, or entanglement properties of systems to precisely measure physical quantities. To measure the desired quantity (such as the strength of an external magnetic field), it is sometimes necessary to minimize the other interactions present in the system. For both control and sensing problems, engineering a specific Hamiltonian is an important step.
 
-\section{NMR Systems}
+\section{Spin-1/2 Systems and Nuclear Magnetic Resonance}
 
+A spin-1/2 particle (such as an electron or proton) has two possible values for its intrinsic angular momentum or ``spin,'' which makes it one of the simplest quantum systems to study. The corresponding Hilbert Space for a single spin-1/2 particle has dimension two.
+Nuclear magnetic resonance (NMR) is a technique % TODO continue describing what NMR is
 % TODO Discuss NMR system, general overview
 
 \begin{align}\label{eq:nmr-ham}
