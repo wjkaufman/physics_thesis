@@ -11,6 +11,9 @@
 *.fls
 *.run.xml
 
+# graphics files
+graphics/*
+
 # MATLAB files
 *.mat
 *.fig
