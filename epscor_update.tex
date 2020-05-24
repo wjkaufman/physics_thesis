@@ -59,7 +59,15 @@ RL algorithms seek to learn a policy function $\pi$ that maps states to actions 
 % TODO include figure of agent/environment and different interactions
 \begin{figure}[ht]
     \centering
-    \includegraphics[width=0.7\linewidth]{graphics/epscor/rl_paradigm.jpeg}
+    \begin{tikzpicture}[->, thick]
+         %nodes
+         \node[draw] at (-3,0) (agent) {Agent ($\pi: S \to A$)};
+         \node[draw] at (3,0) (env) {Environment};
+         \path
+             (agent.north) edge[bend left=60] node[above] {Action $a \in A$} (env.north)
+             (env.south) edge[bend left=60] node[below] {State $s \in S$} (agent.south)
+             (env.west) edge node[below] {Reward $r$} (agent.east);
+    \end{tikzpicture}
     \caption{The general reinforcement learning paradigm.}
     \label{fig:RL}
 \end{figure}
@@ -78,7 +86,7 @@ DDPG is an actor-critic method, where the actor learns the deterministic policy 
 
 % state/action encoding
 For a system of spin-1/2 particles, the \emph{actions} are magnetic field pulses that rotate the spins, and can therefore be parametrized by the axis of rotation, the rotation angle $\alpha$, and the time $dt$ over which the rotation is performed.
-The axis of rotation is assumed to lie in the xy-plane, so a single pulse can be characterized by the tuple $(\theta, \alpha, dt) \in [0,2\pi] \times [0, \alpha_\text{max}] \times [t_\text{min}, \inf)$. $\alpha_\text{max}$ and $t_\text{min}$ depend on the experimental limitations, but for this research the values $\alpha_\text{max} = 2\pi, t_\text{min} = 10^{-7}s$ were taken.
+The axis of rotation is assumed to lie in the xy-plane, so a single pulse can be characterized by the tuple $(\phi, \alpha, dt) \in [0,2\pi] \times [0, \alpha_\text{max}] \times [t_\text{min}, \inf)$. $\alpha_\text{max}$ and $t_\text{min}$ depend on the experimental limitations, but for this research the values $\alpha_\text{max} = 2\pi, t_\text{min} = 10^{-7}s$ were taken.
 The relevant \emph{state} of the spin system is the propagator $U(t)$. However, the number of elements increases exponentially with the number of spins, so storing and computing with propagators quickly becomes infeasible.
 Instead, the state is represented by the sequence of all previous actions performed. This contains the equivalent information stored in the propagator, and requires significantly less memory and computational power.
 
@@ -97,7 +105,7 @@ For short time intervals, both propagators $U_\text{target}$ and $U_\text{exp}$ 
 % network architecture
 Neural network function approximators are used for both the actor's policy function and the critic's action-value function. The state and action inputs to the neural networks are normalized according to the following maps
 \begin{align}
-    \theta &\mapsto \theta / 2\pi \\
+    \phi &\mapsto \phi / 2\pi \\
     \alpha &\mapsto \alpha / 2\pi \\
     t      &\mapsto \frac{\log(t + 10^{-7}) + 7}{2}
 \end{align}
@@ -106,8 +114,55 @@ Because the state is represented by a sequence of actions, long short-term memor
 
 \begin{figure}[ht]
     \centering
-    \includegraphics[width=0.7\linewidth]{graphics/epscor/network_architecture.jpeg}
-    \caption{The network architectures for the policy function $\pi$ and action-value function $Q$.}
+    % \includegraphics[width=0.7\linewidth]{graphics/epscor/network_architecture.jpeg}
+    \begin{subfigure}{.49\textwidth}
+        \centering
+        % actor network
+        \begin{tikzpicture}[->, thick]
+         %nodes
+         \node[draw] at (0,5) (input) {State input ($32\times3$)};
+         \node[draw] at (0,4) (lstm) {LSTM layer (64 hidden units)};
+         \node[draw] at (0,3) (lnorm1) {Layer normalization};
+         \node[draw] at (0,2) (d1) {Dense layer (256, tanh activation)};
+         \node[draw] at (0,1) (lnorm2) {Layer normalization};
+         \node[draw] at (0,0) (d2) {Dense layer (256, tanh)};
+         \node[draw] at (0,-1) (lnorm3) {Layer normalization};
+         \node[draw] at (0,-2) (d3) {Dense layer (256, tanh)};
+         \node[draw] at (0,-3) (output) {Dense layer (3 output units, tanh)};
+         % arrows between nodes
+         \draw (input) -- (lstm); \draw (lstm) -- (lnorm1);
+         \draw (lnorm1)--(d1); \draw(d1)--(lnorm2); \draw (lnorm2) -- (d2);
+         \draw (d2) -- (lnorm3); \draw (lnorm3) -- (d3); \draw (d3) -- (output);
+        \end{tikzpicture}
+        \caption{The actor neural network to learn the policy $\pi(s)$.}
+    \end{subfigure}
+    \begin{subfigure}{.49\textwidth}
+        \centering
+        % critic network
+        \begin{tikzpicture}[->, thick]
+         %nodes
+         \node[draw] at (-2.5,4) (sinput) {State input ($32\times3$)};
+         \node[draw] at (-2.5,3) (lstm) {LSTM layer (64 hidden units)};
+         \node[draw] at (-2.5,2) (d1a) {Dense layer (128, elu)};
+         \node[draw] at (2.5,3) (ainput) {Action input ($1\times 3$)};
+         \node[draw] at (2.5,2) (d1b) {Dense layer (128, elu)};
+         \node[draw] at (0,1) (lnorm1) {Layer normalization};
+         \node[draw] at (0,0) (d2) {Dense layer (256, elu)};
+         \node[draw] at (0,-1) (lnorm2) {Layer normalization};
+         \node[draw] at (0,-2) (d3) {Dense layer (256, elu)};
+         \node[draw] at (0,-3) (lnorm3) {Layer normalization};
+         \node[draw] at (0,-4) (d4) {Dense layer (256, elu)};
+         \node[draw] at (0,-5) (output) {Dense layer (1 output unit)};
+         % arrows between nodes
+         \draw (sinput) -- (lstm); \draw (lstm) -- (d1a);
+         \draw (ainput) -- (d1b); \draw(d1a)--(lnorm1); \draw(d1b)--(lnorm1);
+         \draw (lnorm1)--(d2); \draw (d2) -- (lnorm2);
+         \draw (lnorm2) -- (d3); \draw (d3) -- (lnorm3); \draw (lnorm3) -- (d4);
+         \draw (d4) -- (output);
+        \end{tikzpicture}
+        \caption{The critic neural network to learn $Q(s,a)$.}
+    \end{subfigure}
+    \caption{Neural network architectures .}
     \label{fig:network-architecture}
 \end{figure}
 
@@ -131,7 +186,7 @@ The policy function converges to a single action, failing to learn any state dep
         \includegraphics[width=0.9\linewidth]{graphics/epscor/action_time.png}
         \caption{}
     \end{subfigure}
-    \caption{The actions chosen by the actor (blue) and the actions performed on the environment (black). Each action is a pulse with the axis of rotation specified by $\theta$ (a), $\alpha$ (b), and $dt$ (c). Random noise is added to the actions to explore the action space. Note that the time action is clipped at a non-zero value to prevent delta-function pulses from being implemented.}
+    \caption{The actions chosen by the actor (blue) and the actions performed on the environment (black). Each action is a pulse with the axis of rotation specified by $\phi$ (a), $\alpha$ (b), and $dt$ (c). Random noise is added to the actions to explore the action space. Note that the time action is clipped at a non-zero value to prevent delta-function pulses from being implemented.}
     \label{fig:actions}
 \end{figure}
 % compare to existing methods, NEXT STEPS
