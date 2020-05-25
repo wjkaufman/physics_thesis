@@ -1,0 +1,105 @@
+%!TEX output_directory=output
+
+\documentclass[20pt,margin=1in,innermargin=-1in,blockverticalspace=-0.25in]{tikzposter}
+\geometry{paperwidth=36in,paperheight=28in}
+
+\usepackage{kaufman}
+\usepackage{dartmouth-theme}
+
+% TODO add bib resource
+% \addbibresource{kaufman.bib}
+
+% set theme parameters
+\tikzposterlatexaffectionproofoff
+\usetheme{DartmouthTheme}
+\usecolorstyle{DartmouthStyle}
+
+\title{Hamiltonian Engineering via Reinforcement Learning}
+\author{Will Kaufman}
+\institute{Dartmouth College}
+\titlegraphic{\includegraphics[width=0.03\textwidth]{lonepine.pdf}}
+
+% begin document
+\begin{document}
+\maketitle
+\centering
+\begin{columns}
+    \column{0.5}
+    
+    \block{Hamiltonian engineering problem}{
+    
+    } % end hamiltonian engineering problem block
+    
+    \block{Average Hamiltonian theory}{
+    % TODO talk about AHT, WHH-4 sequence, other new methods
+    % advantages ,drawbacks
+    } % end AHT block
+    
+    \block{Reinforcement learning}{
+    
+    } % end RL block
+    
+    % \column{0.31}
+
+    
+    \column{0.5}
+    
+    \block{Applying RL to Hamiltonian engineering}{
+    % TODO action encoding
+    % state representation
+    % rewards, etc.
+    % current pitfalls
+    } % end application section
+    
+    
+    \block{Further work}{
+    % TODO discrete action space
+    % include experimental constraints and errors
+    % e.g. finite pulse width, phase errors
+    } % end further work
+    
+    \block{References}{
+        % TODO include references
+        % \begin{footnotesize}
+        % \printbibliography[heading=none]
+        % \end{footnotesize}
+    }
+\end{columns}
+\end{document}
+
+
+
+% \block{Hamiltonian learning problem}{
+%     asdfasdf
+%
+%     {\centering
+%     \begin{minipage}{0.8\linewidth}
+%         \begin{algorithm}[H]
+%         \caption{Algorithm thing.}
+%         \label{alg:ham_learn}
+%         \begin{algorithmic}[1]
+%         \STATE Draw a set of parameter vectors $\{\vec{x}_j\}_{j=1}^M$ (or ``particles'') from a prior probability distribution $\pi$, and initialize the particle weights $w_j = 1/M$.
+%         \FOR{$i = 1 \to N_\text{exp}$ experiments}
+%             \STATE Choose experiment $C_i$ to maximize the expected utility of the outcome, perform the experiment, and observe outcome $D_i$.
+%             \STATE Estimate the likelihood $P(D_i|\vec{x}_j)$ for $j=1\to M$ using interactive quantum likelihood estimation (IQLE), repeating the IQLE method a number of times to achieve desired precision in the likelihood.
+%             \STATE Following sequential Monte Carlo (SMC) methods, perform the Bayesian update on the particle weights. If the weights are too small, re-sample the particles from the parameter space.
+%         \ENDFOR
+%         \RETURN The particles and weights $(\vec{x_j}, w_j)_{j=1}^M$.
+%         \end{algorithmic}
+%         \end{algorithm}
+%     \end{minipage}
+%     \par
+%     }
+% }
+
+% \block{Interactive quantum likelihood estimation}{
+%     asdf
+%
+%     \begin{minipage}{\linewidth}
+%     \begin{figure}[H]
+%         \centering
+%         figure here...
+%     \end{figure}
+%     \end{minipage}
+%
+% }
