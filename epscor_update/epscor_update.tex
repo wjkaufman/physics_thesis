@@ -6,7 +6,7 @@
 \title{Applying Reinforcement Learning Techniques to Hamiltonian Engineering}
 \author{Will Kaufman \\ Ramanathan Lab \\ Dartmouth College}
 
-\bibliography{refs.bib}
+\bibliography{../refs.bib}
 
 \begin{document}
 \maketitle
@@ -81,12 +81,13 @@ There are both potential benefits and drawbacks to using RL for Hamiltonian engi
 This may lead to novel pulse sequences that are more robust in experimental settings, where laboratory constraints (such as limited magnetic field strength or pulse timing) prevent the execution of ideal pulse sequences.
 However, because RL techniques rely on simulated quantum systems to learn how to construct pulse sequences, there may be a discrepancy between performance on a small number of spins ($N=4$ spins in current simulation experiments) and performance in a laboratory setting with $\sim10^{23}$ spins. Furthermore, the typical issues associated with machine learning--lack of interpretability of results, no guarantees of convergence--are also associated with RL.
 
-Several RL algorithms exist, each with different approaches depending on the nature of the state space $\mathcal{S}$ or action space $\mathcal{A}$. For Hamiltonian engineering, the action space is continuous: for each pulse, the axis of rotation, the field strength, and the duration can vary continuously (previous approaches to Hamiltonian engineering consider only a discrete set of actions for analytical tractability and to reduce to number of candidate pulse sequences). As a result, the deep deterministic policy gradient (DDPG) algorithm\cite{lillicrap2015continuous} was chosen.
-DDPG is an actor-critic method, where the actor learns the deterministic policy $\pi: \mathcal{S} \to \mathcal{A}$ and the critic learns the action-value function $Q: \mathcal{S} \times \mathcal{A} \to \R$. The value $Q(s,a)$ returns the total expected future rewards by performing action $a$ while in state $s$. Neural network function approximators are used for both the policy $\pi$ and the action-value function $Q$.
+Several RL algorithms exist, each with different approaches depending on the nature of the state space $\mathcal{S}$ or action space $\mathcal{A}$. For Hamiltonian engineering, the action space is continuous: for each pulse, the axis of rotation, the field strength, and the duration can vary continuously (previous approaches to Hamiltonian engineering consider only a discrete set of actions for analytical tractability and to reduce to number of candidate pulse sequences). As a result, the deep deterministic policy gradient (DDPG) algorithm\cite{lillicrap2015continuous} was considered, but the hybrid algorithm Evolutionary Reinforcement Learning (ERL) \cite{khadka2018evolutionguided} was ultimately chosen.
+DDPG is an actor-critic method, where the actor learns the deterministic policy $\pi: \mathcal{S} \to \mathcal{A}$ and the critic learns the action-value function $Q: \mathcal{S} \times \mathcal{A} \to \R$. The value $Q(s,a)$ returns the total expected future rewards by performing action $a$ while in state $s$. Neural network function approximators are used for both the policy $\pi$ and the action-value function $Q$. ERL implements DDPG alongside genetic algorithms to prevent premature convergence of the neural networks to local minima.
 
 % state/action encoding
 For a system of spin-1/2 particles, the \emph{actions} are magnetic field pulses that rotate the spins, and can therefore be parametrized by the axis of rotation, the rotation angle $\alpha$, and the time $dt$ over which the rotation is performed.
-The axis of rotation is assumed to lie in the xy-plane, so a single pulse can be characterized by the tuple $(\phi, \alpha, dt) \in [0,2\pi] \times [0, \alpha_\text{max}] \times [t_\text{min}, \inf)$. $\alpha_\text{max}$ and $t_\text{min}$ depend on the experimental limitations, but for this research the values $\alpha_\text{max} = 2\pi, t_\text{min} = 10^{-7}s$ were taken.
+The axis of rotation is assumed to lie in the xy-plane, so a single pulse can be characterized by the tuple $(\phi, \alpha, dt) \in [-\pi,\pi] \times [-\alpha_\text{max}, \alpha_\text{max}] \times [t_\text{min}, \inf)$.
+$\alpha_\text{max}$ and $t_\text{min}$ depend on the experimental limitations, but for this research the values $\alpha_\text{max} = 2\pi, t_\text{min} = 0$ were taken.
 The relevant \emph{state} of the spin system is the propagator $U(t)$. However, the number of elements increases exponentially with the number of spins, so storing and computing with propagators quickly becomes infeasible.
 Instead, the state is represented by the sequence of all previous actions performed. This contains the equivalent information stored in the propagator, and requires significantly less memory and computational power.
 
@@ -103,14 +104,15 @@ where $U_\text{target}$ is the propagator corresponding to $H_\text{target}$ ove
 For short time intervals, both propagators $U_\text{target}$ and $U_\text{exp}$ are close to the identity, which would make the fidelity close to $1$. The exponent $\tau/t$ makes rewards comparable across different duration pulses sequences, decreasing fidelity for pulse sequence durations $t<\tau$ and increasing fidelity for $t>\tau$.
 
 % network architecture
-Neural network function approximators are used for both the actor's policy function and the critic's action-value function. The state and action inputs to the neural networks are normalized according to the following maps
+Neural network function approximators are used for both the actor's policy function and the critic's action-value function. The state and action inputs to the neural networks are individually mapped to the interval $[-1,1]$.
 \begin{align}
-    \phi &\mapsto \phi / 2\pi \\
-    \alpha &\mapsto \alpha / 2\pi \\
-    t      &\mapsto \frac{\log(t + 10^{-7}) + 7}{2}
+    \phi \in [-\pi, \pi], \phi      &\mapsto \phi / \pi \\
+    \alpha \in [-2\pi,2\pi],\alpha  &\mapsto \alpha / 2\pi \\
+    t \in [0,5\cdot10^{-6}], t      &\mapsto
+        \frac{\log_{10}(t + 10^{-7}) + 7}{0.853785} - 1
 \end{align}
-These map each of the action parameters to the interval $[0,1]$, which improves the neural network performance. The actor's policy function is also restricted to the interval $[0,1]$.
-Because the state is represented by a sequence of actions, long short-term memory (LSTM) layers are used to process the state inputs\cite{lstm}. Fully connected layers with ReLU activation functions are used as hidden layers. See figure~\ref{fig:network-architecture} for a diagram of the network architectures.
+The actor's policy function is restricted to the values in the interval $[-1,1]$ via a tanh activation.
+Because the state is represented by a sequence of actions, long short-term memory (LSTM) layers are used to process the state inputs\cite{lstm}. Fully connected layers with tanh and elu activation functions for the actor and critic respectively are used as hidden layers. See figure~\ref{fig:network-architecture} for a diagram of the network architectures.
 
 \begin{figure}[ht]
     \centering
@@ -166,31 +168,22 @@ Because the state is represented by a sequence of actions, long short-term memor
     \label{fig:network-architecture}
 \end{figure}
 
+
+Preliminary results using ERL for pulse sequence design indicate worse performance than existing Hamiltonian engineering methods, but many modifications to the algorithm remain to be explored.
+The policy-gradient actor does not improve its performance over time, and the evolution-guided population of actors also does not improve (see figure~\ref{fig:results}). The lack of improvement in the population is understandable, because any change in policy is from random mutations to the neural network weights. The policy-gradient actor performs gradient ascent using the critic's $Q$ function, so it is likely that the critic is not effectively learning state-action values.
 % preliminary results
-Preliminary results using DDPG for pulse sequence design indicate worse performance than existing Hamiltonian engineering methods, but many modifications to the algorithm remain to be explored.
-The policy function converges to a single action, failing to learn any state dependence (see figure~\ref{fig:actions}).
-\begin{figure}
+\begin{figure}[ht]
     \centering
-    \begin{subfigure}{.48\textwidth}
-        \centering
-        \includegraphics[width=0.9\linewidth]{graphics/epscor/action_phi.png}
-        \caption{}
-    \end{subfigure}
-    \begin{subfigure}{.48\textwidth}
-        \centering
-        \includegraphics[width=0.9\linewidth]{graphics/epscor/action_rot.png}
-        \caption{}
-    \end{subfigure}
-    \begin{subfigure}{.48\textwidth}
-        \centering
-        \includegraphics[width=0.9\linewidth]{graphics/epscor/action_time.png}
-        \caption{}
-    \end{subfigure}
-    \caption{The actions chosen by the actor (blue) and the actions performed on the environment (black). Each action is a pulse with the axis of rotation specified by $\phi$ (a), $\alpha$ (b), and $dt$ (c). Random noise is added to the actions to explore the action space. Note that the time action is clipped at a non-zero value to prevent delta-function pulses from being implemented.}
-    \label{fig:actions}
+    \includegraphics[width=0.7\linewidth]{graphics/test_fit.png}
+    \caption{The fitnesses (i.e. the maximum reward in the episode) of the highest-fitness actor by generation.}
+    \label{fig:results}
 \end{figure}
 % compare to existing methods, NEXT STEPS
-This may be due to poor choice of hyperparameters (such as the learning rate or the number of observations from which to learn) or a network architecture that is ill-suited to the policy function. Further work is needed to explore both of these possibilities.
+The poor performance may be due to poor choice of hyperparameters (such as the learning rate or the number of observations from which to learn) or ineffective exploration of both state and action space.
+% TODO talk about null action as local minima already, small
+% deviations away from 0 are lower rewards
+% TODO also possibility of discrete actions/stochastic policy
+Further work is needed to explore both of these possibilities.
 
 \printbibliography
 
