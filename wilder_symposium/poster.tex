@@ -1,14 +1,12 @@
 %!TEX output_directory=output
 
-\documentclass[20pt,margin=1in,innermargin=-6in,blockverticalspace=-0.25in]{tikzposter}
-\geometry{paperwidth=48in,paperheight=36in}
+\documentclass[20pt,margin=1in,innermargin=-7in,blockverticalspace=-0in]{tikzposter}
+\geometry{paperwidth=48in,paperheight=35in}
 
 \usepackage{kaufman}
 \usepackage{dartmouth-theme}
 
-% TODO add bib resource
-% \addbibresource{kaufman.bib}
-\bibliography{../refs.bib}
+\addbibresource{../refs.bib}
 
 % set theme parameters
 \tikzposterlatexaffectionproofoff
@@ -28,7 +26,7 @@
     \column{0.33}
     
     \block{Hamiltonian engineering problem}{
-    The time evolution of a quantum system depends on the system's Hamiltonian. For a system with initial state $\rho(0)$ and Hamiltonian $H(t)$, the state at time $t$ is given by
+    The time evolution of a quantum system depends on the system's Hamiltonian, a self-adjoint operator whose eigenvalues correspond to possible energy measurements. For a system with initial density operator $\rho(0)$ and Hamiltonian $H(t)$, the state at time $t$ is given by
     \[
     \rho(t) = U(t)\rho(0)U^\dagger(t)
     \]
@@ -36,7 +34,11 @@
     \begin{equation}
         i\hbar \ddt{U(t)} = H(t) U(t), U(0) = \identity
     \end{equation}
-    Hamiltonian engineering seeks to control the system's evolution so that it appears to evolve under a target ``effective'' Hamiltonian ($H_\text{target}$) when measured stroboscopically. That is,
+    The total Hamiltonian $H(t)$ can generally be broken into a time-independent system Hamiltonian and a time-dependent control Hamiltonian
+    \begin{equation}
+        H(t) = H_\text{system} + H_\text{control}(t)
+    \end{equation}
+    Hamiltonian engineering seeks to design the time-dependent Hamiltonian $H_\text{control}(t)$ to control the system's evolution so that it appears to evolve under a target ``effective'' Hamiltonian ($H_\text{target}$) when measured stroboscopically. That is,
     \begin{equation}\label{eq:strob_measure}
         \rho(Nt_c) = U_\text{target}(Nt_c) \rho(0) U_\text{target}^\dagger(Nt_c)
     \end{equation}
@@ -44,19 +46,21 @@
     \begin{equation}\label{eq:ham_engineering}
         U(Nt_c) = U_\text{target}(Nt_c)
     \end{equation}
-    Equation~\ref{eq:ham_engineering} can be satisfied by introducing additional interactions to the system's Hamiltonian, which in turn will affect $U(t)$.
     } % end hamiltonian engineering problem block
     
     \block{Average Hamiltonian theory}{
-    Average Hamiltonian theory is one approach to solving the Hamiltonian engineering problem \cite{PhysRev.175.453}. For a system of spins in a magnetic field, the internal Hamiltonian contains a chemical shift term and a dipolar coupling term
+    Average Hamiltonian theory is one approach to solving the Hamiltonian engineering problem
+    \cite{PhysRev.175.453}
+    . For a system of spins in a magnetic field, the internal Hamiltonian contains a chemical shift term and a dipolar coupling term
     \begin{equation}\label{eq:ham_spin}
         H_\text{int} = \sum_i \delta_i I_z^{(i)} + \sum_{i,j} d_{ij} \left( 3I_z^{(i)}I_z^{(j)} - \mathbf{I^{(i)}} \cdot \mathbf{I^{(j)}} \right) = H_\text{CS} + H_\text{D}
     \end{equation}
     Applying a magnetic field pulse along the transverse axis performs a global rotation of the spins. The magnetic field pulses manifest themselves as a time-dependent interaction $H_\text{rf}(t)$.
-    If a pulse sequence with cycle time is both cyclic and periodic \cite{gerstein-dybowski}
+    If a pulse sequence with cycle time is both cyclic and periodic
+    \cite{gerstein-dybowski}
     \begin{align}\label{eq:AHT_conditions}
         U_\text{rf}(t_c) &= T\exp \left(
-            -i/\hbar \int_0^{t_c} H_\text{rf}(t) dt \right) = \pm 1
+            -i/\hbar \int_0^{t_c} H_\text{rf}(t) dt \right) = \pm \identity
             & \text{(cyclic)} \\
         H_\text{rf}(t) &= H_\text{rf}(t + Nt_c) & \text{(periodic)}
     \end{align}
@@ -70,25 +74,27 @@
     To engineer a target Hamiltonian $H_t$, the pulse sequence is chosen so that $\overline{H}^{(0)} = H_t$.
     
     Several pulse sequences have been developed using the average Hamiltonian theory framework \cite{PhysRevLett.20.180, PhysRevLett.119.183603, O_Keeffe_2019}.
-    For example, the WAHUHA 4-pulse sequence applied to a spin system with $H_\text{int}$ given in eq~\ref{eq:ham_spin} has the zeroth-order average Hamiltonian $\overline{H}^{(0)} = \frac{1}{3} \sum_i \delta_i (I_x^{(i)} + I_y^{(i)} + I_z^{(i)})$.
+    For example, the WAHUHA 4-pulse sequence applied to a spin system with $H_\text{int}$ given in eq~\ref{eq:ham_spin} has the zeroth-order average Hamiltonian $\overline{H}^{(0)} = \frac{1}{3} \sum_i \delta_i \left( I_x^{(i)} + I_y^{(i)} + I_z^{(i)} \right)$.
     
-    Average Hamiltonian theory assumes that higher-order terms in the Magnus Expansion (eq~\ref{eq:AHT_average}) are negligible. This is true in the regime where $t_c |H_\text{int}| \ll 1$, but $t_c$ is constrained by experimental limitations in the accuracy of pulse timings and strengths.
+    Average Hamiltonian theory assumes that higher-order terms in the Magnus Expansion (eq~\ref{eq:AHT_average}) are negligible. This is often true in the regime where $t_c |H_\text{int}| \ll 1$, but $t_c$ is constrained by experimental limitations in the accuracy of pulse timings and strengths.
     } % end AHT block
     
     \block{Reinforcement learning}{
     Reinforcement learning (RL) is being investigated as an alternative approach to Hamiltonian engineering for spin systems.
-    ``Reinforcement learning is learning what to do--how to map situations to actions--so as to maximize a numerical reward signal.''\cite{sutton2018reinforcement} RL has been applied to a variety of different problems, including playing games such as chess or Go\cite{Silver1140} and interacting with physical environments such as balancing a pole\cite{lillicrap2015continuous}.
-    
-    The RL paradigm involves an \emph{agent} that makes observations on the \emph{state} of the \emph{environment}, performs \emph{actions} on the environment, and receives \emph{rewards} based on its performance (see figure~\ref{fig:RL}).
+    ``Reinforcement learning is learning what to do--how to map situations to actions--so as to maximize a numerical reward signal'' \cite{sutton2018reinforcement}. RL has been applied to a variety of different problems, including playing games such as chess or Go \cite{Silver1140} and interacting with physical environments such as balancing a pole \cite{lillicrap2015continuous}.
     } % end rl block
     
     \column{0.33}
     
     \block{Reinforcement learning (cont.)}{
+    
+    The RL paradigm involves an \emph{agent} that makes observations on the \emph{state} of the \emph{environment}, performs \emph{actions} on the environment, and receives \emph{rewards} based on its performance (see figure~\ref{fig:RL}).
+    
     \begin{minipage}{\linewidth}
     \begin{figure}[H]
         \centering
-        \begin{tikzpicture}[->, thick]
+        \scalebox{1.5}{
+        \begin{tikzpicture}[->, very thick]
              %nodes
              \node[draw] at (-5,0) (agent) {Agent ($\mu: S \to A$)};
              \node[draw] at (5,0) (env) {Environment};
@@ -97,13 +103,14 @@
                  (env.south) edge[bend left=60] node[below] {State $s \in S$} (agent.south)
                  (env.west) edge node[below] {Reward $r$} (agent.east);
         \end{tikzpicture}
+        }
         \caption{The general reinforcement learning paradigm.}
         \label{fig:RL}
     \end{figure}
     \end{minipage}
-    The agent seek to learn a policy function $\mu:S\to A$ which maps a given state to the action that will lead to the largest rewards. In many RL algorithms, an action-value function $Q_\mu(s,a)$ is also learned. The action-value function gives the expected total rewards by performing action $a$ when in state $s$, then following $\mu$.
+    The agent learns a policy function $\mu:S\to A$ which maps a given state to the action that will lead to the largest rewards. In many RL algorithms, an action-value function $Q_\mu(s,a)$ is also learned. The action-value function gives the expected total rewards by performing action $a$ when in state $s$, then following $\mu$.
     
-    Several algorithms have been developed for various realizations of the RL problem. Techniques using deep learning have been applied to problems with continuous action spaces, such as driving a car or controlling a robotic arm in space \cite{lillicrap2015continuous}. Deep deterministic policy gradient (DDPG) uses neural networks to approximate the policy $\mu(s)$ and the action-value function $Q(s,a)$.
+    Several algorithms have been developed for various realizations of the RL problem. Deep deterministic policy gradient (DDPG) uses neural networks to approximate the policy $\mu(s|\theta_\mu)$ and the action-value function $Q(s,a|\theta_Q)$ for continuous action spaces \cite{lillicrap2015continuous}.
     % TODO include specifically how training works?
     Both $\mu$ and $Q$ are trained using gradient-based methods. $Q$ is optimized by minimizing the loss function
     \begin{equation}\label{eq:critic_loss}
@@ -122,7 +129,7 @@
     \end{equation}
     The gradients are estimated from a random subset of experiences $(s,a,r,s')$.
     
-    Although DDPG has been shown to work well on a variety of physical control problems, gradient-based methods are susceptible to converging to local minima. In \cite{khadka2018evolutionguided}, a hybrid algorithm called Evolutionary Reinforcement Learning (ERL) uses both DDPG and genetic algorithms to prevent premature convergence. In ERL, a population of policy functions are maintained, as well as gradient-based policy and action-value functions. Each of the policies are evaluated individually, and the gradient-based functions are optimized using all experiences. The policies in the population are then ranked by performance and selectively ``reproduced'' for the next generation. After a certain number of generations, the gradient-based policy is put into the population. A diagram of the algorithm is presented in figure~\ref{fig:ERL}.
+    In \cite{khadka2018evolutionguided}, a hybrid algorithm called Evolutionary Reinforcement Learning (ERL) uses both DDPG and genetic algorithms to prevent premature convergence to local optima and speed up learning. In ERL, a population of policy functions are maintained, as well as gradient-based policy and action-value functions. A diagram of the algorithm is presented in figure~\ref{fig:ERL}.
     \begin{minipage}{\linewidth}
     \begin{figure}[H]
         \centering
@@ -147,12 +154,11 @@
     \begin{equation}\label{eq:rewards}
         r = -\log\left( 1- \text{fidelity}(U_\text{target}, U_\text{exp})^{\tau/t} \right)
     \end{equation}
-    For short time intervals, both propagators $U_\text{target}$ and $U_\text{exp}$ are close to the identity, which would make the fidelity close to $1$. The exponent $\tau/t$ makes rewards comparable across different duration pulses sequences, decreasing fidelity for pulse sequence durations $t<\tau$ and increasing fidelity for $t>\tau$.
+    The exponent $\tau/t$ makes rewards comparable across different duration pulses sequences.
     
     The actions are magnetic field pulses that perform global rotations, and can therefore be parametrized by the axis of rotation, the rotation angle $\alpha$, and the time $dt$ over which the rotation is performed.
     The axis of rotation is assumed to lie in the xy-plane, so a single pulse can be characterized by the tuple $(\phi, \alpha, dt) \in [-\pi,\pi] \times [-\alpha_\text{max}, \alpha_\text{max}] \times [t_\text{min}, \inf)$.
-    $\alpha_\text{max}$ and $t_\text{min}$ depend on the experimental limitations, but for this work the values $\alpha_\text{max} = 2\pi, t_\text{min} = 0$ were taken.
-    The state is represented by the sequence of all previous actions performed, which contains the information necessary to create the propagator.
+    The state is represented by the sequence of all previous actions performed.
     The state and actions are represented by values in the interval $[-1,1]$ according to the following map
     \begin{align}
         \phi \in [-\pi, \pi], \phi      &\mapsto \phi / \pi \\
@@ -177,47 +183,7 @@
     } % end further work
     
     \block{References}{
-        % TODO include references
-        \begin{footnotesize}
-        \printbibliography[heading=none]
-        \end{footnotesize}
+    \printbibliography[heading=none]
     }
 \end{columns}
 \end{document}
-
-
-
-% \block{Hamiltonian learning problem}{
-%     asdfasdf
-%
-%     {\centering
-%     \begin{minipage}{0.8\linewidth}
-%         \begin{algorithm}[H]
-%         \caption{Algorithm thing.}
-%         \label{alg:ham_learn}
-%         \begin{algorithmic}[1]
-%         \STATE Draw a set of parameter vectors $\{\vec{x}_j\}_{j=1}^M$ (or ``particles'') from a prior probability distribution $\pi$, and initialize the particle weights $w_j = 1/M$.
-%         \FOR{$i = 1 \to N_\text{exp}$ experiments}
-%             \STATE Choose experiment $C_i$ to maximize the expected utility of the outcome, perform the experiment, and observe outcome $D_i$.
-%             \STATE Estimate the likelihood $P(D_i|\vec{x}_j)$ for $j=1\to M$ using interactive quantum likelihood estimation (IQLE), repeating the IQLE method a number of times to achieve desired precision in the likelihood.
-%             \STATE Following sequential Monte Carlo (SMC) methods, perform the Bayesian update on the particle weights. If the weights are too small, re-sample the particles from the parameter space.
-%         \ENDFOR
-%         \RETURN The particles and weights $(\vec{x_j}, w_j)_{j=1}^M$.
-%         \end{algorithmic}
-%         \end{algorithm}
-%     \end{minipage}
-%     \par
-%     }
-% }
-
-% \block{Interactive quantum likelihood estimation}{
-%     asdf
-%
-    % \begin{minipage}{\linewidth}
-    % \begin{figure}[H]
-    %     \centering
-    %     figure here...
-    % \end{figure}
-    % \end{minipage}
-%
-% }
