@@ -53,7 +53,40 @@ In NMR \cite{1976ii}\dots
 \begin{frame}
 \frametitle{Average Hamiltonian theory}
 
-TODO continue here...
+Average Hamiltonian theory is one approach to solving the Hamiltonian engineering problem
+\cite{PhysRev.175.453}.
+If a pulse sequence with cycle time is both cyclic and periodic
+\cite{gerstein-dybowski}
+\begin{align}\label{eq:AHT_conditions}
+    U_\text{rf}(t_c) &= T\exp \left(
+        -i/\hbar \int_0^{t_c} H_\text{rf}(t) dt \right) = \pm \identity
+        & \text{(cyclic)} \\
+    H_\text{rf}(t) &= H_\text{rf}(t + Nt_c) & \text{(periodic)}
+\end{align}
+then, using the Magnus Expansion, the propagator can be given by
+\begin{align}\label{eq:AHT_average}
+    U(t_c) &= \exp\left( \frac{-i}{\hbar} t_c (\overline{H}^{(0)} +
+        \overline{H}^{(1)} + \dots) \right) \\
+    \overline{H}^{(0)} &= 1/t_c \int_0^{t_c}
+        U_\text{rf}(t) H_\text{int} U_\text{rf}^\dagger(t) dt
+\end{align}
+To engineer a target Hamiltonian $H_t$, the pulse sequence is chosen so that $\overline{H}^{(0)} = H_t$.
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Average Hamiltonian theory: examples}
+
+\begin{tabular}{c c c}
+    Name & Pulse sequence (left to right) & $\overline{H}^{(0)}$ \\
+    \hline
+    WHH-4 \cite{PhysRevLett.20.180} &
+        $\tau, P_{-x}, \tau, P_y, \tau, \tau, P_{-y}, \tau, P_x, \tau$ &
+        $\frac{1}{3} \sum_i \delta_i \left( I_x^i + I_y^i + I_z^i \right)$ \\
+    MREV-8 \cite{mansfield1971symmetrized} &
+        $\tau, P_{-x}, \tau, P_y, \tau, \tau, P_{-y}, \tau, P_x, \tau, \tau, P_{x}, \tau, P_y, \tau, \tau, P_{-y}, \tau, P_{-x}, \tau$ &
+        $\frac{1}{3} \sum_i \delta_i \left( I_x^i + I_z^i \right)$ \\
+\end{tabular}
 
 \end{frame}
 
