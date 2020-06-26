@@ -11,6 +11,10 @@
 *.fls
 *.run.xml
 
+# Beamer files
+*.nav
+*.snm
+
 # graphics files
 graphics/*
 
