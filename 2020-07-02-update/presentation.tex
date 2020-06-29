@@ -78,24 +78,32 @@ then, using the Magnus Expansion, the propagator can be given by
 
 To engineer a target Hamiltonian $H_t$, the pulse sequence is chosen so that $\overline{H}^{(0)} = H_t$. Higher-order terms $\overline{H}^{(1)}, \overline{H}^{(2)}, \dots$ can also be considered (e.g. symmetrization).
 
-~
-
-\begin{tabularx}{\linewidth}{c c c}
+\begin{table}
+\centering
+\scalebox{.8}{
+\begin{tabular}{c c c}
     Name & Pulse sequence (left to right) & $\overline{H}^{(0)}$ \\
     \hline
     WHH-4 \cite{PhysRevLett.20.180} &
-        $\tau, P_{-x}, \tau, P_y, \tau, \tau, P_{-y}, \tau, P_x, \tau$ &
+        $\tau, \overline{X}, \tau, Y, 2\tau, \overline{Y}, \tau, X, \tau$ &
         $\frac{1}{3} \sum_i \delta_i \left( I_x^i + I_y^i + I_z^i \right)$ \\
-    MREV-8 \cite{mansfield1971symmetrized} &
-        $\tau, P_{-x}, \tau, P_y, \tau, \tau, P_{-y}, \tau, P_x, \tau$,
-        $\tau, P_{x}, \tau, P_y, \tau, \tau, P_{-y}, \tau, P_{-x}, \tau$ &
+    MREV-8 \cite{mansfield1971symmetrized} & \vtop{\hbox{\strut
+        $\tau, \overline{X}, \tau, Y, 2\tau, \overline{Y}, \tau, X, 2\tau,$
+        }\hbox{\strut
+        $X, \tau, Y, 2\tau, \overline{Y}, \tau, \overline{X}, \tau$
+        }} &
         $\frac{1}{3} \sum_i \delta_i \left( I_x^i + I_z^i \right)$ \\
-    HoRD-qubit-5 \cite{O_Keeffe_2019} &
-        $\tau, P_y, \tau, P_x^2, \tau, P_x P_y P_{-x}^2$,
-        $\tau, P_{-x} P_y P_{-x}, \tau, P_y P_x, \tau$ &
+    HoRD-qubit-5 \cite{O_Keeffe_2019} & \vtop{\hbox{\strut
+        $\tau, Y, \tau, X^2, \tau, X Y \overline{X}^2,$
+        }\hbox{\strut
+        $\tau, \overline{X} Y \overline{X}, \tau, Y X, \tau$
+        }} &
         $1/3 \sum_i I_z^i$ \\
     \hline
-\end{tabularx}
+\end{tabular}
+}
+\end{table}
+
 
 Pulse sequences for dipolar decoupling of spin-1 systems exist \cite{PhysRevLett.119.183603, O_Keeffe_2019}.
 
@@ -115,21 +123,43 @@ Pulse sequences for dipolar decoupling of spin-1 systems exist \cite{PhysRevLett
 
 \end{frame}
 
-\begin{frame}
-\frametitle{GRAPE}
+\begin{frame}[allowframebreaks]
+\frametitle{Gradient ascent pulse engineering (GRAPE)}
 
-% TODO include GRAPE here
+The control Hamiltonian is parametrized by amplitudes $u_k(t)$ so that
+\begin{equation}
+    H_\text{control}(t) = \sum_k u_k(t) H_k
+\end{equation}
+
+And a performance function $\Phi$ measures the overlap with a target operator
+\begin{align*}
+    \Phi_0 &= \Tr{C^\dagger \rho(t_\text{cyc})} &
+        \text{ (Hermitian operator transfer)} \\
+    \Phi_3 &= \Re \Tr{U_\text{target}^\dagger U(t_\text{cyc})} &
+        \text{ (unitary synthesis)}
+\end{align*}
+$\Phi$ is maximized by the following amplitude update rule
+\begin{equation}
+    u_k(j) \to u_k(j) + \epsilon \frac{\delta \Phi}{\delta u_k(j)}
+\end{equation}
+
+\begin{itemize}
+    \item Easily extended to range of parameters for robustness
+    \item Algorithm depends on initial random amplitudes, duration $t_\text{cyc}$, and discretization $N = \Delta t/t_\text{cyc}$
+    % \item Not well-suited for continuous-time problems
+    % TODO include above?
+\end{itemize}
 
 \end{frame}
-
-% TODO add benefits/limitations of GRAPE?
 
 \section{Reinforcement learning as alternative approach}
 
 \begin{frame}
 \frametitle{Reinforcement learning paradigm}
 
-% TODO intro section to RL, relate to MDP?
+\begin{quote}
+    Reinforcement learning is learning what to do--how to map situations to actions--so as to maximize a numerical reward signal. \cite{sutton2018reinforcement}
+\end{quote}
 
 \begin{figure}
     \centering
@@ -139,14 +169,18 @@ Pulse sequences for dipolar decoupling of spin-1 systems exist \cite{PhysRevLett
          \node[draw] at (-5,0) (agent) {Agent ($\pi: S \to \mathcal{P}(A)$)};
          \node[draw] at (5,0) (env) {Environment};
          \path
-             (agent.north) edge[bend left=60] node[above] {Action $a \in A$} (env.north)
-             (env.south) edge[bend left=60] node[below] {State $s \in S$} (agent.south)
+             (agent.north) edge[bend left=30] node[above] {Action $a \in A$} (env.north)
+             (env.south) edge[bend left=30] node[below] {State $s \in S$} (agent.south)
              (env.west) edge node[below] {Reward $r$} (agent.east);
     \end{tikzpicture}
     }
     %\caption{The general reinforcement learning paradigm.}
     \label{fig:RL}
 \end{figure}
+
+Different from supervised learning, where labeled data trains a model.
+
+% \emph{Many} variations of reinforcement learning algorithms.
 
 \end{frame}
 
@@ -164,7 +198,7 @@ Pulse sequences for dipolar decoupling of spin-1 systems exist \cite{PhysRevLett
     \item Stochastic policy $\pi: S \to \mathcal{P}(A)$:
         maps from states to probability distributions over actions (also written $\pi(a|s)$)
     \item State value $V^\pi:S \to \R$: expected return from state following policy $\pi$
-    \item State-action value $Q^\pi: S \times A \to \R$: expected return from state and performing action, then following policy $\pi$
+    % \item State-action value $Q^\pi: S \times A \to \R$: expected return from state and performing action, then following policy $\pi$
 \end{itemize}
 
 \end{frame}
@@ -181,43 +215,101 @@ A ``critic'' learns the value function $V^\pi_\phi$, and an ``actor'' learns the
 \end{align}
 
 $\hat{R}_i - V^\pi_\phi(s_i)$ is called the \emph{advantage} $A_i$.
-% TODO include Bellman equation?
 
 \pause
 
-Gradient-based methods are susceptible to local minima.
+\begin{itemize}
+    \item Can be trained ``online'' (one experience at a time) or ``offline'' using replay buffer
+    \item Susceptible to local minima
+\end{itemize}
 
 \end{frame}
 
 \begin{frame}
 \frametitle{Evolutionary reinforcement learning}
 
-% TODO diagram
+Hybrid algorithm that uses both policy gradient (PG) and evolutionary algorithms (EA).
+
+\begin{figure}
+    \centering
+    \includegraphics[height=0.6\textheight]{ERL.png}
+    \caption{Reproduced from \cite{khadka2018evolutionguided}.}
+    \label{fig:ERL}
+\end{figure}
+\cite{khadka2018evolutionguided}
+
+\begin{itemize}
+    \item Information flows between EA and PG components
+    \item Diverse exploration of action space
+\end{itemize}
 
 \end{frame}
 
 \begin{frame}
 \frametitle{Applying RL to Hamiltonian engineering}
 
-% TODO make a table?
-%How things relate
+\begin{table}
+\label{tab:rl_ham}
+\scalebox{.9}{
+\begin{tabular}{c c c}
+    RL concept & Hamiltonian engineering & Code representation \\
+    \hline
+    Action & Unitary operator & Indicator vector \\
+    State & Propagator $U(t)$ & Sequence of action vector \\
+    Reward & Unitary operator fidelity &
+        $r = -\log \left( 1 - \Re{
+            \frac{\Tr{U_\text{target}^\dagger U(t)}}{\Tr{\identity}}
+        } \right)$ \\
+\end{tabular}
+}
+\end{table}
+
+% TODO include example of what it looks like...
 
 \end{frame}
 
 \section{Results}
 
-\begin{frame}
+\begin{frame}[allowframebreaks]
 \frametitle{Hyperparameter search and algorithm performance}
-% TODO
-\end{frame}
 
-\begin{frame}
-\frametitle{Hyperparameter search and algorithm performance (cont.)}
-% TODO
+Many hyperparameters to tune for ERL model
+\begin{itemize}
+    \item Learning rates (actor and critic)
+    \item Neural network architecture (RNN layer type, depth, width, activation functions)
+    \item Gradient update frequency (online learning or experience replay)
+    \item \dots
+\end{itemize}
+
+Hyperparameter combinations so far haven't led to consistent policy convergence.
+\begin{figure}
+    \centering
+    \includegraphics[width=.9\textwidth]{2020-06-23/popFitnesses-002.png}
+    \label{fig:popFitnesses}
+\end{figure}
+
+% TODO continue here...
+
 \end{frame}
 
 \begin{frame}
 \frametitle{Candidate pulse sequences}
+
+Although ERL algorithm hasn't consistently converged to good policies, several candidate pulse sequences have been identified.
+
+\begin{table}
+    \label{tab:candidates}
+    \begin{tabular}{c c}
+        Number & Pulse sequence (left to right) \\
+        \hline
+        % note that there was another pulse sequence that
+        % turned out to be bad, so 2,3,4 were renumbered as 1,2,3
+        1 & $\tau, \overline{X}, Y, \tau, \overline{X}, \tau, \overline{Y}, \overline{X}^2$ \\
+        2 & $\overline{X}, \tau, \overline{X}, \tau, \overline{Y}, X$ \\
+        3 & $X, \overline{Y}, \overline{X}, \tau, X, \overline{Y}^2, \tau, $
+            $Y, \tau, \overline{X}, Y^2, X^2$ \\
+    \end{tabular}
+\end{table}
 
 % TODO
 % general evaluation strategy (compare to WHH-4, MREV-8)
@@ -228,22 +320,64 @@ Gradient-based methods are susceptible to local minima.
 \end{frame}
 
 \begin{frame}
-\frametitle{Candidate pulse sequences (cont.)}
-% TODO
+\frametitle{Candidate 1 pulse sequence performance}
+
+\begin{figure}
+    \centering
+    \includegraphics[height=.8\textheight]{2020-06-23/reward_hist-2.pdf}
+    \label{fig:candidate_1}
+\end{figure}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Candidate 2 pulse sequence performance}
+
+\begin{figure}
+    \centering
+    \includegraphics[height=.8\textheight]{2020-06-23/reward_hist-3.pdf}
+    \label{fig:candidate_2}
+\end{figure}
+
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Candidate 3 pulse sequence performance}
+
+\begin{figure}
+    \centering
+    \includegraphics[height=.8\textheight]{2020-06-23/reward_hist_N4_coupling1e4.pdf}
+    \label{fig:candidate_3}
+\end{figure}
+
 \end{frame}
 
 \section{Next steps}
 
 \begin{frame}
 \frametitle{Improvements to RL algorithm}
-% TODO
-% convergence, speed, robustness, efficiency
-% change setup to GRAPE-like tests (likely won't be as effective)
+
+\begin{itemize}
+    \item Convergence to optimal policy
+    \item Robustness against errors
+    \item Algorithm efficiency
+    \item Variety of target Hamiltonians
+    \item Explore GRAPE-like implementation
+    \pause
+    \item Change algorithm to include MCTS (similar to AlphaZero)
+\end{itemize}
+
 \end{frame}
 
 \begin{frame}
 \frametitle{Experimental verification of candidate pulse sequences}
-% TODO
+
+\begin{itemize}
+    \item Measures of performance in experiments
+    \item % TODO more here???
+\end{itemize}
+
 \end{frame}
 
 \begin{frame}[allowframebreaks]
