@@ -59,52 +59,70 @@ If a pulse sequence with cycle time is both cyclic and periodic
 \cite{gerstein-dybowski}
 \begin{align}\label{eq:AHT_conditions}
     U_\text{rf}(t_c) &= T\exp \left(
-        -i/\hbar \int_0^{t_c} H_\text{rf}(t) dt \right) = \pm \identity
+        -i \int_0^{t_c} H_\text{rf}(t) dt \right) = \pm \identity
         & \text{(cyclic)} \\
     H_\text{rf}(t) &= H_\text{rf}(t + Nt_c) & \text{(periodic)}
 \end{align}
 then, using the Magnus Expansion, the propagator can be given by
 \begin{align}\label{eq:AHT_average}
-    U(t_c) &= \exp\left( \frac{-i}{\hbar} t_c (\overline{H}^{(0)} +
+    U(t_c) &= \exp\left( -i t_c (\overline{H}^{(0)} +
         \overline{H}^{(1)} + \dots) \right) \\
     \overline{H}^{(0)} &= 1/t_c \int_0^{t_c}
         U_\text{rf}(t) H_\text{int} U_\text{rf}^\dagger(t) dt
 \end{align}
-To engineer a target Hamiltonian $H_t$, the pulse sequence is chosen so that $\overline{H}^{(0)} = H_t$.
 
 \end{frame}
 
 \begin{frame}
 \frametitle{Average Hamiltonian theory: examples}
 
-\begin{tabular}{c c c}
+To engineer a target Hamiltonian $H_t$, the pulse sequence is chosen so that $\overline{H}^{(0)} = H_t$. Higher-order terms $\overline{H}^{(1)}, \overline{H}^{(2)}, \dots$ can also be considered (e.g. symmetrization).
+
+~
+
+\begin{tabularx}{\linewidth}{c c c}
     Name & Pulse sequence (left to right) & $\overline{H}^{(0)}$ \\
     \hline
     WHH-4 \cite{PhysRevLett.20.180} &
         $\tau, P_{-x}, \tau, P_y, \tau, \tau, P_{-y}, \tau, P_x, \tau$ &
         $\frac{1}{3} \sum_i \delta_i \left( I_x^i + I_y^i + I_z^i \right)$ \\
     MREV-8 \cite{mansfield1971symmetrized} &
-        $\tau, P_{-x}, \tau, P_y, \tau, \tau, P_{-y}, \tau, P_x, \tau, \tau, P_{x}, \tau, P_y, \tau, \tau, P_{-y}, \tau, P_{-x}, \tau$ &
+        $\tau, P_{-x}, \tau, P_y, \tau, \tau, P_{-y}, \tau, P_x, \tau$,
+        $\tau, P_{x}, \tau, P_y, \tau, \tau, P_{-y}, \tau, P_{-x}, \tau$ &
         $\frac{1}{3} \sum_i \delta_i \left( I_x^i + I_z^i \right)$ \\
-\end{tabular}
+    HoRD-qubit-5 \cite{O_Keeffe_2019} &
+        $\tau, P_y, \tau, P_x^2, \tau, P_x P_y P_{-x}^2$,
+        $\tau, P_{-x} P_y P_{-x}, \tau, P_y P_x, \tau$ &
+        $1/3 \sum_i I_z^i$ \\
+    \hline
+\end{tabularx}
+
+Pulse sequences for dipolar decoupling of spin-1 systems exist \cite{PhysRevLett.119.183603, O_Keeffe_2019}.
 
 \end{frame}
 
 \begin{frame}
 \frametitle{Average Hamiltonian theory: benefits and limitations}
 
-
+\begin{itemize}
+    \item Analytically tractable
+    \item Account for finite-width pulses
+    \item Can characterize terms in average Hamiltonian
+    \pause
+    \item Only tractable for lowest-order terms
+    \item Enforced structure on pulse sequences
+\end{itemize}
 
 \end{frame}
 
 \begin{frame}
 \frametitle{GRAPE}
 
-Text
+% TODO include GRAPE here
 
 \end{frame}
 
-% TODO add benefits/limitations of?
+% TODO add benefits/limitations of GRAPE?
 
 \section{Reinforcement learning as alternative approach}
 
@@ -118,7 +136,7 @@ Text
     \scalebox{.5}{
     \begin{tikzpicture}[->, very thick]
          %nodes
-         \node[draw] at (-5,0) (agent) {Agent ($\mu: S \to A$)};
+         \node[draw] at (-5,0) (agent) {Agent ($\pi: S \to \mathcal{P}(A)$)};
          \node[draw] at (5,0) (env) {Environment};
          \path
              (agent.north) edge[bend left=60] node[above] {Action $a \in A$} (env.north)
@@ -135,14 +153,39 @@ Text
 \begin{frame}
 \frametitle{RL Definitions}
 
-% TODO define S, A, pi, V or Q
+\begin{itemize}
+    \item State space $S$; all possible states of the environment
+    \item Action space $A$: all possible actions that can be performed
+    \item Total return $R_t$: sum of all rewards from time $t$ to end of episode (length $T$)
+    \begin{equation}\label{eq:return}
+        R_t = \sum_{k=t}^T r_k
+    \end{equation}
+    \pause
+    \item Stochastic policy $\pi: S \to \mathcal{P}(A)$:
+        maps from states to probability distributions over actions (also written $\pi(a|s)$)
+    \item State value $V^\pi:S \to \R$: expected return from state following policy $\pi$
+    \item State-action value $Q^\pi: S \times A \to \R$: expected return from state and performing action, then following policy $\pi$
+\end{itemize}
 
 \end{frame}
 
 \begin{frame}
 \frametitle{Actor-critic methods}
 
-% TODO include Bellman equation, gradient update rules
+A ``critic'' learns the value function $V^\pi_\phi$, and an ``actor'' learns the policy function $\pi_\theta$ \cite{sutton2018reinforcement}.
+
+\begin{align}\label{eq:loss_fns}
+    L(\phi) &= \sum_i (\hat{R}_i - V^\pi_\phi(s_i))^2 \\
+    L(\theta) &= -\sum_i (\hat{R}_i - V^\pi_\phi(s_i))
+        \ln \pi_\theta(a_i|s_i)
+\end{align}
+
+$\hat{R}_i - V^\pi_\phi(s_i)$ is called the \emph{advantage} $A_i$.
+% TODO include Bellman equation?
+
+\pause
+
+Gradient-based methods are susceptible to local minima.
 
 \end{frame}
 
@@ -203,7 +246,7 @@ Text
 % TODO
 \end{frame}
 
-\begin{frame}
+\begin{frame}[allowframebreaks]
 \frametitle{Bibliography}
 
 \printbibliography
