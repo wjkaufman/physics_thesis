@@ -94,11 +94,11 @@ To engineer a target Hamiltonian $H_t$, the pulse sequence is chosen so that $\o
         }} &
         $\frac{1}{3} \sum_i \delta_i \left( I_x^i + I_z^i \right)$ \\
     HoRD-qubit-5 \cite{O_Keeffe_2019} & \vtop{\hbox{\strut
-        $\tau, Y, \tau, X^2, \tau, X Y \overline{X}^2,$
+        $\tau, Y, \tau, X^2, \tau, \overline{X}^2 Y X,$
         }\hbox{\strut
-        $\tau, \overline{X} Y \overline{X}, \tau, Y X, \tau$
+        $\tau, \overline{X} Y \overline{X}, \tau, X Y, \tau$
         }} &
-        $1/3 \sum_i I_z^i$ \\
+        $1/3 \sum_i \delta_i I_z^i$ \\
     \hline
 \end{tabular}
 }
@@ -112,18 +112,27 @@ Pulse sequences for dipolar decoupling of spin-1 systems exist \cite{PhysRevLett
 \begin{frame}
 \frametitle{Average Hamiltonian theory: benefits and limitations}
 
+\begin{figure}
+    \centering
+    \includegraphics[width=.7\textwidth]{HoRD-qubit-5.png}
+    \caption{HoRD-qubit-5, reproduced from \cite{O_Keeffe_2019}.}
+    \label{fig:HoRD_qubit_5}
+\end{figure}
+
 \begin{itemize}
     \item Analytically tractable
     \item Account for finite-width pulses
     \item Can characterize terms in average Hamiltonian
     \pause
+    \color{red}{
     \item Only tractable for lowest-order terms
     \item Enforced structure on pulse sequences
+    }
 \end{itemize}
 
 \end{frame}
 
-\begin{frame}[allowframebreaks]
+\begin{frame}
 \frametitle{Gradient ascent pulse engineering (GRAPE)}
 
 The control Hamiltonian is parametrized by amplitudes $u_k(t)$ so that
@@ -143,13 +152,17 @@ $\Phi$ is maximized by the following amplitude update rule
     u_k(j) \to u_k(j) + \epsilon \frac{\delta \Phi}{\delta u_k(j)}
 \end{equation}
 
+\end{frame}
+
+\begin{frame}
+\frametitle{GRAPE: benefits and limitations}
+
 \begin{itemize}
     \item Easily extended to range of parameters for robustness
-    \item Algorithm depends on initial random amplitudes, duration $t_\text{cyc}$, and discretization $N = \Delta t/t_\text{cyc}$
+    \item Algorithm depends on initial random amplitudes and duration $t_\text{cyc}$
     % \item Not well-suited for continuous-time problems
     % TODO include above?
 \end{itemize}
-
 \end{frame}
 
 \section{Reinforcement learning as alternative approach}
@@ -188,11 +201,11 @@ Different from supervised learning, where labeled data trains a model.
 \frametitle{RL Definitions}
 
 \begin{itemize}
-    \item State space $S$; all possible states of the environment
+    \item State space $S$: all possible states of the environment
     \item Action space $A$: all possible actions that can be performed
-    \item Total return $R_t$: sum of all rewards from time $t$ to end of episode (length $T$)
+    \item Total return $R_t$: sum of all discounted rewards from time $t$ to end of episode (length $T$)
     \begin{equation}\label{eq:return}
-        R_t = \sum_{k=t}^T r_k
+        R_t = \sum_{k=t}^T \gamma^{k-t} r_k, \gamma \in [0,1)
     \end{equation}
     \pause
     \item Stochastic policy $\pi: S \to \mathcal{P}(A)$:
@@ -211,7 +224,7 @@ A ``critic'' learns the value function $V^\pi_\phi$, and an ``actor'' learns the
 \begin{align}\label{eq:loss_fns}
     L(\phi) &= \sum_i (\hat{R}_i - V^\pi_\phi(s_i))^2 \\
     L(\theta) &= -\sum_i (\hat{R}_i - V^\pi_\phi(s_i))
-        \ln \pi_\theta(a_i|s_i)
+        \log \pi_\theta(a_i|s_i)
 \end{align}
 
 $\hat{R}_i - V^\pi_\phi(s_i)$ is called the \emph{advantage} $A_i$.
@@ -255,7 +268,7 @@ Hybrid algorithm that uses both policy gradient (PG) and evolutionary algorithms
     RL concept & Hamiltonian engineering & Code representation \\
     \hline
     Action & Unitary operator & Indicator vector \\
-    State & Propagator $U(t)$ & Sequence of action vector \\
+    State & Propagator $U(t)$ & Sequence of action vectors \\
     Reward & Unitary operator fidelity &
         $r = -\log \left( 1 - \Re{
             \frac{\Tr{U_\text{target}^\dagger U(t)}}{\Tr{\identity}}
@@ -271,9 +284,9 @@ Hybrid algorithm that uses both policy gradient (PG) and evolutionary algorithms
 \section{Results}
 
 \begin{frame}[allowframebreaks]
-\frametitle{Hyperparameter search and algorithm performance}
+\frametitle{Hyperparameter search}
 
-Many hyperparameters to tune for ERL model
+Many hyperparameters to tune for ERL algorithm
 \begin{itemize}
     \item Learning rates (actor and critic)
     \item Neural network architecture (RNN layer type, depth, width, activation functions)
@@ -281,14 +294,19 @@ Many hyperparameters to tune for ERL model
     \item \dots
 \end{itemize}
 
+% TODO continue here...
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Algorithm performance}
+
 Hyperparameter combinations so far haven't led to consistent policy convergence.
 \begin{figure}
     \centering
     \includegraphics[width=.9\textwidth]{2020-06-23/popFitnesses-002.png}
     \label{fig:popFitnesses}
 \end{figure}
-
-% TODO continue here...
 
 \end{frame}
 
@@ -324,7 +342,7 @@ Although ERL algorithm hasn't consistently converged to good policies, several c
 
 \begin{figure}
     \centering
-    \includegraphics[height=.8\textheight]{2020-06-23/reward_hist-2.pdf}
+    \includegraphics[height=.8\textheight]{2020-06-23/reward_hist_1.pdf}
     \label{fig:candidate_1}
 \end{figure}
 
@@ -335,7 +353,7 @@ Although ERL algorithm hasn't consistently converged to good policies, several c
 
 \begin{figure}
     \centering
-    \includegraphics[height=.8\textheight]{2020-06-23/reward_hist-3.pdf}
+    \includegraphics[height=.8\textheight]{2020-06-23/reward_hist_2.pdf}
     \label{fig:candidate_2}
 \end{figure}
 
@@ -347,7 +365,7 @@ Although ERL algorithm hasn't consistently converged to good policies, several c
 
 \begin{figure}
     \centering
-    \includegraphics[height=.8\textheight]{2020-06-23/reward_hist_N4_coupling1e4.pdf}
+    \includegraphics[height=.8\textheight]{2020-06-23/reward_hist_3.pdf}
     \label{fig:candidate_3}
 \end{figure}
 
@@ -356,26 +374,25 @@ Although ERL algorithm hasn't consistently converged to good policies, several c
 \section{Next steps}
 
 \begin{frame}
-\frametitle{Improvements to RL algorithm}
+\frametitle{Next steps}
+
+Improvements to RL algorithm
 
 \begin{itemize}
     \item Convergence to optimal policy
     \item Robustness against errors
-    \item Algorithm efficiency
+    % \item Algorithm efficiency
     \item Variety of target Hamiltonians
-    \item Explore GRAPE-like implementation
-    \pause
-    \item Change algorithm to include MCTS (similar to AlphaZero)
+    \item Explore GRAPE-like implementation (continuous action spaces)
 \end{itemize}
 
-\end{frame}
+\pause
 
-\begin{frame}
-\frametitle{Experimental verification of candidate pulse sequences}
+Experimental verification of candidate pulse sequences
 
 \begin{itemize}
-    \item Measures of performance in experiments
-    \item % TODO more here???
+    \item Measures of performance in experiments (randomized benchmarking?)
+    % \item TODO more here???
 \end{itemize}
 
 \end{frame}
