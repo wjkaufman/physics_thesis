@@ -17,6 +17,7 @@
 
 # graphics files
 graphics/*
+*.png
 
 # MATLAB files
 *.mat
