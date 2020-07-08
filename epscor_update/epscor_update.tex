@@ -19,47 +19,55 @@
 % problem statement: Hamiltonian engineering
 The time evolution of a quantum system depends on the system's Hamiltonian. For a system with initial state $\ket{\psi(0)}$ and Hamiltonian $H(t)$, the state at time $t$ is given by
 \[
-\ket{\psi(t)} = U(t)\ket{\psi(0)}
+\rho(t) = U(t)\rho(0)U^\dagger(t)
 \]
 where the propagator $U(t)$ maps from initial states ($t=0$) to states at time $t$. The propagator is defined by
 \begin{equation}
     i\hbar \ddt{U(t)} = H(t) U(t), U(0) = \identity
 \end{equation}
-Hamiltonian engineering seeks to control the system's evolution so that it appears to evolve under a target ``effective'' Hamiltonian. The set of control operations depends on the specific quantum system, but generally manifest themselves as additional terms in the Hamiltonian. As an explicit example, in nuclear magnetic resonance (NMR), the total internal Hamiltonian is given by
-\begin{equation}\label{eq:Hint}
-    H = \sum_i \delta_i I_z^{(i)} + \sum_{i,j} d_{ij} \left( 3I_z^{(i)}I_z^{(j)} - \mathbf{I^{(i)}} \cdot \mathbf{I^{(j)}} \right) = H_\text{CS} + H_\text{D}
+The total Hamiltonian can be broken into a time-independent system Hamiltonian and a time-dependent control Hamiltonian.
+\begin{equation}
+    H(t) = H_\text{system} + H_\text{control}(t)
 \end{equation}
+Hamiltonian engineering seeks to design the time-dependent Hamiltonian $H_\text{control}(t)$ to control the system's evolution so that it appears to evolve under a target ``effective'' Hamiltonian ($H_\text{target}$) when measured stroboscopically. That is,
+\begin{equation}\label{eq:strob_measure}
+    \rho(Nt_c) = U_\text{target}(Nt_c) \rho(0) U_\text{target}^\dagger(Nt_c)
+\end{equation}
+where $U_\text{target}$ is the propagator determined by $H_\text{target}$, $t_c$ is the cycle time, and $N \in \N$.
+
+As an example, in nuclear magnetic resonance (NMR), the system and control Hamiltonians are given by
+\begin{align}\label{eq:ham_spin}
+    H_\text{system} &= \sum_i \delta_i I_z^i + \sum_{i,j} d_{ij} \left( 3I_z^iI_z^j - \mathbf{I^i} \cdot \mathbf{I^j} \right)
+    = H_\text{CS} + H_\text{D} \\
+    H_\text{control}(t) &= -B_1(t) \sum_i \gamma_n^i I_x^i
+\end{align}
 where $H_\text{CS}$ denotes the chemical shift Hamiltonian and $H_\text{D}$ denotes the dipolar Hamiltonian.
-The control operations for NMR are external magnetic fields applied, typically perpendicular to the static field, which can be used to rotate the nuclear spins.
-To obtain a clearer signal from which the chemical shifts $\delta_i$ can be measured, the effective Hamiltonian should contain the chemical shift interaction (possibly scaled by some non-zero value $\beta$) and should not contain the dipolar interactions.
-\[
-H_\text{eff} = \beta H_\text{CS}
-\]
-% TODO explain more math here to relate Heff and H+Hrf(t)?
+The control operations for NMR are external magnetic fields applied, typically perpendicular to the static field.
+Common engineered Hamiltonians for NMR decouple the dipolar interactions, so that only the chemical shift term remains. This allows the chemical shifts $\delta_i$ to be measured, or to perofrm magnetometry experiments.
 
 % existing methods: AHT, WAHUHA, Choi/O'Keefe
 There have been several different approaches to the Hamiltonian engineering problem.
 % AHT, WHH, choi/O'Keefe
-Average Hamiltonian theory\cite{PhysRev.175.453} presents a mathematical framework to approximate the average effective Hamiltonian for a cyclic and periodic sequence of pulses (control operations) applied to the system.
+Average Hamiltonian theory \cite{PhysRev.175.453} presents a mathematical framework to approximate the average effective Hamiltonian for a cyclic and periodic sequence of pulses (control operations) applied to the system.
 % TODO include a brief walk-through below?
 %Given a set of pulses $\{P_k\}_{k=1}^n$, where each $P_k$ is a unitary operator representing the action on the quantum system,
 % explain cyclic, periodic
-This framework was used to identify the WAHUHA 4-pulse sequence\cite{PhysRevLett.20.180} that average the dipolar interactions to zero for NMR spectroscopy. More recently, constrained optimization techniques have been combined with average Hamiltonian theory to develop pulse sequences to decouple spin-1 dipolar interactions\cite{PhysRevLett.119.183603} and for magnetometry in spin ensembles\cite{O_Keeffe_2019}.
+This framework was used to identify the WAHUHA 4-pulse sequence \cite{PhysRevLett.20.180} that average the dipolar interactions to zero for NMR spectroscopy. More recently, constrained optimization techniques have been combined with average Hamiltonian theory to develop pulse sequences to decouple spin-1 dipolar interactions \cite{PhysRevLett.119.183603} and for magnetometry in spin ensembles \cite{O_Keeffe_2019}.
 % limitations of AHT
 Although this approach provides geometric intuition for spin-1/2 systems and simplifies the Hamiltonian engineering problem significantly, there are several limitations. First, the average Hamiltonian is approximated to leading order, and higher-order terms are assumed to vanish in the regime where the pulse sequence length $t_\text{cyc}$ is much smaller than the timescale of the Hamiltonian. Second, the pulses are assumed to be applied instantaneously (called ``delta-function pulses'') so the system evolves under the pulses and the internal Hamiltonian separately.
 % Other assumption with perfect pulses/timings?
 In experimental settings, there are physical constraints on the pulse width (depending on the applied magnetic field strength) and on $t_\text{cyc}$ which may violate the assumptions outlined above.
 
 % my approach: RL, diagram
-As part of the EPSCoR project, reinforcement learning (RL) is being investigated as an alternative approach to Hamiltonian engineering, specifically focusing on spin-1/2 systems.
-``Reinforcement learning is learning what to do--how to map situations to actions--so as to maximize a numerical reward signal.''\cite{sutton2018reinforcement} RL has been applied to a variety of different problems, including playing games such as chess or Go\cite{Silver1140} and interacting with physical environments such as balancing a pole\cite{lillicrap2015continuous}. In the case of Hamiltonian engineering, the situations correspond to the propagators of the system at different times, the actions correspond to pulses or delays, and the reward signal quantifies the degree to which the system has evolved under the target effective Hamiltonian.
+As part of the EPSCoR project, reinforcement learning (RL) is being investigated as an alternative approach to Hamiltonian engineering.
+``Reinforcement learning is learning what to do--how to map situations to actions--so as to maximize a numerical reward signal.'' \cite{sutton2018reinforcement} RL has been applied to a variety of different problems, including playing games such as chess or Go \cite{Silver1140} and interacting with physical environments such as balancing a pole \cite{lillicrap2015continuous}. In the case of Hamiltonian engineering, the ``situations'' correspond to the propagators of the system at different times, the ``actions'' correspond to pulses or delays, and the ``reward signal'' quantifies the overlap of the actual propagator with the propagator determined by the target effective Hamiltonian.
 RL algorithms seek to learn a policy function $\pi$ that maps states to actions that will lead to the largest rewards. See figure~\ref{fig:RL} for a diagram outlining the general components of RL.
 
 \begin{figure}[ht]
     \centering
     \begin{tikzpicture}[->, thick]
          %nodes
-         \node[draw] at (-3,0) (agent) {Agent ($\pi: S \to A$)};
+         \node[draw] at (-3,0) (agent) {Agent ($\pi: S \to \mathcal{P}(A)$)};
          \node[draw] at (3,0) (env) {Environment};
          \path
              (agent.north) edge[bend left=60] node[above] {Action $a \in A$} (env.north)
@@ -75,45 +83,55 @@ RL algorithms seek to learn a policy function $\pi$ that maps states to actions 
 % fewer assumptions than AHT, could be more precise/better performance
 % just specify target Hamiltonian and let algorithm learn
 % specify experimental constraints
-There are both potential benefits and drawbacks to using RL for Hamiltonian engineering. Approaches with average Hamiltonian theory require that pulse sequences be periodic and cyclic, approximate the propagator by using the lowest-order average Hamiltonian, and occasionally assume delta-function pulses. RL techniques would overcome these constraints and assumptions by calculating the propagator of a simulated quantum system numerically. This allows for non-periodic or acyclic pulse sequences to be considered, and accounts for finite pulse widths.
+There are both potential benefits and drawbacks to using RL for Hamiltonian engineering. Approaches with average Hamiltonian theory require that pulse sequences be periodic and cyclic, approximate the propagator by using the lowest-order average Hamiltonian. RL techniques would overcome these constraints and assumptions by calculating the propagator of a simulated quantum system numerically. This allows for a broader variety of pulse sequence structures to be considered, and accounts for finite pulse widths and timing or phase errors in the numerical simulations.
 This may lead to novel pulse sequences that are more robust in experimental settings, where laboratory constraints (such as limited magnetic field strength or pulse timing) prevent the execution of ideal pulse sequences.
 However, because RL techniques rely on simulated quantum systems to learn how to construct pulse sequences, there may be a discrepancy between performance on a small number of spins ($N=4$ spins in current simulation experiments) and performance in a laboratory setting with $\sim10^{23}$ spins. Furthermore, the typical issues associated with machine learning--lack of interpretability of results, no guarantees of convergence--are also associated with RL.
 
 \section{Methods}
 
-Several RL algorithms exist, each with different approaches depending on the nature of the state space $\mathcal{S}$ or action space $\mathcal{A}$. For Hamiltonian engineering, the action space is continuous: for each pulse, the axis of rotation, the field strength, and the duration can vary continuously (previous approaches to Hamiltonian engineering consider only a discrete set of actions for analytical tractability and to reduce to number of candidate pulse sequences). As a result, the deep deterministic policy gradient (DDPG) algorithm\cite{lillicrap2015continuous} was considered, but the hybrid algorithm Evolutionary Reinforcement Learning (ERL) \cite{khadka2018evolutionguided} was ultimately chosen.
-DDPG is an actor-critic method, where the actor learns the deterministic policy $\pi: \mathcal{S} \to \mathcal{A}$ and the critic learns the action-value function $Q: \mathcal{S} \times \mathcal{A} \to \R$. The value $Q(s,a)$ returns the total expected future rewards by performing action $a$ while in state $s$. Neural network function approximators are used for both the policy $\pi$ and the action-value function $Q$. ERL implements DDPG alongside genetic algorithms to prevent premature convergence of the neural networks to local minima.
+Several RL algorithms exist, each with different approaches depending on the nature of the state space $S$ or action space $A$. For Hamiltonian engineering, the action space is either discrete or continuous: for each pulse, the axis of rotation, the field strength, and the duration can vary continuously, but many previous approaches to Hamiltonian engineering consider only a discrete set of actions for analytical tractability and to reduce to number of candidate pulse sequences. After exploring both possibilities, the discrete action space paradigm was chosen. However, the continuous action space approach to Hamiltonian engineering could also be promising, and would be more similar to previous approaches such as GRAPE \cite{Khaneja-2005}.
+
+Of the many existing reinforcement learning algorithms, the Evolutionary Reinforcement Learning (ERL) hybrid algorithm \cite{khadka2018evolutionguided} was ultimately chosen. This algorithm uses both standard RL algorithms (such as policy gradient or actor-critic methods) and evolutionary algorithms to prevent convergence to local minima and promote diverse exploration of the state and action space.
+%The population consists of actors that each have a policy $\pi_\theta$. A policy corresponds to a neural network function approximator with a specific set of parameters $\theta$. In addition to the population, there is an RL-actor and an RL-critic that learns the action-value function $Q$.
 
 % state/action encoding
-For a system of spin-1/2 particles, the \emph{actions} are magnetic field pulses that rotate the spins, and can therefore be parametrized by the axis of rotation, the rotation angle $\alpha$, and the time $dt$ over which the rotation is performed.
-The axis of rotation is assumed to lie in the xy-plane, so a single pulse can be characterized by the tuple $(\phi, \alpha, dt) \in [-\pi,\pi] \times [-\alpha_\text{max}, \alpha_\text{max}] \times [t_\text{min}, \inf)$.
-$\alpha_\text{max}$ and $t_\text{min}$ depend on the experimental limitations, but for this research the values $\alpha_\text{max} = 2\pi, t_\text{min} = 0$ were taken.
+% For a system of spin-1/2 particles, the \emph{actions} are magnetic field pulses that rotate the spins, and can therefore be parametrized by the axis of rotation, the rotation angle $\alpha$, and the time $dt$ over which the rotation is performed.
+% The axis of rotation is assumed to lie in the xy-plane, so a single pulse can be characterized by the tuple $(\phi, \alpha, dt) \in [-\pi,\pi] \times [-\alpha_\text{max}, \alpha_\text{max}] \times [t_\text{min}, \inf)$.
+% $\alpha_\text{max}$ and $t_\text{min}$ depend on the experimental limitations, but for this research the values $\alpha_\text{max} = 2\pi, t_\text{min} = 0$ were taken.
+For a spin system, the actions are magnetic field pulses that effectively perform a global rotation of the spins.
+With a discrete action space, a natural choice of actions is the set of all $\pi/2$ pulses along the x- or y-axis, and a delay of length $\tau$.
+\begin{equation}
+    A = \{ X, \overline{X}, Y, \overline{Y}, \tau \}
+\end{equation}
 The relevant \emph{state} of the spin system is the propagator $U(t)$. However, the number of elements increases exponentially with the number of spins, so storing and computing with propagators quickly becomes infeasible.
 Instead, the state is represented by the sequence of all previous actions performed. This contains the equivalent information stored in the propagator, and requires significantly less memory and computational power.
 
 % fidelity, rewards
 To quantify how well a given pulse sequence engineers the target Hamiltonian $H_\text{target}$, the following fidelity function is used:
 \begin{equation}\label{eq:fidelity}
-    \text{fidelity}(U_\text{target}^\dagger, U_\text{exp}) = \left| \text{Tr}\left( \frac{U_\text{target}^\dagger U_\text{exp}}{2^N} \right) \right|
+    \text{fidelity}(U_\text{target}, U_\text{exp}) = \left|
+        \frac{\Tr{U_\text{target}^\dagger U_\text{exp}}}%
+        {\Tr{\identity}}
+    \right|
 \end{equation}
 where $U_\text{target}$ is the propagator corresponding to $H_\text{target}$ over the length of the pulse sequence and $U_\text{exp}$ is the propagator corresponding to the pulse sequence itself. The fidelity is a scalar value between $0$ and $1$, with values closer to $1$ indicating better performance. Using this definition of fidelity, the rewards in the RL algorithm are
 \begin{equation}\label{eq:rewards}
-    r = -\log\left( 1- \text{fidelity}(U_\text{target}, U_\text{exp})%^{\tau/t}
+    r = -\log\left( 1- \text{fidelity}(U_\text{target}, U_\text{exp})
     \right)
 \end{equation}
-% TODO check that above is right
-For short time intervals, both propagators $U_\text{target}$ and $U_\text{exp}$ are close to the identity, which would make the fidelity close to $1$. The exponent $\tau/t$ makes rewards comparable across different duration pulses sequences, decreasing fidelity for pulse sequence durations $t<\tau$ and increasing fidelity for $t>\tau$.
 
 % network architecture
-Neural network function approximators are used for both the actor's policy function and the critic's action-value function. The state and action inputs to the neural networks are individually mapped to the interval $[-1,1]$.
-\begin{align}
-    \phi \in [-\pi, \pi], \phi      &\mapsto \phi / \pi \\
-    \alpha \in [-2\pi,2\pi],\alpha  &\mapsto \alpha / 2\pi \\
-    t \in [0,5\cdot10^{-6}], t      &\mapsto
-        \frac{\log_{10}(t + 10^{-7}) + 7}{0.853785} - 1
-\end{align}
-The actor's policy function is restricted to the values in the interval $[-1,1]$ via an elu activation.
-Because the state is represented by a sequence of actions, long short-term memory (LSTM) layers are used to process the state inputs\cite{lstm}. Fully connected layers with elu activation functions for the actor and critic are used as hidden layers. See figure~\ref{fig:network-architecture} for a diagram of the network architectures.
+Neural network function approximators are used for both the actor's policy function and the critic's value function.
+% The state and action inputs to the neural networks are individually mapped to the interval $[-1,1]$.
+% \begin{align}
+%     \phi \in [-\pi, \pi], \phi      &\mapsto \phi / \pi \\
+%     \alpha \in [-2\pi,2\pi],\alpha  &\mapsto \alpha / 2\pi \\
+%     t \in [0,5\cdot10^{-6}], t      &\mapsto
+%         \frac{\log_{10}(t + 10^{-7}) + 7}{0.853785} - 1
+% \end{align}
+% The actor's policy function is restricted to the values in the interval $[-1,1]$ via an elu activation.
+The state is represented as an $T \times 5$ matrix, where $T$ is the maximum number of actions in the episode and $5$ corresponds to the number of actions. In each row, the action performed is indicated by a $1$, and the rest of the entries are $0$.
+Because the state is represented by a sequence of actions, long short-term memory (LSTM) layers are used to process the state inputs \cite{lstm}. Fully connected layers with elu activation functions for the actor and critic are used as hidden layers. See figure~\ref{fig:network-architecture} for a diagram of the network architectures.
 
 \begin{figure}[H]
     \centering
@@ -129,13 +147,11 @@ Because the state is represented by a sequence of actions, long short-term memor
          \node[draw] at (0,2) (d1) {Dense layer (64, elu activation)};
          \node[draw] at (0,1) (lnorm2) {Layer normalization};
          \node[draw] at (0,0) (d2) {Dense layer (64, elu)};
-         \node[draw] at (0,-1) (lnorm3) {Layer normalization};
-         \node[draw] at (0,-2) (d3) {Dense layer (64, elu)};
-         \node[draw] at (0,-3) (output) {Dense layer (3 output units, elu)};
+         \node[draw] at (0,-1) (output) {Dense layer (3 output units, elu)};
          % arrows between nodes
          \draw (input) -- (lstm); \draw (lstm) -- (lnorm1);
          \draw (lnorm1)--(d1); \draw(d1)--(lnorm2); \draw (lnorm2) -- (d2);
-         \draw (d2) -- (lnorm3); \draw (lnorm3) -- (d3); \draw (d3) -- (output);
+         \draw (d2) -- (output);
         \end{tikzpicture}
         \caption{The actor neural network to learn the policy $\pi(s)$.}
     \end{subfigure}
@@ -144,26 +160,21 @@ Because the state is represented by a sequence of actions, long short-term memor
         % critic network
         \begin{tikzpicture}[->, thick]
          %nodes
-         \node[draw] at (-2.5,4) (sinput) {State input ($32\times5$)};
-         \node[draw] at (-2.5,3) (lstm) {LSTM layer (64 hidden units)};
-         \node[draw] at (-2.5,2) (d1a) {Dense layer (64, elu)};
-         \node[draw] at (2.5,3) (ainput) {Action input ($1\times 5$)};
-         \node[draw] at (2.5,2) (d1b) {Dense layer (64, elu)};
+         \node[draw] at (0,4) (sinput) {State input ($32\times5$)};
+         \node[draw] at (0,3) (lstm) {LSTM layer (64 hidden units)};
+         \node[draw] at (0,2) (d1a) {Dense layer (64, elu)};
          \node[draw] at (0,1) (lnorm1) {Layer normalization};
          \node[draw] at (0,0) (d2) {Dense layer (64, elu)};
          \node[draw] at (0,-1) (lnorm2) {Layer normalization};
          \node[draw] at (0,-2) (d3) {Dense layer (64, elu)};
-         \node[draw] at (0,-3) (lnorm3) {Layer normalization};
-         \node[draw] at (0,-4) (d4) {Dense layer (64, elu)};
-         \node[draw] at (0,-5) (output) {Dense layer (1 output unit)};
+         \node[draw] at (0,-3) (output) {Dense layer (1 output unit)};
          % arrows between nodes
          \draw (sinput) -- (lstm); \draw (lstm) -- (d1a);
-         \draw (ainput) -- (d1b); \draw(d1a)--(lnorm1); \draw(d1b)--(lnorm1);
-         \draw (lnorm1)--(d2); \draw (d2) -- (lnorm2);
-         \draw (lnorm2) -- (d3); \draw (d3) -- (lnorm3); \draw (lnorm3) -- (d4);
-         \draw (d4) -- (output);
+         \draw(d1a)--(lnorm1);
+         \draw (lnorm1)--(d2); \draw (d2) -- (lnorm2); \draw (lnorm2) -- (d3);
+         \draw (d3) -- (output);
         \end{tikzpicture}
-        \caption{The critic neural network to learn $Q(s,a)$.}
+        \caption{The critic neural network to learn $V(s)$.}
     \end{subfigure}
     \caption{Neural network architectures .}
     \label{fig:network-architecture}
@@ -180,9 +191,9 @@ Preliminary results using ERL for pulse sequence design indicate promise compare
 
 So far, a few candidate pulse sequences have been identified to engineer the effective Hamiltonian
 \begin{equation}
-    H_\text{eff} = \sum_i \delta_i/3 (I_x^{(i)} + I_y^{(i)} + I_z^{(i)})
+    H_\text{target} = \sum_i \delta_i/3 (I_x^{(i)} + I_y^{(i)} + I_z^{(i)})
 \end{equation}
-This effective Hamiltonian was chosen as a benchmark to compare candidate pulse sequences against the WHH-4 pulse sequence \cite{PhysRevLett.20.180}. The ERL algorithm, in separate runs, performed the following pulse sequences.
+This effective Hamiltonian was chosen as a benchmark to compare candidate pulse sequences against the WHH-4 pulse sequence \cite{PhysRevLett.20.180}. The ERL algorithm, in separate runs, performed the following pulse sequences (starting from left to right).
 \begin{align}\label{eq:candidate_seq}
 \begin{split}
     1: \, & \tau, \overline{X}, Y, \tau, \overline{X}, \tau, \overline{Y}, \overline{X}^2 \\
@@ -191,25 +202,25 @@ This effective Hamiltonian was chosen as a benchmark to compare candidate pulse 
         Y, \tau, \overline{X}, Y^2, X^2
 \end{split}
 \end{align}
-Pulse sequence fidelity was evaluated for 250 random dipolar coupling strengths $d_{ij}$ (see equation~\ref{eq:Hint}), and for a variety of pulse and delay durations (or ``widths''). In addition to the candidate pulse sequences, the WHH-4 pulse sequence was also evaluated for the same parameters to compare performance. To account for differences in total pulse sequence duration, the sequences were repeated until $100\mu$s had elapsed. The rewards for  pulse sequences are presented in figures~\ref{fig:candidate_1} through~\ref{fig:candidate_3}.
+Pulse sequence fidelity was evaluated for 250 random dipolar coupling strengths $d_{ij}$ (see equation~\ref{eq:ham_spin}), and for a variety of delay and pulse durations (or ``pulse widths''). In addition to the candidate pulse sequences, the WHH-4 pulse sequence was also evaluated for the same parameters to compare performance. To account for differences in total pulse sequence duration, the sequences were repeated until $100\mu$s had elapsed. The rewards for  pulse sequences are presented in figures~\ref{fig:candidate_1} through~\ref{fig:candidate_3}.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.85\linewidth]{2020-07-07/reward_hist_2.pdf}
+    \includegraphics[width=0.8\linewidth]{2020-07-07/reward_hist_2.pdf}
     \caption{Final reward distribution for first candidate pulse sequence.}
     \label{fig:candidate_1}
 \end{figure}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.85\linewidth]{2020-07-07/reward_hist_3.pdf}
+    \includegraphics[width=0.8\linewidth]{2020-07-07/reward_hist_3.pdf}
     \caption{Final reward distribution for second candidate pulse sequence.}
     \label{fig:candidate_2}
 \end{figure}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.85\linewidth]{2020-07-07/reward_hist_4.pdf}
+    \includegraphics[width=0.8\linewidth]{2020-07-07/reward_hist_4.pdf}
     \caption{Final reward distribution for third candidate pulse sequence.}
     \label{fig:candidate_3}
 \end{figure}
@@ -224,7 +235,7 @@ Improvements to the ERL algorithm can also be made. While a viable pulse sequenc
     \caption{The fitnesses (i.e. the maximum reward in the episode) of the highest-fitness actor by generation. The red points denote when the highest-fitness actor is in the population, and the blue points denote when the actor is the policy gradient.}
     \label{fig:results}
 \end{figure}
-The lack of improvement in the population is understandable, because any change in policy is from random mutations to the neural network weights. The policy-gradient actor performs gradient ascent using the critic's $Q$ function, so it is likely that the critic is not effectively learning state-action values.
+The lack of improvement in the population is understandable, because any change in policy is from random mutations to the neural network weights. The RL-actor improves its policy by gradient ascent using the critic's value function, so it is likely that the critic is not effectively learning state values.
 % TODO flesh this out more
 
 The poor performance may be due to poor choice of hyperparameters (such as the learning rate or the number of observations from which to learn) or ineffective exploration of both state and action space.
