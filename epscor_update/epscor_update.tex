@@ -7,14 +7,14 @@
 \author{Will Kaufman \\ Ramanathan Lab \\ Dartmouth College}
 
 \bibliography{../refs.bib}
+\graphicspath{{../graphics/}}
 
 \begin{document}
 \maketitle
 
-% intro
-% TODO write this
-
 \section{Background}
+
+% TODO use Hamiltonian engineering stuff I wrote for poster/presentation?
 
 % problem statement: Hamiltonian engineering
 The time evolution of a quantum system depends on the system's Hamiltonian. For a system with initial state $\ket{\psi(0)}$ and Hamiltonian $H(t)$, the state at time $t$ is given by
@@ -50,15 +50,11 @@ Although this approach provides geometric intuition for spin-1/2 systems and sim
 % Other assumption with perfect pulses/timings?
 In experimental settings, there are physical constraints on the pulse width (depending on the applied magnetic field strength) and on $t_\text{cyc}$ which may violate the assumptions outlined above.
 
-% GRAPE/other
-% TODO then understand/write this
-
 % my approach: RL, diagram
 As part of the EPSCoR project, reinforcement learning (RL) is being investigated as an alternative approach to Hamiltonian engineering, specifically focusing on spin-1/2 systems.
 ``Reinforcement learning is learning what to do--how to map situations to actions--so as to maximize a numerical reward signal.''\cite{sutton2018reinforcement} RL has been applied to a variety of different problems, including playing games such as chess or Go\cite{Silver1140} and interacting with physical environments such as balancing a pole\cite{lillicrap2015continuous}. In the case of Hamiltonian engineering, the situations correspond to the propagators of the system at different times, the actions correspond to pulses or delays, and the reward signal quantifies the degree to which the system has evolved under the target effective Hamiltonian.
 RL algorithms seek to learn a policy function $\pi$ that maps states to actions that will lead to the largest rewards. See figure~\ref{fig:RL} for a diagram outlining the general components of RL.
 
-% TODO include figure of agent/environment and different interactions
 \begin{figure}[ht]
     \centering
     \begin{tikzpicture}[->, thick]
@@ -102,7 +98,8 @@ To quantify how well a given pulse sequence engineers the target Hamiltonian $H_
 \end{equation}
 where $U_\text{target}$ is the propagator corresponding to $H_\text{target}$ over the length of the pulse sequence and $U_\text{exp}$ is the propagator corresponding to the pulse sequence itself. The fidelity is a scalar value between $0$ and $1$, with values closer to $1$ indicating better performance. Using this definition of fidelity, the rewards in the RL algorithm are
 \begin{equation}\label{eq:rewards}
-    r = -\log\left( 1- \text{fidelity}(U_\text{target}, U_\text{exp})^{\tau/t} \right)
+    r = -\log\left( 1- \text{fidelity}(U_\text{target}, U_\text{exp})%^{\tau/t}
+    \right)
 \end{equation}
 % TODO check that above is right
 For short time intervals, both propagators $U_\text{target}$ and $U_\text{exp}$ are close to the identity, which would make the fidelity close to $1$. The exponent $\tau/t$ makes rewards comparable across different duration pulses sequences, decreasing fidelity for pulse sequence durations $t<\tau$ and increasing fidelity for $t>\tau$.
@@ -120,13 +117,13 @@ Because the state is represented by a sequence of actions, long short-term memor
 
 \begin{figure}[H]
     \centering
-    % \includegraphics[width=0.7\linewidth]{graphics/epscor/network_architecture.jpeg}
+    % \includegraphics[width=0.7\linewidth]{network_architecture.jpeg}
     \begin{subfigure}{.49\textwidth}
         \centering
         % actor network
         \begin{tikzpicture}[->, thick]
          %nodes
-         \node[draw] at (0,5) (input) {State input ($32\times3$)};
+         \node[draw] at (0,5) (input) {State input ($32\times5$)};
          \node[draw] at (0,4) (lstm) {LSTM layer (64 hidden units)};
          \node[draw] at (0,3) (lnorm1) {Layer normalization};
          \node[draw] at (0,2) (d1) {Dense layer (64, elu activation)};
@@ -147,10 +144,10 @@ Because the state is represented by a sequence of actions, long short-term memor
         % critic network
         \begin{tikzpicture}[->, thick]
          %nodes
-         \node[draw] at (-2.5,4) (sinput) {State input ($32\times3$)};
+         \node[draw] at (-2.5,4) (sinput) {State input ($32\times5$)};
          \node[draw] at (-2.5,3) (lstm) {LSTM layer (64 hidden units)};
          \node[draw] at (-2.5,2) (d1a) {Dense layer (64, elu)};
-         \node[draw] at (2.5,3) (ainput) {Action input ($1\times 3$)};
+         \node[draw] at (2.5,3) (ainput) {Action input ($1\times 5$)};
          \node[draw] at (2.5,2) (d1b) {Dense layer (64, elu)};
          \node[draw] at (0,1) (lnorm1) {Layer normalization};
          \node[draw] at (0,0) (d2) {Dense layer (64, elu)};
@@ -174,52 +171,63 @@ Because the state is represented by a sequence of actions, long short-term memor
 
 \section{Results}
 
+% TODO
+% include relevant histograms
+% include fidelity vs time plots
+% proofread everything, make sure it's up to date
+
 Preliminary results using ERL for pulse sequence design indicate promise compared to existing Hamiltonian engineering methods. However, many modifications to the algorithm remain to be explored to improve convergence and robustness of results.
 
 So far, a few candidate pulse sequences have been identified to engineer the effective Hamiltonian
 \begin{equation}
     H_\text{eff} = \sum_i \delta_i/3 (I_x^{(i)} + I_y^{(i)} + I_z^{(i)})
 \end{equation}
-This effective Hamiltonian was chosen as a benchmark to compare candidate pulse sequences against the WHH-4 pulse sequence \cite{PhysRevLett.20.180}. The ERL algorithm performed the following pulse sequence.
-\begin{equation}\label{eq:candidate4}
-    % x ybar xbar, tau, x ybar^2, tau, y, tau, xbar y^2 x^2
-    P_x, P_{\overline{y}}, P_{\overline{x}}, \tau, , P_x, P_{\overline{y}},
-    P_{\overline{y}}, \tau, P_y, \tau, P_{\overline{x}}, P_y, P_y, P_x, P_x
-\end{equation}
-Pulse sequence fidelity was evaluated for 250 random dipolar coupling strengths $d_{ij}$ (see equation~\ref{eq:Hint}), and for a variety of pulse and delay durations (or ``widths''). In addition to the candidate pulse sequence, the WHH-4 pulse sequence was also evaluated for the same parameters to compare performance. To account for differences in total pulse sequence duration, the sequences were repeated until $1$ms had elapsed. The rewards for both pulse sequences are presented in figure~\ref{fig:candidate_hist}.
+This effective Hamiltonian was chosen as a benchmark to compare candidate pulse sequences against the WHH-4 pulse sequence \cite{PhysRevLett.20.180}. The ERL algorithm, in separate runs, performed the following pulse sequences.
+\begin{align}\label{eq:candidate_seq}
+\begin{split}
+    1: \, & \tau, \overline{X}, Y, \tau, \overline{X}, \tau, \overline{Y}, \overline{X}^2 \\
+    2: \, & \overline{X}, \tau, \overline{X}, \tau, \overline{Y}, X \\
+    3: \, & X, \overline{Y}, \overline{X}, \tau, X, \overline{Y}^2, \tau,
+        Y, \tau, \overline{X}, Y^2, X^2
+\end{split}
+\end{align}
+Pulse sequence fidelity was evaluated for 250 random dipolar coupling strengths $d_{ij}$ (see equation~\ref{eq:Hint}), and for a variety of pulse and delay durations (or ``widths''). In addition to the candidate pulse sequences, the WHH-4 pulse sequence was also evaluated for the same parameters to compare performance. To account for differences in total pulse sequence duration, the sequences were repeated until $100\mu$s had elapsed. The rewards for  pulse sequences are presented in figures~\ref{fig:candidate_1} through~\ref{fig:candidate_3}.
 
 \begin{figure}[H]
     \centering
-    \begin{subfigure}{\linewidth}
-        \centering
-        \includegraphics[width=0.85\linewidth]{graphics/reward_hist_N4_coupling5e3.pdf}
-        \caption{Dipolar coupling strength standard deviation of $5$kHz.}
-    \end{subfigure}
-    \begin{subfigure}{\linewidth}
-        \centering
-        \includegraphics[width=0.85\linewidth]{graphics/reward_hist_N4_coupling1e4.pdf}
-        \caption{Dipolar coupling strength standard deviation of $10$kHz.}
-    \end{subfigure}
-    \caption{Histograms of rewards for candidate and WHH-4 pulse sequence.}
-    \label{fig:candidate_hist}
+    \includegraphics[width=0.85\linewidth]{2020-07-07/reward_hist_2.pdf}
+    \caption{Final reward distribution for first candidate pulse sequence.}
+    \label{fig:candidate_1}
 \end{figure}
 
-Although the candidate pulse sequence (equation~\ref{eq:candidate4}) generally outperforms the WHH-4 pulse sequence, further work is necessary to understand its utility in experimental settings. Robustness against timing and phase errors can be studied in simulation and in NMR systems.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\linewidth]{2020-07-07/reward_hist_3.pdf}
+    \caption{Final reward distribution for second candidate pulse sequence.}
+    \label{fig:candidate_2}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\linewidth]{2020-07-07/reward_hist_4.pdf}
+    \caption{Final reward distribution for third candidate pulse sequence.}
+    \label{fig:candidate_3}
+\end{figure}
+
+The candidate pulse sequences (equation~\ref{eq:candidate_seq}) generally perform worse than the WHH-4 pulse sequence, although for certain pulse widths and delays the candidate sequences seem to perform better. Further work is necessary to understand its utility in experimental settings. Robustness against timing and phase errors can be studied in simulation and in NMR systems.
 
 Improvements to the ERL algorithm can also be made. While a viable pulse sequence was identified, the algorithm failed to converge to a policy that repeatedly performed the pulse sequence. Additionally, for multiple runs of the ERL algorithm, some failed to identify a viable pulse sequence at all. The policy-gradient actor does not consistently improve its performance over time, and the evolution-guided population of actors also does not improve (see figure~\ref{fig:results}).
 % preliminary results
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.7\linewidth]{graphics/test_fit.png}
-    \caption{The fitnesses (i.e. the maximum reward in the episode) of the highest-fitness actor by generation.}
+    \includegraphics[width=0.7\linewidth]{2020-06-23/testFitnesses-002.png}
+    \caption{The fitnesses (i.e. the maximum reward in the episode) of the highest-fitness actor by generation. The red points denote when the highest-fitness actor is in the population, and the blue points denote when the actor is the policy gradient.}
     \label{fig:results}
 \end{figure}
 The lack of improvement in the population is understandable, because any change in policy is from random mutations to the neural network weights. The policy-gradient actor performs gradient ascent using the critic's $Q$ function, so it is likely that the critic is not effectively learning state-action values.
+% TODO flesh this out more
 
 The poor performance may be due to poor choice of hyperparameters (such as the learning rate or the number of observations from which to learn) or ineffective exploration of both state and action space.
-% TODO talk about null action as local minima already, small
-% deviations away from 0 are lower rewards
-% TODO also possibility of discrete actions/stochastic policy
 Further work is needed to explore both of these possibilities.
 
 \printbibliography
