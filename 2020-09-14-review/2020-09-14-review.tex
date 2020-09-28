@@ -1,0 +1,183 @@
+%!TEX output_directory=output
+\documentclass[twocolumn, aps, prd]{revtex4-2}
+
+\usepackage[revtex]{kaufman}
+
+\begin{document}
+
+%\preprint{IDK...}
+% TODO what does this do?
+
+\title{Reinforcement Learning for Hamiltonian Engineering}
+%\thanks{Ramanathan Lab}
+\author{Will Kaufman}
+\affiliation{%
+Dartmouth College, Ramanathan Lab}
+\date{September 14, 2020}
+
+% TODO include abstract?
+
+\maketitle
+
+
+\section{Hamiltonian Engineering and Average Hamiltonian Theory}
+
+The time evolution of a quantum system depends on the system's Hamiltonian. For a system with initial density operator $\rho(0)$ and Hamiltonian $H(t)$, the state at time $t$ is given by
+\[
+\rho(t) = U(t)\rho(0)U^\dagger(t)
+\]
+where the propagator $U(t)$ maps from initial states ($t=0$) to states at time $t$. The propagator is defined by
+\begin{equation}
+    \ddt{U(t)} = \frac{-i}{\hbar} H(t) U(t), U(0) = \identity
+\end{equation}
+The total Hamiltonian can be broken into a time-independent system Hamiltonian and a time-dependent control Hamiltonian.
+\begin{equation}
+    H(t) = H_\text{system} + H_\text{control}(t)
+\end{equation}
+\emph{Hamiltonian engineering} seeks to design the time-dependent Hamiltonian $H_\text{control}(t)$ to control the system's evolution so that it appears to evolve under a target ``effective'' Hamiltonian ($H_\text{target}$) when measured stroboscopically. That is,
+\begin{equation}\label{eq:strob_measure}
+    \rho(Nt_c) = U_\text{target}(Nt_c) \rho(0) U_\text{target}^\dagger(Nt_c)
+\end{equation}
+where $U_\text{target}$ is the propagator determined by $H_\text{target}$, $t_c$ is the cycle time, and $N \in \N$.
+
+As an example, in nuclear magnetic resonance (NMR), the system Hamiltonian
+in the lab frame
+is given by
+\begin{align}\label{eq:ham_spin}
+    H_\text{system} &= \sum_i \omega_0^i I_z^i
+        + \sum_i \delta_i I_z^i
+        + \sum_{i,j} d_{ij}
+            \left( 3I_z^iI_z^j - \mathbf{I^i} \cdot \mathbf{I^j} \right) \\
+    &= H_\text{Z} + H_\text{CS} + H_\text{D} \\
+\end{align} % TODO is control Hamiltonian correct? Also include I_y
+where $H_\text{Z}$ denotes the Zeeman term, $H_\text{CS}$ the chemical shift term, and $H_\text{D}$ the dipolar interaction term.
+The control Hamiltonian is given by
+\begin{equation}
+    H_\text{control}(t) = -B_x(t) \sum_i \gamma_n^i I_x^i
+    % \sum_i (c_x(t) I_x^i + c_y(t) I_y^i)
+        % -B_x(t) \sum_i \gamma_n^i I_x^i +
+        %     -B_y(t) \sum_i \gamma_n^i I_y^i
+\end{equation}
+where $\gamma_n^i$ is the gyromagnetic ratio for nucleus $i$.
+The spin system can be analyzed in a rotating frame that removes the Zeeman term from the system Hamiltonian, and the control field $B_x(t)$ can be constructed to address 
+Common engineered Hamiltonians for NMR decouple the dipolar interactions, so that only the chemical shift term remains. This allows the chemical shifts $\delta_i$ to be measured, or to perform magnetometry experiments.
+
+% TODO explain AHT, how it's a solution to AHT
+
+\section{Reinforcement learning for Hamiltonian engineering}
+
+% TODO choices of approach: discrete vs
+
+\subsection{Action space}
+
+% discrete vs continuous
+% kind of continuous action space at beginning (action = (phi, rot, t)), but no sense of momentum
+
+\subsection{Reward schemes}
+
+% TODO
+% sparse and dense rewards
+% basically everything tried: rewards every step, every 6 steps, only at end of episode
+
+\subsection{State representation}
+
+% TODO
+% sequence of actions (one-hot vectors)
+% density matrix (both target and experimental values)
+
+\subsection{Reinforcement learning algorithm}
+
+% TODO
+
+\subsubsection{Q-learning and DQN}
+
+% TODO
+
+\begin{itemize}
+
+\item
+  MATLAB, January-March
+\item
+  May(ish), started using TF-Agents
+\item
+  Algorithm learned to delay only, not sufficient exploration in state
+  space
+\end{itemize}
+
+\subsubsection{DDPG}
+
+% TODO
+
+\cite{lillicrap2015continuous}
+
+\subsubsection{ERL}
+
+% TODO
+
+\begin{itemize}
+
+\item
+  most success using this algorithm, but it's construction promotes more
+  exploration and diversity of policies
+\end{itemize}
+
+\subsubsection{PPO}
+
+% TODO
+
+\begin{itemize}
+
+\item
+  Similar to DQN, generally learned to delay or to rotate back and forth
+\end{itemize}
+
+\section{Conclusions}
+
+% TODO
+
+\begin{itemize}
+
+\item
+  RL is hard
+
+  \begin{itemize}
+  
+  \item
+    Non-stationary nature of problem (training model on data generated
+    by model) is difficult
+  \item
+    Balancing exploration and exploitation
+  \item
+    Discontinuous reward function on state space
+  \end{itemize}
+\item
+  Distinguishing between working algorithm and luck (esp.~with ERL)
+\end{itemize}
+
+% TODO next steps
+
+\begin{itemize}
+
+\item
+  Look more into supervised learning
+
+  \begin{itemize}
+  
+  \item
+    Learn map from pulse sequence to fidelity
+  \item
+    Learn map from pulse sequence to average Hamiltonian
+  \end{itemize}
+\item
+  Consider continuous action space
+
+  \begin{itemize}
+  
+  \item
+    Less a combinatorial problem, closer to existing applications of RL
+  \end{itemize}
+\end{itemize}
+
+\bibliography{../refs.bib}
+
+\end{document}
