@@ -15,12 +15,12 @@
 \bibliography{../refs.bib}
 \graphicspath{{../graphics/}}
 
-% TODO add funding acknowledgement, shrink this and show logos too...
-
 \title[RL for Quantum Control in NMR]{Using Reinforcement Learning for Quantum Control in Magnetic Resonance [DRAFT]}
 \author[Will Kaufman]{Will Kaufman\inst{1} \and Benjamin Alford\inst{1} \and Pai Peng\inst{2} \and Xiaoyang Huang\inst{2} \and Linta Joseph\inst{1} \and Paola Cappellaro\inst{2} \and Chandrasekhar Ramanathan\inst{1}}
 \date[March Meeting 2021]{APS March Meeting 2021 \\
-Session X32: Quantum Machine Learning III}
+Session X32: Quantum Machine Learning III \\
+% TODO add funding acknowledgement, shrink this and show logos too...
+{\footnotesize NSF support under Grants OIA-1921199, PHY1734011, and PHY1915218.}}
 \institute[Dartmouth and MIT]{
 \inst{1}Department of Physics and Astronomy, Dartmouth College \\
 Hanover, NH 03755, USA
@@ -28,14 +28,15 @@ Hanover, NH 03755, USA
 \inst{2}Research Laboratory of Electronics, Massachusetts Institute of Technology \\
 Cambridge, Massachusetts 02139, USA}
 
-% \titlegraphic{
-% \includegraphics[height=.1\textheight]{lonepine.pdf}
-% \includegraphics[height=.1\textheight]{mit_logo.png}
-% }
+\titlegraphic{
+\includegraphics[height=.1\textheight]{Dartmouth.eps}
+\hfill
+\includegraphics[height=.1\textheight]{mit_logo.png}
+}
 
 \begin{document}
 
-\frame{\titlepage}
+\frame[plain]{\titlepage}
 
 \begin{frame}
 \frametitle{Table of Contents}
@@ -47,14 +48,13 @@ Cambridge, Massachusetts 02139, USA}
 \begin{frame}{Quantum control in spin systems}
 
 \[
-    H(t) = H_\text{system} + H_\text{control}(t)
+    H(t) = H_{\text{sys}} + H_{\text{ctrl}}(t)
 \]
 
-Can use $H_\text{control}(t)$ to achieve state-to-state transfer ($\rho_0 \to \rho$) or a unitary transformation $U$.
+Can use $H_{\text{ctrl}}(t)$ to achieve
+% state-to-state transfer ($\rho_0 \to \rho$) or
+a unitary transformation $U$ given by an effective Hamiltonian $H_\text{eff}$.
 
-% TODO remove state-to-state transfer? Just mention unitary/Hamiltonian engineering
-% TODO also just focusing on closed system/unitary dynamics
-% TODO many body dynamics, global control only
 % TODO also include spectrum with/without refocusing dipolar interactions?
 
 \begin{figure}
@@ -62,17 +62,12 @@ Can use $H_\text{control}(t)$ to achieve state-to-state transfer ($\rho_0 \to \r
 \input{spin_system.tex}
 \end{figure}
 
-\note{Different types of spin systems: \emph{strongly} coupled (solid state NMR) and \emph{weakly} coupled (ESR, NV/P1 centers)
+\note{
+Only focusing on closed system dynamics with global control (spins are not addressed individually).
 
-Don't have universal control, only global control (affects all spins).}
+% Different types of spin systems: \emph{strongly} coupled (solid state NMR) and \emph{weakly} coupled (ESR, NV/P1 centers)
 
-\end{frame}
-
-\begin{frame}{Hamiltonian engineering}
-
-% TODO remove slide, put important info on previous...
-
-Use $H_\text{control}(t)$ to evolve the system under a desired effective Hamiltonian $H_\text{eff}$.
+Hamiltonian engineering used for:
 
 \begin{itemize}
     \item Time suspension ($H_\text{eff} = 0$)
@@ -80,15 +75,10 @@ Use $H_\text{control}(t)$ to evolve the system under a desired effective Hamilto
     \item Quantum simulation
 \end{itemize}
 
-\note{
-Applicable to many-body spin systems. \\
-Mention sensing in context of canceling dipolar interactions.}
-
+}
 \end{frame}
 
-\begin{frame}{Average Hamiltonian theory}
-
-% TODO explain what interaction frame is, put in note...
+\begin{frame}[plain]{Average Hamiltonian theory}
 
 \begin{figure}
 \centering
@@ -96,136 +86,96 @@ Mention sensing in context of canceling dipolar interactions.}
 \input{AHT_diagram.tex}
 }
 \end{figure}
-% For some pulse sequences with cycle time $t_c$, the time-evolution operator for one cycle can be given in terms of an average Hamiltonian
-% \[
-%     U(t_c) = \exp\left( -i t_c (\overline{H}^{(0)} +
-%         \overline{H}^{(1)} + \dots) \right)
-% \]
-\begin{align*}
-    \overline{H}^{(0)} &= \frac{1}{t_c} \int_0^{t_c}
-        \widetilde{H}_\text{system}(t) dt \\
-    \overline{H}^{(1)} &= \frac{1}{2it_c} \int_0^{t_c} dt_1 \int_0^{t_1} dt_2
-        [\widetilde{H}_\text{system}(t_1), \widetilde{H}_\text{system}(t_2)]
-\end{align*}
-
-% TODO include second order term
 % and include diagram showing difficulty with different time terms
 
 \note{
 Average Hamiltonian Theory (AHT) has been used extensively for Hamiltonian engineering
+
+Interaction frame is determined by $H_{\text{ctrl}}$, ``toggles'' the system Hamiltonian.
 
 Note how the first-order term has commutator of toggled Hamiltonians at different times. This is straightforward to calculate with a 4-pulse sequence, but gets analytically intractable for longer sequences, and for higher-order terms.
 }
 
 \end{frame}
 
-\begin{frame}{Existing approaches to Hamiltonian engineering}
-
-% TODO
-% * Need to shorten this probably
-% * Have this slide be more about shortfalls of AHT
-% * Move yxx48 pulse sequence to RL
-
-\begin{itemize}
-    \item WAHUHA 4-pulse sequence (\cite{PhysRevLett.20.180})
-    \[H_\text{eff} = \textcolor[rgb]{0,0.69,0}{H_{\text{CS}}'}\]
-    
-    \item CORY 48-pulse sequence (\cite{CORY1990205})
-    \[H_\text{eff} = 0\]
-    designed analytically using AHT to be robust to errors
-    % TODO what is CORY48 robust to?
-    
-    % \item More recent pulse sequences for sensing from \cite{O_Keeffe_2019} and \cite{PhysRevLett.119.183603} by applying linear programming techniques
-    % % TODO what did OKeeffe and Choi do? Sensing?
-    
-    \item New yxx48 pulse sequence (\cite{peng2021deep})
-    \[H_\text{eff} = 0\]
-    designed using deep reinforcement learning and evolutionary algorithms
-\end{itemize}
-
-\note{CORY-48 designed for time suspension while being robust to rotation and offset errors}
-
-\end{frame}
-
-
-
-\begin{frame}{Existing approaches (cont.)}
+\begin{frame}[plain]{Average Hamiltonian theory (cont.)}
 
 \begin{figure}
 \centering
-\includegraphics[width=.7\textwidth]{decay_plot.pdf}
+\includegraphics[width=0.6\textwidth]{AHT-HO-diagram.pdf}
+
+From \cite{brinkmann_2016}.
 \end{figure}
-
-Shorter, analytically tractable $\iff$ Longer, complicated
-
-\note{
-AHT has led to useful pulse sequences, but\dots
-\begin{itemize}
-    \item Typically only consider the lowest order term in average Hamiltonian (higher-order terms get intractable quickly)
-    \item Longer pulse sequences have been shown to improve fidelity, but difficult to identify/analyze in AHT
-\end{itemize}
-}
-
-% TODO include figure showing large number of possibilities?
 
 \end{frame}
 
-\section{Reinforcement learning for quantum control}
+\begin{frame}{Existing approaches to Hamiltonian engineering}
 
+\begin{itemize}
+    \item WAHUHA 4-pulse sequence (\cite{PhysRevLett.20.180}), $H_\text{eff} = \textcolor[rgb]{0,0.69,0}{H_{\text{CS}}'}$
+    
+    \item CORY 48-pulse sequence (\cite{CORY1990205}) designed analytically using AHT to be robust to errors, $H_\text{eff} = 0$
+\end{itemize}
+
+\begin{figure}
+\centering
+\includegraphics[width=.5\textwidth]{decay_plot.pdf}
+\end{figure}
+
+\pause
+
+Are there better approaches to Hamiltonian engineering?
+
+\note{
+WHH-4 designed with pen and paper
+
+CORY-48 designed for time suspension while being robust to rotation and offset errors
+
+AHT is great tool, but it's limited to approximating the average Hamiltonian with lowest-order terms. Longer sequences further restrict computing HO terms.
+
+But longer pulse sequences can perform better\dots
+
+}
+
+\end{frame}
+
+
+
+
+\section{Reinforcement learning for quantum control}
 
 \begin{frame}{Reinforcement learning for quantum control}
 
 \begin{figure}
 \centering
-\includegraphics[width=.8\textwidth]{rl.png}
+\includegraphics[width=.6\textwidth]{rl.png}
 
 From \cite{sutton2018reinforcement}.
-% \caption{}
 \end{figure}
 
 \begin{itemize}
     \item State $\to$ propagator
     \item Action $\to$ rf-pulse
-    \item Reward $\to$ propagator fidelity
+    \item Reward $\to$ propagator fidelity $\left(\Re{
+        \frac{\Tr{U_\text{target}^\dagger U(t)}}{\Tr{\identity}}
+    }\right)$
+    % \[
+    %     \text{fidelity}(U, U_\text{target}) = \Re{
+    %         \frac{\Tr{U_\text{target}^\dagger U(t)}}{\Tr{\identity}}
+    %     }
+    % \]
 \end{itemize}
     
 \end{frame}
 
-\begin{frame}{Reinforcement learning for quantum control (cont.)}
-
-% TODO can I include this info in above slide, then remove this slide?
-
-\[
-    \text{fidelity}(U, U_\text{target}) = \Re{
-        \frac{\Tr{U_\text{target}^\dagger U(t)}}{\Tr{\identity}}
-    }
-\]
-For RL algorithm performance, use log infidelity as ``reward''
-\[
-    r = -\log \left( 1 - \text{fidelity} \right)
-\]
-
-\pause
-
-\[
-r = 4 \iff \text{fidelity} = 0.\underline{9999}
-\]
-
-% \note{Can apply RL to discrete control problem (pulse sequences)
-% or continuous control (shaped pulses, continuously-varying control
-% Hamiltonians)}
-
-\end{frame}
-
 \begin{frame}{Constructing pulse sequences using RL}
 
-Implemented AlphaZero algorithm (\cite{Silver1140}) designed to play Chess, Shogi, and Go.
-% TODO insert graphic of some sort...
+Implemented AlphaZero algorithm (\cite{Silver1140}, originally for Chess, Shogi, and Go).
 % TODO call out to potential for tailored pulse sequences for particular systems, and robust to certain things...
 
 \begin{figure}
 \centering
-\scalebox{.75}{
+\scalebox{.7}{
 \input{mcts.tex}
 }
 \end{figure}
@@ -248,16 +198,27 @@ With tree structure, can optionally add AHT constraints to search.
 
 \begin{frame}{Comparison between RL approaches}
 
-% TODO make this prettier...
-\begin{tabular}{p{.2\textwidth} p{.5\textwidth} p{.25\textwidth}}
+Different RL algorithm used by our collaborators (\cite{peng2021deep}).
+
+\begin{table}
+\centering
+\begin{footnotesize}
+\begin{tabular}{p{.2\textwidth}|p{.5\textwidth}|p{.25\textwidth}}
     Characteristic & Evolutionary Reinforcement Learning & AlphaZero \\
     \hline
     State representation & Sequence of previous pulses & Same \\
+    \hline
     Action space & Delay or $\pi/2$-pulse along $\pm$X, $\pm$Y & Same \\
+    \hline
     Learning method & Evolutionary algorithms (gradient-free) & Tree search and experience replay (gradient based) \\
+    \hline
     % Neural network architecture  % TODO what is their NN architecture?
-    Prior knowledge & Builds longer sequences from shorter ones & Uses AHT to prune tree search
+    Prior knowledge & Builds longer sequences from shorter ones & Uses AHT to prune tree search \\
+    \hline
+    Pulse sequences ($H_\text{eff} = 0$) & yxx48 & az48
 \end{tabular}
+\end{footnotesize}
+\end{table}
 
 \end{frame}
 
@@ -279,15 +240,21 @@ on 16 Intel Xeon E5-2640V3 (2.6GHz) CPUs.
 
 \begin{frame}{Computational results (cont.)}
 
-\{ Plot of fidelity vs pulse sequence length \}
-
-Currently gathering data for this plot
+\begin{figure}
+\centering
+\includegraphics[width=.75\textwidth]{pulse-sequence-length.pdf}
+\end{figure}
 
 \end{frame}
 
 \begin{frame}{Experimental results}
 
-\{decay plots, compare with yxx48 and CORY-48\}
+\{waiting on experimental results\}
+
+\begin{figure}
+\centering
+\includegraphics[width=.75\textwidth]{decay_plot.pdf}
+\end{figure}
 
 % waiting on results from (hopefully) better pulse sequence
 
@@ -322,12 +289,12 @@ Currently gathering data for this plot
 
 
 \begin{align*}
-    H_\text{system} &= \sum_i \delta_i I_z^i + \sum_{i,j} d_{ij} \left( 3I_z^iI_z^j - \mathbf{I^i} \cdot \mathbf{I^j} \right) \\
+    H_{\text{sys}} &= \sum_i \delta_i I_z^i + \sum_{i,j} d_{ij} \left( 3I_z^iI_z^j - \mathbf{I^i} \cdot \mathbf{I^j} \right) \\
         &= H_\text{CS} + H_\text{D}
 \end{align*}
 
 \[
-    H_\text{control}(t) = -B_1(t) \sum_i \gamma_n^i I_x^i -B_2(t) \sum_i \gamma_n^i I_y^i
+    H_{\text{ctrl}}(t) = -B_1(t) \sum_i \gamma_n^i I_x^i -B_2(t) \sum_i \gamma_n^i I_y^i
 \]
 
 \end{frame}
@@ -356,15 +323,15 @@ The series converges rapidly when \(t||H|| \ll 1\).
 We often work in the interaction frame of the control Hamiltonian, with transformation operator
 
 \begin{align*}
-    \frac{d}{dt} U_\text{control}(t) &=
-        -i H_\text{control}(t)U_\text{control}(t) \\
-    U_\text{control}(0) &= \identity
+    \frac{d}{dt} U_{\text{ctrl}}(t) &=
+        -i H_{\text{ctrl}}(t)U_{\text{ctrl}}(t) \\
+    U_{\text{ctrl}}(0) &= \identity
 \end{align*}
 
 So the Hamiltonian in the interaction frame becomes
 
 \[
-    \widetilde{H}(t) = \widetilde{H}_\text{system}(t) = U_\text{control}(t)^\dagger H_\text{system} U_\text{control}(t)
+    \widetilde{H}(t) = \widetilde{H}_{\text{sys}}(t) = U_{\text{ctrl}}(t)^\dagger H_{\text{sys}} U_{\text{ctrl}}(t)
 \]
 
 \cite{brinkmann_2016}.
@@ -376,10 +343,10 @@ So the Hamiltonian in the interaction frame becomes
 
 If a pulse sequence is both cyclic and periodic \cite{gerstein-dybowski}
 \begin{align*}
-    U_\text{control}(t_c) &= T\exp \left(
-        -i \int_0^{t_c} H_\text{control}(t) dt \right) = \pm \identity
+    U_{\text{ctrl}}(t_c) &= T\exp \left(
+        -i \int_0^{t_c} H_{\text{ctrl}}(t) dt \right) = \pm \identity
          \, \text{(cyclic)} \\
-    H_\text{control}(t) &= H_\text{control}(t + Nt_c) \, \text{(periodic)}
+    H_{\text{ctrl}}(t) &= H_{\text{ctrl}}(t + Nt_c) \, \text{(periodic)}
 \end{align*}
 then the interaction frame and the lab frame coincide at multiples of
 the cycle time, and the propagator can be given by
@@ -394,12 +361,19 @@ Higher-order terms for average Hamiltonian become nasty\dots
 \begin{frame}{AHT: Pulse sequences (cont.)}
 
 \begin{align*}
-    \overline{H}^{(0)} &= 1/t_c \int_0^{t_c}
-        \widetilde{H}_\text{system}(t) dt \\
-    \overline{H}^{(1)} &= 1/2it_c \int_0^{t_c} dt_1 \int_0^{t_1} dt_2
-        [\widetilde{H}_\text{system}(t_1),
-         \widetilde{H}_\text{system}(t_2)] \\
-     \overline{H}^{(2)} &= \text{TODO fill this in} \\
+    \overline{H}^{(0)} &= \frac{1}{t_c} \int_0^{t_c}
+        \widetilde{H}_{\text{sys}}(t) dt \\
+    %
+    \overline{H}^{(1)} &= \frac{1}{2it_c} \int_0^{t_c} dt_1 \int_0^{t_1} dt_2
+        [\widetilde{H}_{\text{sys}}(t_1), \widetilde{H}_{\text{sys}}(t_2)] \\
+    %
+    \overline{H}^{(2)} &= -\frac{1}{6t_c}
+    \int_0^{t_c} dt_1 \int_0^{t_1} dt_2 \int_0^{t_2} dt_3
+    \left\{
+    \left[\widetilde{H}_{\text{sys}}(t_1), \left[\widetilde{H}_{\text{sys}}(t_2), \widetilde{H}_{\text{sys}}(t_3)\right]\right] +
+    \left[\left[\widetilde{H}_{\text{sys}}(t_1), \widetilde{H}_{\text{sys}}(t_2)\right], \widetilde{H}_{\text{sys}}(t_3)\right]
+    \right\} \\
+    \vdots
 \end{align*}
 
 \end{frame}
@@ -431,7 +405,7 @@ Sources of error:
 \begin{figure}
 \centering
 \includegraphics[width=.4\textwidth]{phase_transients_viz.png}
-\caption{Ideal pulse shape (a) and phase transients (b) \cite{1976ii}.}
+\caption{(a) Ideal pulse shape,  (b) phase transients. From \cite{1976ii}.}
 \end{figure}
 
 \end{frame}
@@ -449,6 +423,24 @@ Action representation:
 Spin system simulation parameters:
 
 % TODO system/ensemble simulation
+
+\[
+    \text{fidelity}(U, U_\text{target}) = \Re{
+        \frac{\Tr{U_\text{target}^\dagger U(t)}}{\Tr{\identity}}
+    }
+\]
+For RL algorithm performance, use log infidelity as ``reward''
+\[
+    r = -\log \left( 1 - \text{fidelity} \right)
+\]
+
+\[
+r = 4 \iff \text{fidelity} = 0.\underline{9999}
+\]
+
+% \note{Can apply RL to discrete control problem (pulse sequences)
+% or continuous control (shaped pulses, continuously-varying control
+% Hamiltonians)}
 
 \end{frame}
 
