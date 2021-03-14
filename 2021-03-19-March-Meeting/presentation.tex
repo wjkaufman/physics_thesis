@@ -2,10 +2,10 @@
 \documentclass{beamer}
 
 % TODO
-% * clean up figures, especially handwritten ones
 % * Minimize text in slides
 % * Make slides stand alone (provide enough information to get gist)
 % * Make it simple (e.g. “higher is better in this plot”, “reward of 4 means 0.9999”)
+% * Get to my data/results by 5 minute mark
 
 \usepackage[beamer]{kaufman}
 
@@ -19,7 +19,6 @@
 \author[Will Kaufman]{Will Kaufman\inst{1} \and Benjamin Alford\inst{1} \and Pai Peng\inst{2} \and Xiaoyang Huang\inst{2} \and Linta Joseph\inst{1} \and Paola Cappellaro\inst{2} \and Chandrasekhar Ramanathan\inst{1}}
 \date[March Meeting 2021]{APS March Meeting 2021 \\
 Session X32: Quantum Machine Learning III \\
-% TODO add funding acknowledgement, shrink this and show logos too...
 {\footnotesize NSF support under Grants OIA-1921199, PHY1734011, and PHY1915218.}}
 \institute[Dartmouth and MIT]{
 \inst{1}Department of Physics and Astronomy, Dartmouth College \\
@@ -29,56 +28,64 @@ Hanover, NH 03755, USA
 Cambridge, Massachusetts 02139, USA}
 
 \titlegraphic{
-\includegraphics[height=.1\textheight]{Dartmouth.eps}
+\includegraphics[height=.08\textheight]{Dartmouth.pdf}
 \hfill
-\includegraphics[height=.1\textheight]{mit_logo.png}
+\includegraphics[height=.08\textheight]{mit_logo.png}
 }
 
 \begin{document}
 
 \frame[plain]{\titlepage}
 
-\begin{frame}
-\frametitle{Table of Contents}
-\tableofcontents
-\end{frame}
+% \begin{frame}
+% \frametitle{Table of Contents}
+% \tableofcontents
+% \end{frame}
 
 \section{Quantum control}
 
-\begin{frame}{Quantum control in spin systems}
-
-\[
-    H(t) = H_{\text{sys}} + H_{\text{ctrl}}(t)
-\]
-
-Can use $H_{\text{ctrl}}(t)$ to achieve
-% state-to-state transfer ($\rho_0 \to \rho$) or
-a unitary transformation $U$ given by an effective Hamiltonian $H_\text{eff}$.
-
-% TODO also include spectrum with/without refocusing dipolar interactions?
+\begin{frame}{Magnetic dipolar interactions in solids}
 
 \begin{figure}
 \centering
-\input{spin_system.tex}
+\includegraphics[width=0.4\textwidth]{1H-NMR.jpg}
+\hfill
+\scalebox{.5}{
+\input{bath-spins.tex}
+}
+% \caption{}
+% \label{}
 \end{figure}
 
-\note{
-Only focusing on closed system dynamics with global control (spins are not addressed individually).
-
-% Different types of spin systems: \emph{strongly} coupled (solid state NMR) and \emph{weakly} coupled (ESR, NV/P1 centers)
-
-Hamiltonian engineering used for:
-
+Magentic dipolar interactions\dots
 \begin{itemize}
-    \item Time suspension ($H_\text{eff} = 0$)
-    \item Sensing (e.g. $H_\text{eff} = \beta \textcolor[rgb]{0,0.69,0}{H_{\text{CS}}}$)
-    \item Quantum simulation
+    % TODO reference Linta's, Ethan's talks
+    \item Broaden spectral lines in NMR (\cite{linta_march_meeting})
+    \item Lead to decay of central spin coherence in bath (\cite{ethan_march_meeting})
 \end{itemize}
 
-}
+\begin{align*}
+    H_{\text{sys}} &= \sum_i \delta_i I_z^i + \sum_{i,j} d_{ij} \left( 3I_z^iI_z^j - \mathbf{I^i} \cdot \mathbf{I^j} \right) \\
+        &= H_\text{CS} + H_\text{D}
+\end{align*}
+
+Refocusing dipolar interactions would narrow spectral lines, increase coherence times.
+
+{\footnotesize \cite{Ottowa-NMR}}
+
 \end{frame}
 
-\begin{frame}[plain]{Average Hamiltonian theory}
+\begin{frame}{Average Hamiltonian theory}
+
+If\dots
+\begin{itemize}
+    \item Consider cyclic and periodic pulse sequences
+    \[
+    U_{\text{ctrl}}(t_c) = \identity, H_{\text{ctrl}}(t) = H_{\text{ctrl}}(t + Nt_c)
+    \]
+    \item Observe system stroboscopically ($t = Nt_c$)
+\end{itemize}
+\dots then system appears to evolve under an effective \emph{average} Hamiltonian
 
 \begin{figure}
 \centering
@@ -89,47 +96,33 @@ Hamiltonian engineering used for:
 % and include diagram showing difficulty with different time terms
 
 \note{
-Average Hamiltonian Theory (AHT) has been used extensively for Hamiltonian engineering
+Average Hamiltonian Theory (AHT) has been used extensively for Hamiltonian engineering. AHT lets you design pulse sequences that refocus (cancel) certain terms in the Hamiltonian.
 
 Interaction frame is determined by $H_{\text{ctrl}}$, ``toggles'' the system Hamiltonian.
 
-Note how the first-order term has commutator of toggled Hamiltonians at different times. This is straightforward to calculate with a 4-pulse sequence, but gets analytically intractable for longer sequences, and for higher-order terms.
+% Note how the first-order term has commutator of toggled Hamiltonians at different times. This is straightforward to calculate with a 4-pulse sequence, but gets analytically intractable for longer sequences, and for higher-order terms.
 }
-
-\end{frame}
-
-\begin{frame}[plain]{Average Hamiltonian theory (cont.)}
-
-\begin{figure}
-\centering
-\includegraphics[width=0.6\textwidth]{AHT-HO-diagram.pdf}
-
-From \cite{brinkmann_2016}.
-\end{figure}
 
 \end{frame}
 
 \begin{frame}{Existing approaches to Hamiltonian engineering}
 
 \begin{itemize}
-    \item WAHUHA 4-pulse sequence (\cite{PhysRevLett.20.180}), $H_\text{eff} = \textcolor[rgb]{0,0.69,0}{H_{\text{CS}}'}$
+    \item WAHUHA 4-pulse sequence (\cite{PhysRevLett.20.180}), refocuses dipolar interaction to lowest-order
     
-    \item CORY 48-pulse sequence (\cite{CORY1990205}) designed analytically using AHT to be robust to errors, $H_\text{eff} = 0$
+    \item CORY 48-pulse sequence (\cite{CORY1990205}) designed analytically using AHT to be robust to errors, refocuses \emph{all} interactions to second order
 \end{itemize}
 
 \begin{figure}
 \centering
 \includegraphics[width=.5\textwidth]{decay_plot.pdf}
+% TODO replace ^ with more data from Linta
 \end{figure}
-
-\pause
-
-Are there better approaches to Hamiltonian engineering?
 
 \note{
 WHH-4 designed with pen and paper
 
-CORY-48 designed for time suspension while being robust to rotation and offset errors
+CORY-48 designed to refocus all interactions while being robust to rotation and offset errors
 
 AHT is great tool, but it's limited to approximating the average Hamiltonian with lowest-order terms. Longer sequences further restrict computing HO terms.
 
@@ -139,10 +132,46 @@ But longer pulse sequences can perform better\dots
 
 \end{frame}
 
+\begin{frame}{AHT limitations}
+
+{\footnotesize
+\begin{align*}
+    \overline{H}^{(0)} &= \frac{1}{t_c} \int_0^{t_c}
+        \widetilde{H}_{\text{sys}}(t) dt \\
+    %
+    \overline{H}^{(1)} &= \frac{1}{2it_c} \int_0^{t_c} dt_1 \int_0^{t_1} dt_2
+        [\widetilde{H}_{\text{sys}}(t_1), \widetilde{H}_{\text{sys}}(t_2)] \\
+    %
+    \overline{H}^{(2)} &= -\frac{1}{6t_c}
+    \int_0^{t_c} dt_1 \int_0^{t_1} dt_2 \int_0^{t_2} dt_3 &
+    \left\{
+    \left[\widetilde{H}_{\text{sys}}(t_1), \left[\widetilde{H}_{\text{sys}}(t_2), \widetilde{H}_{\text{sys}}(t_3)\right]\right] \right. \\
+    & & + \left.
+    \left[\left[\widetilde{H}_{\text{sys}}(t_1), \widetilde{H}_{\text{sys}}(t_2)\right], \widetilde{H}_{\text{sys}}(t_3)\right]
+    \right\}
+\end{align*}
+}
+% TODO make sure I can see this figure
+\begin{figure}
+\centering
+\includegraphics[width=0.5\textwidth]{AHT-HO-diagram.pdf}
+
+From \cite{brinkmann_2016}.
+\end{figure}
+
+\pause
+
+Are there better approaches to Hamiltonian engineering?
+
+\note{
+``RL has been advancing rapidly in recent years, useful tool for tackling a wide range of problems''
+}
+
+\end{frame}
 
 
 
-\section{Reinforcement learning for quantum control}
+\section{Reinforcement learning for Hamiltonian engineering}
 
 \begin{frame}{Reinforcement learning for quantum control}
 
@@ -170,7 +199,7 @@ From \cite{sutton2018reinforcement}.
 
 \begin{frame}{Constructing pulse sequences using RL}
 
-Implemented AlphaZero algorithm (\cite{Silver1140}, originally for Chess, Shogi, and Go).
+Implemented AlphaZero algorithm (\cite{Silver1140}, originally for Chess, Shogi, and Go). Many different possible RL approaches (\cite{peng2021deep}).
 % TODO call out to potential for tailored pulse sequences for particular systems, and robust to certain things...
 
 \begin{figure}
@@ -181,7 +210,10 @@ Implemented AlphaZero algorithm (\cite{Silver1140}, originally for Chess, Shogi,
 \end{figure}
 
 \note{
-Action space is delay, $\pm$X, $\pm$Y. Target unitary for time suspension is identity.
+
+Our collaborators at MIT have explored an alternative approach using evolutionary algorithms and deep learning.
+
+Action space is delay, $\pm$X, $\pm$Y. Target unitary is identity (want no dynamics, refocus all interactions).
 
 Each iteration of algorithm involves collecting data in a tree search and training neural networks on the collected data. Neural network maps state to policy (what pulse should I apply next?) and value (how good will this pulse sequence be?).
 
@@ -196,54 +228,75 @@ With tree structure, can optionally add AHT constraints to search.
 \end{frame}
 
 
-\begin{frame}{Comparison between RL approaches}
+\begin{frame}{Errors in experimental NMR}
 
-Different RL algorithm used by our collaborators (\cite{peng2021deep}).
+\begin{itemize}
+    \item Rotation (``flip angle'') errors
+    \begin{figure}
+    \centering
+    % TODO make/find graphic for rotation errors
+    % \includegraphics[width=.4\textwidth]{phase_transients_viz.png}
+    
+    Rotation error visual.
+    \end{figure}
+    \item Phase transient errors
+    \begin{figure}
+    \centering
+    \includegraphics[width=.4\textwidth]{phase_transients_viz.png}
+    
+    (a) Ideal pulse shape,  (b) phase transients. From \cite{1976ii}.
+    \end{figure}
+    \item Resonance offset errors
+\end{itemize}
 
-\begin{table}
+\end{frame}
+
+\begin{frame}{Computational results}
+
+% TODO put one plot on each slide, all pulse sequences in the plot
+% TODO break it into different pulse sequence lengths
+% TODO then robustness pulse sequences
+
+% TODO include results for weakly and strongly coupled spin systems
+
+Goal: refocus all interactions (\(\overline{H}=0\)) in strongly coupled spin system, run on 16 Intel Xeon E5-2640V3 (2.6GHz) CPUs.
+
+\begin{itemize}
+    \item Different pulse sequence lengths ($12\tau$ to $96\tau$)
+    \item AHT constraints (unconstrained, frequently refocused)
+    \item Robustness against experimental errors
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}{Computational results: pulse sequence length}
+
+\begin{figure}
 \centering
-\begin{footnotesize}
-\begin{tabular}{p{.2\textwidth}|p{.5\textwidth}|p{.25\textwidth}}
-    Characteristic & Evolutionary Reinforcement Learning & AlphaZero \\
-    \hline
-    State representation & Sequence of previous pulses & Same \\
-    \hline
-    Action space & Delay or $\pi/2$-pulse along $\pm$X, $\pm$Y & Same \\
-    \hline
-    Learning method & Evolutionary algorithms (gradient-free) & Tree search and experience replay (gradient based) \\
-    \hline
-    % Neural network architecture  % TODO what is their NN architecture?
-    Prior knowledge & Builds longer sequences from shorter ones & Uses AHT to prune tree search \\
-    \hline
-    Pulse sequences ($H_\text{eff} = 0$) & yxx48 & az48
-\end{tabular}
-\end{footnotesize}
-\end{table}
+\includegraphics[width=.75\textwidth]{pulse-sequence-length.pdf}
+\end{figure}
+% TODO make sure yxx48 and cory48 are in this too
+
+% todo and add robustness plots for rotation and phase transient errors
 
 \end{frame}
 
 
-\begin{frame}{Computational results}
-
-% TODO include results for weakly and strongly coupled spin systems
-
-Searching for 48-pulse sequence for time suspension (\(\overline{H}=0\)) in strongly coupled spin system, identified \textrm{az48} sequence after 14 hours
-on 16 Intel Xeon E5-2640V3 (2.6GHz) CPUs.
+\begin{frame}{Computational results: AHT constraints}
 
 \begin{figure}
 \centering
 \includegraphics[width=.49\textwidth]{rot_errors.pdf}
 \includegraphics[width=.49\textwidth]{phase_transients.pdf}
 \end{figure}
+% TODO redo all these figures...
 
 \end{frame}
 
-\begin{frame}{Computational results (cont.)}
 
-\begin{figure}
-\centering
-\includegraphics[width=.75\textwidth]{pulse-sequence-length.pdf}
-\end{figure}
+\begin{frame}{Computational results: robustness}
+
+% TODO make robustness plots once I have further data...
 
 \end{frame}
 
@@ -255,8 +308,19 @@ on 16 Intel Xeon E5-2640V3 (2.6GHz) CPUs.
 \centering
 \includegraphics[width=.75\textwidth]{decay_plot.pdf}
 \end{figure}
+% TODO replace this with actual experimental results I have...
 
 % waiting on results from (hopefully) better pulse sequence
+
+\end{frame}
+
+\begin{frame}{Summary}
+
+\begin{itemize}
+    \item RL is promising new tool to design pulse sequences for Hamiltonian engineering
+    \item Useful for tailoring control to specific system characteristics and errors
+    \item Best-performing approach is mix of RL and knowledge from AHT
+\end{itemize}
 
 \end{frame}
 
@@ -283,6 +347,40 @@ on 16 Intel Xeon E5-2640V3 (2.6GHz) CPUs.
 
 
 \section{Appendix}
+
+
+\begin{frame}{Quantum control in spin systems}
+
+\[
+    H(t) = H_{\text{sys}} + H_{\text{ctrl}}(t)
+\]
+
+Can use $H_{\text{ctrl}}(t)$ to achieve
+% state-to-state transfer ($\rho_0 \to \rho$) or
+a unitary transformation $U$ given by an effective Hamiltonian $H_\text{eff}$.
+
+% TODO also include spectrum with/without refocusing dipolar interactions?
+
+\begin{figure}
+\centering
+\input{spin_system.tex}
+\end{figure}
+
+\note{
+Only focusing on closed system dynamics with global control (spins are not addressed individually).
+
+% Different types of spin systems: \emph{strongly} coupled (solid state NMR) and \emph{weakly} coupled (ESR, NV/P1 centers)
+
+Hamiltonian engineering used for:
+
+\begin{itemize}
+    \item Sensing (refocusing dipolar interactions, e.g. $H_\text{eff} = \beta \textcolor[rgb]{0,0.69,0}{H_{\text{CS}}}$)
+    \item Quantum memory (refocusing all interactions, $H_\text{eff} = 0$)
+    \item Quantum simulation
+\end{itemize}
+
+}
+\end{frame}
 
 
 \begin{frame}{Quantum control in spin systems}
@@ -358,26 +456,6 @@ Higher-order terms for average Hamiltonian become nasty\dots
 
 \end{frame}
 
-\begin{frame}{AHT: Pulse sequences (cont.)}
-
-\begin{align*}
-    \overline{H}^{(0)} &= \frac{1}{t_c} \int_0^{t_c}
-        \widetilde{H}_{\text{sys}}(t) dt \\
-    %
-    \overline{H}^{(1)} &= \frac{1}{2it_c} \int_0^{t_c} dt_1 \int_0^{t_1} dt_2
-        [\widetilde{H}_{\text{sys}}(t_1), \widetilde{H}_{\text{sys}}(t_2)] \\
-    %
-    \overline{H}^{(2)} &= -\frac{1}{6t_c}
-    \int_0^{t_c} dt_1 \int_0^{t_1} dt_2 \int_0^{t_2} dt_3
-    \left\{
-    \left[\widetilde{H}_{\text{sys}}(t_1), \left[\widetilde{H}_{\text{sys}}(t_2), \widetilde{H}_{\text{sys}}(t_3)\right]\right] +
-    \left[\left[\widetilde{H}_{\text{sys}}(t_1), \widetilde{H}_{\text{sys}}(t_2)\right], \widetilde{H}_{\text{sys}}(t_3)\right]
-    \right\} \\
-    \vdots
-\end{align*}
-
-\end{frame}
-
 \begin{frame}{AHT: Special Cases}
 
 \begin{itemize}
@@ -394,19 +472,6 @@ Higher-order terms for average Hamiltonian become nasty\dots
 \begin{frame}{Spin systems}
 
 % TODO include Hcontrol <-> pulses description
-
-Sources of error:
-\begin{itemize}
-    \item Rotation (``flip angle'') error: control field magnitudes and/or durations are mis-calibrated
-    \item Phase transient error: rotations about quadrature axes due to circuit impedance
-    \item Offset error: rotating frame does not match system frequency
-\end{itemize}
-
-\begin{figure}
-\centering
-\includegraphics[width=.4\textwidth]{phase_transients_viz.png}
-\caption{(a) Ideal pulse shape,  (b) phase transients. From \cite{1976ii}.}
-\end{figure}
 
 \end{frame}
 
@@ -441,6 +506,32 @@ r = 4 \iff \text{fidelity} = 0.\underline{9999}
 % \note{Can apply RL to discrete control problem (pulse sequences)
 % or continuous control (shaped pulses, continuously-varying control
 % Hamiltonians)}
+
+\end{frame}
+
+\begin{frame}{Comparison between RL approaches}
+
+Different RL algorithm used by our collaborators (\cite{peng2021deep}).
+
+\begin{table}
+\centering
+\begin{footnotesize}
+\begin{tabular}{p{.2\textwidth}|p{.5\textwidth}|p{.25\textwidth}}
+    Characteristic & Evolutionary Reinforcement Learning & AlphaZero \\
+    \hline
+    State representation & Sequence of previous pulses & Same \\
+    \hline
+    Action space & Delay or $\pi/2$-pulse along $\pm$X, $\pm$Y & Same \\
+    \hline
+    Learning method & Evolutionary algorithms (gradient-free) & Tree search and experience replay (gradient based) \\
+    \hline
+    % Neural network architecture  % TODO what is their NN architecture?
+    Prior knowledge & Builds longer sequences from shorter ones & Uses AHT to prune tree search \\
+    \hline
+    Pulse sequences ($H_\text{eff} = 0$) & yxx48 & az48
+\end{tabular}
+\end{footnotesize}
+\end{table}
 
 \end{frame}
 
@@ -520,7 +611,7 @@ L2 regularization: prevent overfitting to data
 
 \begin{frame}{Pulse sequences identified using AlphaZero}
 
-\textrm{az48} pulse sequence (for time suspension):
+\textrm{az48} pulse sequence (refocuses all interactions):
 
 $ -X, \tau, Y, \tau, Y, \tau, X, \tau, Y, \tau, Y, \tau $
 $ -Y, \tau, X, \tau, X, \tau, -Y, \tau, X, \tau, X, \tau $
