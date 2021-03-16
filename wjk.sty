@@ -1,0 +1,262 @@
+% (c) 2020 Will Kaufman
+%
+% parts adapted from John Voight, 2017,
+% and Jay Pantone, 2018
+%
+
+\ProvidesPackage{kaufman}[Will Kaufman's LaTeX package]
+
+\newif\if@loadbeamer %\@loadhyperreffalse
+\DeclareOption{beamer}{\@loadbeamertrue}
+\DeclareOption{document}{\@loadbeamerfalse}
+
+\newif\if@loadposter
+\DeclareOption{poster}{\@loadpostertrue}
+
+\newif\if@revtex %\@loadhyperreffalse
+\DeclareOption{revtex}{\@revtextrue}
+
+\ExecuteOptions{document}
+
+\ProcessOptions\relax
+
+
+\if@loadbeamer % load presentation packages
+% best theme as of 2018-08-11
+% \usetheme{Berlin}
+% define color theme here...
+\definecolor{dartmouth_primary}{RGB}{0, 105, 62}
+\definecolor{dartmouth_secondary}{RGB}{0, 77, 45}
+\definecolor{dartmouth_tertiary}{RGB}{18, 49, 43}
+\definecolor{dartmouth_quaternary}{RGB}{0, 60, 115}
+% \setbeamercolor*{structure}{bg=dartmouth_primary!20,fg=dartmouth_primary}
+\setbeamercolor*{palette primary}{fg=white,bg=dartmouth_primary}
+\setbeamercolor*{palette secondary}{fg=white,bg=dartmouth_secondary}
+\setbeamercolor*{palette tertiary}{fg=white,bg=dartmouth_tertiary}
+\setbeamercolor*{palette quaternary}{fg=white,bg=dartmouth_quaternary}
+
+\setbeamercolor{section in toc}{fg=black,bg=white}
+\setbeamercolor{alerted text}{fg=dartmouth_primary!50!black!80!black}
+
+\setbeamercolor{titlelike}{parent=palette primary,fg=dartmouth_primary!50!black}
+\setbeamercolor{frametitle}{bg=dartmouth_primary,fg=white}
+\setbeamercolor*{titlelike}{parent=palette primary}
+
+\setbeamercolor{itemize item}{fg=dartmouth_primary}
+\setbeamercolor{enumerate item}{fg=dartmouth_primary}
+\setbeamercolor{bibliography item}{fg=dartmouth_primary}
+\setbeamercolor*{bibliography entry author}{fg=dartmouth_primary}
+\setbeamercolor*{bibliography entry location}{fg=dartmouth_primary}
+
+
+% % include TOC at beginning of each section
+% \AtBeginSection[]
+% {
+%   \begin{frame}
+%     \frametitle{Table of Contents}
+%     \tableofcontents[currentsection]
+%   \end{frame}
+% }
+% include slide number
+\addtobeamertemplate{navigation symbols}{}{%
+    \usebeamerfont{footline}%
+    \usebeamercolor[fg]{footline}%
+    \hspace{1em}%
+    \insertframenumber/\inserttotalframenumber
+}
+% add numbers to bibliography
+\setbeamertemplate{bibliography item}{\insertbiblabel}
+% load beamer-specific packages
+\RequirePackage{lmodern}
+\else % load document packages
+\RequirePackage[margin=1in]{geometry}
+\RequirePackage[colorlinks=true,linkcolor=blue,
+            citecolor=blue,
+            urlcolor=black]{hyperref}
+\fi % end load document-specific packages
+
+\if@revtex
+\else
+% use authoryear citestyle
+\RequirePackage[
+style=nature,
+citestyle=authoryear,
+uniquename=init,
+backend=biber
+]{biblatex}
+% \RequirePackage[style=nature]{biblatex}
+\fi  % end if revtex bibliography
+
+
+% load rest of packages
+\RequirePackage[utf8]{inputenc}
+\RequirePackage{graphicx}
+\RequirePackage{tikz}
+\usetikzlibrary{arrows}
+\usetikzlibrary{positioning}
+\RequirePackage{color}
+\RequirePackage{subcaption}
+\RequirePackage{tabularx}
+% pretty math things
+\RequirePackage{amssymb}
+\RequirePackage{amsthm}
+\RequirePackage{amsmath}
+\RequirePackage{amsxtra}
+\RequirePackage{dsfont}
+% for algorithm-type stuff
+\RequirePackage{algorithm}
+\RequirePackage{algorithmic}
+% for inputting code etc.
+\RequirePackage{listings}
+\RequirePackage{minibox}
+% more packages
+\RequirePackage{mathrsfs}
+\RequirePackage{enumerate}
+\RequirePackage[super]{nth}
+\RequirePackage{bookmark} % makes section bookmarks in PDF files
+\RequirePackage{float} % for making figures stay where they're put!
+\RequirePackage{grffile} % for allowing PDF filenames to have dots in them
+\RequirePackage{lipsum} % for filler text
+% end require package
+ 
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.45,0.15,0.40}
+\definecolor{backcolour}{rgb}{0.96,0.96,0.96}
+ 
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\footnotesize,
+    breakatwhitespace=false,
+    breaklines=true,
+    captionpos=b,
+    keepspaces=true,
+    numbers=left,
+    %numbersep=5pt,
+    showspaces=false,
+    showstringspaces=false,
+    showtabs=false,
+    tabsize=2
+}
+
+\lstset{style=mystyle}
+
+
+% general commands
+
+\newcommand{\divline}%
+{\begin{center}%
+\rule{0.5\linewidth}{0.4pt}%
+\end{center}}
+
+\newcommand{\comment}[1]
+{
+\begin{center}
+    \fbox{
+    \parbox{.9\textwidth}{
+        \begin{center}
+            \textbf{\large COMMENT}
+        \end{center}
+        #1
+    }
+    }
+\end{center}
+}
+
+% environments
+
+\newenvironment{problab}[1]
+{\noindent\textbf{Problem #1}.}
+{\medskip}
+
+\newenvironment{solulab}[1]
+{\noindent\textbf{Solution to #1}.}
+{\medskip}
+
+% \newenvironment{solution}
+% {
+%
+% \smallskip
+%
+% \noindent\textbf{Solution}.}
+% {
+%
+% \medskip
+%
+% }
+
+% \newtheorem{theorem}{Theorem}
+
+
+%%% custom commands
+
+% Physics definitions
+\newcommand*{\hham}{\mathcal{H}}
+\newcommand{\ket}[1]{|#1\rangle}
+\newcommand{\bra}[1]{\langle#1|}
+\newcommand{\ddt}[1]{\frac{d #1}{dt}}
+% identity operator
+\newcommand{\identity}{\mathds{1}}
+
+% arg min and max
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator{\lcm}{lcm}
+% \DeclareMathOperator{\det}{det}
+
+\newcommand{\lub}{\textrm{l.u.b.}}
+\newcommand{\glb}{\textrm{g.l.b.}}
+% \newcommand{\gcd}{\textrm{gcd}}
+
+\newcommand{\finseq}[2]{#1_1,#1_2,#1_3,\dots,#1_#2}
+\newcommand{\infseq}[1]{{#1}_1,{#1}_2,{#1}_3,\dots}
+\newcommand{\infsubseq}[2]{{#1}_{#2_1},{#1}_{#2_2},{#1}_{#2_3},\dots}
+
+% define equals symbols
+\newcommand{\defeq}{\mathrel{\mathop:}=}
+
+\newcommand{\A}{\mathbb A}
+\newcommand{\C}{\mathbb C}
+\newcommand{\F}{\mathbb F}
+\newcommand{\HH}{\mathbb H}
+% \newcommand{\PP}{\mathbb P}
+\newcommand{\Q}{\mathbb Q}
+\newcommand{\R}{\mathbb R}
+\newcommand{\T}{\mathcal T}
+\newcommand{\Z}{\mathbb Z}
+\newcommand{\Qbar}{\overline{\mathbb Q}}
+\newcommand{\N}{\mathbb N}
+
+% overwrite amsmath Re and Im symbols
+\renewcommand{\Re}{\operatorname{Re}}
+\renewcommand{\Im}{\operatorname{Im}}
+
+% for probability and expectation
+\renewcommand{\P}{\mathbb P} % overwrites paragraph symbol
+\newcommand{\E}{\mathbb E}
+
+\newcommand{\Tr}[1]{\text{Tr}\left( #1 \right)}
+
+\newcommand{\bdA}{\mathbf A}
+\newcommand{\bdJ}{\mathbf J}
+\newcommand{\bdO}{\mathbf O}
+\newcommand{\bdS}{\mathbf S}
+\newcommand{\bfA}{\mathbb A}
+\newcommand{\bfC}{\mathbb C}
+\newcommand{\bfF}{\mathbb F}
+\newcommand{\bfG}{\mathbb G}
+\newcommand{\bfH}{\mathbb H}
+\newcommand{\bfQ}{\mathbb Q}
+\newcommand{\bfR}{\mathbb R}
+\newcommand{\bfS}{\mathbb S}
+\newcommand{\bfT}{\mathbb T}
+\newcommand{\bfZ}{\mathbb Z}
+
+% from Pantone 2018
+
+\newcommand{\ds}{\displaystyle}
+\newcommand{\Var}{\operatorname{Var}}
