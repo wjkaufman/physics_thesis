@@ -12,7 +12,7 @@
 % uncomment to include notes in PDF
 % \setbeameroption{show notes}
 
-\bibliography{../refs.bib}
+\bibliography{{../refs.bib}}
 \graphicspath{{../graphics/}}
 
 \title[RL for Quantum Control in NMR]{Using Reinforcement Learning for Quantum Control in Magnetic Resonance [DRAFT]}
@@ -42,7 +42,7 @@ Cambridge, Massachusetts 02139, USA}
 % \tableofcontents
 % \end{frame}
 
-\section{Quantum control}
+\section{Hamiltonian engineering}
 
 \begin{frame}{Magnetic dipolar interactions in solids}
 
@@ -50,9 +50,10 @@ Cambridge, Massachusetts 02139, USA}
 \centering
 \includegraphics[width=0.4\textwidth]{1H-NMR.jpg}
 \hfill
-\scalebox{.5}{
+\scalebox{.7}{
 \input{bath-spins.tex}
-}
+} \\
+{\footnotesize \cite{Ottowa-NMR}}
 % \caption{}
 % \label{}
 \end{figure}
@@ -60,18 +61,16 @@ Cambridge, Massachusetts 02139, USA}
 Magentic dipolar interactions\dots
 \begin{itemize}
     % TODO reference Linta's, Ethan's talks
-    \item Broaden spectral lines in NMR (\cite{linta_march_meeting})
-    \item Lead to decay of central spin coherence in bath (\cite{ethan_march_meeting})
+    \item Broaden spectral lines in NMR (Linta Joseph, Session J33)
+    \item Lead to decay of central spin coherence in bath (Ethan Williams, Session L29)
 \end{itemize}
 
-\begin{align*}
-    H_{\text{sys}} &= \sum_i \delta_i I_z^i + \sum_{i,j} d_{ij} \left( 3I_z^iI_z^j - \mathbf{I^i} \cdot \mathbf{I^j} \right) \\
-        &= H_\text{CS} + H_\text{D}
-\end{align*}
+\[
+    H_{\text{sys}} = \sum_i \delta_i I_z^i + \sum_{i,j} d_{ij} \left( 3I_z^iI_z^j - \mathbf{I^i} \cdot \mathbf{I^j} \right)
+    = H_\text{CS} + H_\text{D}
+\]
 
-Refocusing dipolar interactions would narrow spectral lines, increase coherence times.
-
-{\footnotesize \cite{Ottowa-NMR}}
+Refocusing dipolar interactions would narrow spectral lines and increase coherence times.
 
 \end{frame}
 
@@ -85,7 +84,7 @@ If\dots
     \]
     \item Observe system stroboscopically ($t = Nt_c$)
 \end{itemize}
-\dots then system appears to evolve under an effective \emph{average} Hamiltonian
+\dots then system appears to evolve under an effective \emph{average} Hamiltonian.
 
 \begin{figure}
 \centering
@@ -109,13 +108,13 @@ Interaction frame is determined by $H_{\text{ctrl}}$, ``toggles'' the system Ham
 
 \begin{itemize}
     \item WAHUHA 4-pulse sequence (\cite{PhysRevLett.20.180}), refocuses dipolar interaction to lowest-order
-    
+
     \item CORY 48-pulse sequence (\cite{CORY1990205}) designed analytically using AHT to be robust to errors, refocuses \emph{all} interactions to second order
 \end{itemize}
 
 \begin{figure}
 \centering
-\includegraphics[width=.5\textwidth]{decay_plot.pdf}
+\includegraphics[width=.7\textwidth]{decay_plot.pdf}
 % TODO replace ^ with more data from Linta
 \end{figure}
 
@@ -134,19 +133,19 @@ But longer pulse sequences can perform better\dots
 
 \begin{frame}{AHT limitations}
 
-{\footnotesize
+{\scriptsize % or \footnotesize
 \begin{align*}
     \overline{H}^{(0)} &= \frac{1}{t_c} \int_0^{t_c}
         \widetilde{H}_{\text{sys}}(t) dt \\
     %
     \overline{H}^{(1)} &= \frac{1}{2it_c} \int_0^{t_c} dt_1 \int_0^{t_1} dt_2
-        [\widetilde{H}_{\text{sys}}(t_1), \widetilde{H}_{\text{sys}}(t_2)] \\
+        \left[\widetilde{H}_{\text{sys}}(t_1), \widetilde{H}_{\text{sys}}(t_2)\right] \\
     %
     \overline{H}^{(2)} &= -\frac{1}{6t_c}
-    \int_0^{t_c} dt_1 \int_0^{t_1} dt_2 \int_0^{t_2} dt_3 &
+    \int_0^{t_c} dt_1 \int_0^{t_1} dt_2 \int_0^{t_2} dt_3
     \left\{
     \left[\widetilde{H}_{\text{sys}}(t_1), \left[\widetilde{H}_{\text{sys}}(t_2), \widetilde{H}_{\text{sys}}(t_3)\right]\right] \right. \\
-    & & + \left.
+    & \hspace{13em} + \left.
     \left[\left[\widetilde{H}_{\text{sys}}(t_1), \widetilde{H}_{\text{sys}}(t_2)\right], \widetilde{H}_{\text{sys}}(t_3)\right]
     \right\}
 \end{align*}
@@ -154,14 +153,14 @@ But longer pulse sequences can perform better\dots
 % TODO make sure I can see this figure
 \begin{figure}
 \centering
-\includegraphics[width=0.5\textwidth]{AHT-HO-diagram.pdf}
+\includegraphics[width=0.4\textwidth]{AHT-HO-diagram.pdf}
 
-From \cite{brinkmann_2016}.
+{\scriptsize From \cite{brinkmann_2016}.}
 \end{figure}
 
-\pause
-
-Are there better approaches to Hamiltonian engineering?
+% \pause
+% TODO either figure out how to include this or drop it
+% Are there better approaches to Hamiltonian engineering?
 
 \note{
 ``RL has been advancing rapidly in recent years, useful tool for tackling a wide range of problems''
@@ -177,7 +176,7 @@ Are there better approaches to Hamiltonian engineering?
 
 \begin{figure}
 \centering
-\includegraphics[width=.6\textwidth]{rl.png}
+\includegraphics[width=.8\textwidth]{rl.png}
 
 From \cite{sutton2018reinforcement}.
 \end{figure}
@@ -194,7 +193,7 @@ From \cite{sutton2018reinforcement}.
     %     }
     % \]
 \end{itemize}
-    
+
 \end{frame}
 
 \begin{frame}{Constructing pulse sequences using RL}
@@ -236,17 +235,18 @@ With tree structure, can optionally add AHT constraints to search.
     \centering
     % TODO make/find graphic for rotation errors
     % \includegraphics[width=.4\textwidth]{phase_transients_viz.png}
-    
+
     Rotation error visual.
     \end{figure}
     \item Phase transient errors
     \begin{figure}
     \centering
-    \includegraphics[width=.4\textwidth]{phase_transients_viz.png}
-    
+    \includegraphics[width=.6\textwidth]{phase_transients_viz.png}
+
     (a) Ideal pulse shape,  (b) phase transients. From \cite{1976ii}.
     \end{figure}
-    \item Resonance offset errors
+    % \item Resonance offset errors
+    % TODO mention ^?
 \end{itemize}
 
 \end{frame}
@@ -259,8 +259,7 @@ With tree structure, can optionally add AHT constraints to search.
 
 % TODO include results for weakly and strongly coupled spin systems
 
-Goal: refocus all interactions (\(\overline{H}=0\)) in strongly coupled spin system, run on 16 Intel Xeon E5-2640V3 (2.6GHz) CPUs.
-
+Goal: refocus all interactions (\(\overline{H}=0\)) in strongly coupled spin system.
 \begin{itemize}
     \item Different pulse sequence lengths ($12\tau$ to $96\tau$)
     \item AHT constraints (unconstrained, frequently refocused)
