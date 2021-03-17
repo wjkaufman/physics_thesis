@@ -156,6 +156,12 @@
 \draw  [fill={rgb, 255:red, 0; green, 0; blue, 0 }  ,fill opacity=1 ] (122.6,256.6) -- (131.4,256.6) -- (131.4,286.4) -- (122.6,286.4) -- cycle ;
 %Shape: Rectangle [id:dp617205458629722]
 \draw  [color={rgb, 255:red, 0; green, 0; blue, 0 }  ,draw opacity=0.5 ] (162.2,257.2) -- (171,257.2) -- (171,287) -- (162.2,287) -- cycle ;
+%Bend Arrow [id:dp6585364177452142]
+\draw  [fill={rgb, 255:red, 0; green, 0; blue, 0 }  ,fill opacity=1 ] (280.18,50) -- (305.68,24.51) .. controls (327.39,2.79) and (362.59,2.79) .. (384.3,24.51) -- (399.15,39.35) -- (404.67,33.82) -- (407.09,61.09) -- (379.82,58.68) -- (385.35,53.15) -- (370.5,38.31) .. controls (356.41,24.22) and (333.57,24.22) .. (319.48,38.31) -- (293.98,63.8) -- cycle ;
+%Bend Arrow [id:dp0451220258211682]
+\draw  [fill={rgb, 255:red, 0; green, 0; blue, 0 }  ,fill opacity=1 ] (410.17,173.99) -- (385.17,199) .. controls (362.73,221.43) and (326.35,221.43) .. (303.92,199) -- (288.58,183.66) -- (282.87,189.37) -- (280.37,161.19) -- (308.55,163.69) -- (302.84,169.4) -- (318.18,184.74) .. controls (332.74,199.3) and (356.35,199.3) .. (370.91,184.74) -- (395.91,159.74) -- cycle ;
+%Up Arrow [id:dp2948113074954464]
+\draw  [color={rgb, 255:red, 53; green, 35; blue, 35 }  ,draw opacity=1 ][fill={rgb, 255:red, 0; green, 0; blue, 0 }  ,fill opacity=1 ] (459.17,113.35) -- (468.17,124) -- (477.17,113.35) -- (472.67,113.35) -- (472.67,89) -- (463.67,89) -- (463.67,113.35) -- cycle ;
 
 % Text Node
 \draw (41.59,125.5) node   [align=left] {start};
@@ -206,9 +212,17 @@
 % Text Node
 \draw (121.2,242.2) node [anchor=north west][inner sep=0.75pt]  [font=\footnotesize]  {$\overline{Y}$};
 % Text Node
-\draw (313.43,93) node  [font=\Huge]  {$\dotsc $};
+\draw (333.5,277.4) node [anchor=north west][inner sep=0.75pt]  [font=\normalsize]  {$U_{\text{target}} =1$};
 % Text Node
-\draw (361,94.4) node [anchor=north west][inner sep=0.75pt]  [font=\Huge]  {$U_{\text{target}} = \identity$};
+\draw    (422.67,58.33) -- (513.67,58.33) -- (513.67,83.33) -- (422.67,83.33) -- cycle  ;
+\draw (425.67,62.33) node [anchor=north west][inner sep=0.75pt]   [align=left] {replay buffer};
+% Text Node
+\draw    (392.67,129.67) -- (543.67,129.67) -- (543.67,154.67) -- (392.67,154.67) -- cycle  ;
+\draw (395.67,133.67) node [anchor=north west][inner sep=0.75pt]   [align=left] {policy/value networks};
+% Text Node
+\draw (293,67) node [anchor=north west][inner sep=0.75pt]   [align=left] {search statistics};
+% Text Node
+\draw (282.67,218.67) node [anchor=north west][inner sep=0.75pt]   [align=left] {improved policy/value};
 
 
 \end{tikzpicture}
