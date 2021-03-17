@@ -7,12 +7,15 @@
 % * Make it simple (e.g. “higher is better in this plot”, “reward of 4 means 0.9999”)
 % * Get to my data/results by 5 minute mark
 
-\usepackage[beamer]{wjk}
+% TODO make sure I have most up-to-date data for AHT-constrained
+% search and robust pulse sequence
+
+\usepackage[beamer]{../wjk}
 
 % uncomment to include notes in PDF
 % \setbeameroption{show notes}
 
-\bibliography{{../refs.bib}}
+\bibliography{../refs.bib}
 \graphicspath{{../graphics/}}
 
 \title[RL for Quantum Control in NMR]{Using Reinforcement Learning for Quantum Control in Magnetic Resonance [DRAFT]}
@@ -28,14 +31,15 @@ Hanover, NH 03755, USA
 Cambridge, Massachusetts 02139, USA}
 
 \titlegraphic{
-\includegraphics[height=.08\textheight]{Dartmouth.pdf}
+\includegraphics[height=.06\textheight]{Dartmouth.pdf}
 \hfill
-\includegraphics[height=.08\textheight]{mit_logo.png}
+\includegraphics[height=.06\textheight]{mit_logo.png}
 }
 
 \begin{document}
 
-\frame[plain]{\titlepage}
+\frame{\titlepage}
+% TODO need [plain]?
 
 % \begin{frame}
 % \frametitle{Table of Contents}
@@ -50,13 +54,11 @@ Cambridge, Massachusetts 02139, USA}
 \centering
 \includegraphics[width=0.4\textwidth]{1H-NMR.jpg}
 \hfill
-\scalebox{.7}{
+\scalebox{.6}{
 \input{bath-spins.tex}
 } \\
-{\footnotesize \cite{Ottowa-NMR}}
-% \caption{}
-% \label{}
 \end{figure}
+{\footnotesize \cite{Ottowa-NMR}}
 
 Magentic dipolar interactions\dots
 \begin{itemize}
@@ -65,10 +67,12 @@ Magentic dipolar interactions\dots
     \item Lead to decay of central spin coherence in bath (Ethan Williams, Session L29)
 \end{itemize}
 
+{\footnotesize
 \[
     H_{\text{sys}} = \sum_i \delta_i I_z^i + \sum_{i,j} d_{ij} \left( 3I_z^iI_z^j - \mathbf{I^i} \cdot \mathbf{I^j} \right)
     = H_\text{CS} + H_\text{D}
 \]
+}
 
 Refocusing dipolar interactions would narrow spectral lines and increase coherence times.
 
@@ -150,10 +154,11 @@ But longer pulse sequences can perform better\dots
     \right\}
 \end{align*}
 }
+\vspace{-1em}
 % TODO make sure I can see this figure
 \begin{figure}
 \centering
-\includegraphics[width=0.4\textwidth]{AHT-HO-diagram.pdf}
+\includegraphics[width=0.3\textwidth]{AHT-HO-diagram.pdf}
 
 {\scriptsize From \cite{brinkmann_2016}.}
 \end{figure}
@@ -172,7 +177,7 @@ But longer pulse sequences can perform better\dots
 
 \section{Reinforcement learning for Hamiltonian engineering}
 
-\begin{frame}{Reinforcement learning for quantum control}
+\begin{frame}{Reinforcement learning for Hamiltonian engineering}
 
 \begin{figure}
 \centering
@@ -200,6 +205,7 @@ From \cite{sutton2018reinforcement}.
 
 Implemented AlphaZero algorithm (\cite{Silver1140}, originally for Chess, Shogi, and Go). Many different possible RL approaches (\cite{peng2021deep}).
 % TODO call out to potential for tailored pulse sequences for particular systems, and robust to certain things...
+% TODO note Pai's presentation earlier in the week
 
 \begin{figure}
 \centering
@@ -234,16 +240,16 @@ With tree structure, can optionally add AHT constraints to search.
     \begin{figure}
     \centering
     % TODO make/find graphic for rotation errors
-    % \includegraphics[width=.4\textwidth]{phase_transients_viz.png}
-
-    Rotation error visual.
+    \scalebox{.6}{
+    \input{rotation-error.tex}
+    }
     \end{figure}
     \item Phase transient errors
     \begin{figure}
     \centering
     \includegraphics[width=.6\textwidth]{phase_transients_viz.png}
 
-    (a) Ideal pulse shape,  (b) phase transients. From \cite{1976ii}.
+    (a) Ideal pulse shape,  (b) phase transients, from \cite{1976ii}.
     \end{figure}
     % \item Resonance offset errors
     % TODO mention ^?
@@ -253,12 +259,6 @@ With tree structure, can optionally add AHT constraints to search.
 
 \begin{frame}{Computational results}
 
-% TODO put one plot on each slide, all pulse sequences in the plot
-% TODO break it into different pulse sequence lengths
-% TODO then robustness pulse sequences
-
-% TODO include results for weakly and strongly coupled spin systems
-
 Goal: refocus all interactions (\(\overline{H}=0\)) in strongly coupled spin system.
 \begin{itemize}
     \item Different pulse sequence lengths ($12\tau$ to $96\tau$)
@@ -266,36 +266,70 @@ Goal: refocus all interactions (\(\overline{H}=0\)) in strongly coupled spin sys
     \item Robustness against experimental errors
 \end{itemize}
 
+% TODO move experimental error description here...
+
 \end{frame}
 
-\begin{frame}{Computational results: pulse sequence length}
+\begin{frame}{Computational results: AlphaZero algorithm learns}
+
+\movie[width=.8\textwidth]{}{2021-03-15-12-pulse-sequence-rewards.mp4}
+% TODO put in video showing learning, increasing rewards...
+
+\end{frame}
+
+\begin{frame}[allowframebreaks]%
+{Computational results: unconstrained search}
+
+Starting \emph{tabula rasa} (no AHT knowledge)
+
+% TODO update figures below with new data once I get it...
+\begin{figure}
+\centering
+\includegraphics[width=.8\textwidth]{rot_errors-unconstrained.pdf}
+\end{figure}
 
 \begin{figure}
 \centering
-\includegraphics[width=.75\textwidth]{pulse-sequence-length.pdf}
+\includegraphics[width=.8\textwidth]{phase_transients-unconstrained.pdf.pdf}
 \end{figure}
-% TODO make sure yxx48 and cory48 are in this too
-
-% todo and add robustness plots for rotation and phase transient errors
 
 \end{frame}
 
 
-\begin{frame}{Computational results: AHT constraints}
+\begin{frame}[allowframebreaks]%
+{Computational results: AHT-constrained search}
 
 \begin{figure}
 \centering
-\includegraphics[width=.49\textwidth]{rot_errors.pdf}
-\includegraphics[width=.49\textwidth]{phase_transients.pdf}
+\includegraphics[width=.8\textwidth]{rot_errors-AHT.pdf}
 \end{figure}
-% TODO redo all these figures...
+
+\begin{figure}
+\centering
+\includegraphics[width=.8\textwidth]{phase_transients-AHT.pdf}
+\end{figure}
 
 \end{frame}
 
 
-\begin{frame}{Computational results: robustness}
+\begin{frame}[allowframebreaks]%
+{Computational results: robustness}
 
-% TODO make robustness plots once I have further data...
+Accidentally added significant phase transient error\dots
+
+\begin{figure}
+\centering
+\includegraphics[width=.8\textwidth]{rot_errors-robust.pdf}
+\end{figure}
+
+\break
+
+\dots but at least the pulse sequence was robust to it!
+
+\begin{figure}
+\centering
+\includegraphics[width=.8\textwidth]{phase_transients-robust.pdf}
+\end{figure}
 
 \end{frame}
 
@@ -309,17 +343,20 @@ Goal: refocus all interactions (\(\overline{H}=0\)) in strongly coupled spin sys
 \end{figure}
 % TODO replace this with actual experimental results I have...
 
-% waiting on results from (hopefully) better pulse sequence
-
 \end{frame}
 
 \begin{frame}{Summary}
 
 \begin{itemize}
+    % TODO mention dipolar interactions, start with physics again...
     \item RL is promising new tool to design pulse sequences for Hamiltonian engineering
     \item Useful for tailoring control to specific system characteristics and errors
     \item Best-performing approach is mix of RL and knowledge from AHT
 \end{itemize}
+
+\pause
+
+Thanks for listening!
 
 \end{frame}
 
