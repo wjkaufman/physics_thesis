@@ -18,7 +18,7 @@
 \bibliography{../refs.bib}
 \graphicspath{{../graphics/}}
 
-\title[RL for Quantum Control in NMR]{Using Reinforcement Learning for Quantum Control in Magnetic Resonance [DRAFT]}
+\title[RL for Quantum Control in NMR]{Using Reinforcement Learning for Quantum Control in Magnetic Resonance}
 \author[Will Kaufman]{Will Kaufman\inst{1} \and Benjamin Alford\inst{1} \and Pai Peng\inst{2} \and \\
 Xiaoyang Huang\inst{2} \and Linta Joseph\inst{1} \and Paola Cappellaro\inst{2} \and Chandrasekhar Ramanathan\inst{1}}
 \date[March Meeting 2021]{APS March Meeting 2021 \\
@@ -59,13 +59,15 @@ Cambridge, Massachusetts 02139, USA}
 \hfill
 \scalebox{.6}{
 \input{bath-spins.tex}
-} \\
-\hspace{.2em}{\scriptsize%
+}
+\end{figure}
+\vspace{-1em}
+\hspace{3em}
+{\scriptsize%
 % for NMR spectrum figure
 % \cite{Ottowa-NMR}
 Facey 2008.%
 }
-\end{figure}
 
 Magentic dipolar interactions\dots
 \begin{itemize}
@@ -126,7 +128,6 @@ Interaction frame is determined by $H_{\text{ctrl}}$, ``toggles'' the system Ham
 \begin{figure}
 \centering
 \includegraphics[width=.7\textwidth]{decay_plot.pdf}
-% TODO replace ^ with more data from Linta
 \end{figure}
 
 \note{
@@ -193,7 +194,7 @@ From \cite{sutton2018reinforcement}.
 
 \begin{itemize}
     \item State $\to$ propagator
-    \item Action $\to$ rf-pulse
+    \item Action $\to$ control pulses
     \item Reward $\to$ propagator fidelity $\left(\Re{
         \frac{\Tr{U_\text{target}^\dagger U(t)}}{\Tr{\identity}}
     }\right)$
@@ -251,9 +252,9 @@ Goal: decouple all interactions (\(\overline{H}=0\)) in strongly coupled spin sy
 \end{figure}
 
 \begin{itemize}
-    \item Unconstrained search (\emph{tabula rasa}, no AHT knowledge), 1\% pulse rotation error, no phase transients error, different pulse sequence lengths ($12\tau, 24\tau, 36\tau, 48\tau$)
-    \item AHT-constrained search, 1\% pulse rotation error, no phase transients error, $48\tau$ sequence length
-    \item AHT-constrained search, 5\% pulse rotation error, .1\% phase transients error, $48\tau$ sequence length
+    \item Unconstrained search (\emph{tabula rasa}, no AHT knowledge), 1\% pulse rotation error, different pulse sequence lengths ($12\tau, 24\tau, 36\tau, 48\tau$)
+    \item AHT-constrained search, 1\% pulse rotation error, $48\tau$ sequence length
+    % \item AHT-constrained search, 5\% pulse rotation error, .1\% phase transient error, $48\tau$ sequence length
 \end{itemize}
 
 % TODO identify fidelities obtained under ideal conditions
@@ -295,12 +296,23 @@ Unconstrained search doesn't learn well for long pulse sequences, but adding low
 \end{frame}
 
 \begin{frame}
-{Robustness to pulse rotation error}
+{Robustness to errors: unconstrained search}
 
-% TODO include az12, az48 (w AHT), and robust, plus yxx48 and c48
 \begin{figure}
 \centering
-\includegraphics[width=.9\textwidth]{rot_errors.pdf}
+\includegraphics[width=.49\textwidth]{rot_errors-unconstrained.pdf}
+\hfill
+\includegraphics[width=.49\textwidth]{phase_transients-unconstrained.pdf}
+\end{figure}
+
+\end{frame}
+
+\begin{frame}
+{Robustness to pulse rotation error: AHT constraints}
+
+\begin{figure}
+\centering
+\includegraphics[width=.9\textwidth]{rot_errors-constrained.pdf}
 \end{figure}
 
 \end{frame}
@@ -309,62 +321,19 @@ Unconstrained search doesn't learn well for long pulse sequences, but adding low
 
 \begin{figure}
 \centering
-\includegraphics[width=.9\textwidth]{phase_transients.pdf}
+\includegraphics[width=.9\textwidth]{phase_transients-constrained.pdf}
 \end{figure}
 
 \end{frame}
 
-% \begin{frame}
-% {Robustness to pulse rotation error: AHT-constraints}
-%
-% Adding lowest-order AHT constraints to tree search\dots
-% % TODO replace with new data if/when I get it
-%
-% \begin{figure}
-% \centering
-% \includegraphics[width=.9\textwidth]{rot_errors-AHT.pdf}
-% \end{figure}
-%
-% \end{frame}
-%
-%
-% \begin{frame}
-% {Robustness to phase transient error: AHT-constraints}
-%
-% \begin{figure}
-% \centering
-% \includegraphics[width=.9\textwidth]{phase_transients-AHT.pdf}
-% \end{figure}
-%
-% \end{frame}
-%
-% \begin{frame}
-% {Robustness to rotation error: larger training errors}
-%
-% % TODO replace with new data if/when I get it
-%
-% Accidentally added significant phase transient error\dots
-%
-% \begin{figure}
-% \centering
-% \includegraphics[width=.9\textwidth]{rot_errors-robust.pdf}
-% \end{figure}
-%
-% \end{frame}
-%
-% \begin{frame}
-% {Robustness to phase transient error: larger training errors}
-%
-% % TODO replace with new data if/when I get it
-%
-% \dots but at least the pulse sequence was robust to it!
-%
-% \begin{figure}
-% \centering
-% \includegraphics[width=.9\textwidth]{phase_transients-robust.pdf}
-% \end{figure}
-%
-% \end{frame}
+\begin{frame}{Fidelity vs. tau spacing}
+
+\begin{figure}
+\centering
+\includegraphics[width=.9\textwidth]{tau_delay.pdf}
+\end{figure}
+
+\end{frame}
 
 \begin{frame}{Experimental results}
 
@@ -505,8 +474,6 @@ So the Hamiltonian in the interaction frame becomes
 
 \begin{frame}{AHT: Pulse sequences}
 
-% TODO add density operator, diagrams
-
 If a pulse sequence is both cyclic and periodic \cite{gerstein-dybowski}
 \begin{align*}
     U_{\text{ctrl}}(t_c) &= T\exp \left(
@@ -543,19 +510,20 @@ Higher-order terms for average Hamiltonian become nasty\dots
 %
 % \end{frame}
 
-\begin{frame}{Reinforcement learning methodology}
+\begin{frame}{Simulation/RL parameters}
 
-% TODO fill in below
+\begin{itemize}
+    \item $N=3$ spin-1/2 system, $\delta_i \sim \mathcal{N}(0, 1)$, $d_{ij} \sim \mathcal{N}(0, 100)$
+    \item Delay $\tau = 10^{-4}$, pulse length $t_p = 10^{-5}$
+    \item Ensemble of 50 spin systems with different chemical shifts and dipolar interactions
+\end{itemize}
 
-Working on this slide still...
 
-State representation:
-
-Action representation:
-
-Spin system simulation parameters:
-
-% TODO system/ensemble simulation
+\begin{itemize}
+    \item Replay buffer size: $10^6$ ``experiences'' ($(s, a, r)$)
+    \item Batch size: $2048$
+    \item Training duration: $10^4$ training steps
+\end{itemize}
 
 \[
     \text{fidelity}(U, U_\text{target}) = \Re{
