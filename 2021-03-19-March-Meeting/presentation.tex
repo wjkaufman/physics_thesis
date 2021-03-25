@@ -12,8 +12,8 @@
 
 \usepackage[beamer]{../wjk}
 
-% uncomment to include notes in PDF
-% \setbeameroption{show notes}
+% uncomment to only show notes in PDF
+% \setbeameroption{show only notes}
 
 \bibliography{../refs.bib}
 \graphicspath{{../graphics/}}
@@ -65,8 +65,8 @@ Cambridge, Massachusetts 02139, USA}
 \hspace{3em}
 {\scriptsize%
 % for NMR spectrum figure
-% \cite{Ottowa-NMR}
-Facey 2008.%
+\nocite{Ottowa-NMR}
+From Facey 2008.%
 }
 
 Magentic dipolar interactions\dots
@@ -110,7 +110,11 @@ If\dots
 \note{
 Average Hamiltonian Theory (AHT) has been used extensively for Hamiltonian engineering. AHT lets you design pulse sequences that decouples (cancels) certain terms in the Hamiltonian.
 
-Interaction frame is determined by $H_{\text{ctrl}}$, ``toggles'' the system Hamiltonian.
+Axes in the figure show the orientation of the interaction frame, cyclic because first and last orientations are the same.
+
+If you measure at $t_c$, then system will appear to evolve under $\overline{H}$.
+
+% Interaction frame is determined by $H_{\text{ctrl}}$, ``toggles'' the system Hamiltonian.
 
 % Note how the first-order term has commutator of toggled Hamiltonians at different times. This is straightforward to calculate with a 4-pulse sequence, but gets analytically intractable for longer sequences, and for higher-order terms.
 }
@@ -122,7 +126,7 @@ Interaction frame is determined by $H_{\text{ctrl}}$, ``toggles'' the system Ham
 \begin{itemize}
     \item WAHUHA 4-pulse sequence (\cite{PhysRevLett.20.180}), decouples dipolar interaction to lowest-order
 
-    \item CORY 48-pulse sequence (\cite{CORY1990205}) designed analytically using AHT to be robust to errors, decouples \emph{all} interactions to second order
+    \item CORY 48-pulse sequence (\cite{CORY1990205}) designed analytically using AHT to be robust to experimental imperfections, decouples \emph{all} interactions to second order
 \end{itemize}
 
 \begin{figure}
@@ -133,11 +137,7 @@ Interaction frame is determined by $H_{\text{ctrl}}$, ``toggles'' the system Ham
 \note{
 WHH-4 designed with pen and paper
 
-CORY-48 designed to decouple all interactions while being robust to rotation and offset errors
-
-AHT is great tool, but it's limited to approximating the average Hamiltonian with lowest-order terms. Longer sequences further restrict computing HO terms.
-
-But longer pulse sequences can perform better\dots
+Plot of average correlation of adamantane sample for FID, and using two pulse sequences. See how coherence time improves with dipolar decoupling! But there's still room to improve before we reach T1 limit.
 
 }
 
@@ -172,6 +172,9 @@ But longer pulse sequences can perform better\dots
 % TODO make sure I can see this figure ^
 
 \note{
+
+AHT is great, but it gets really hard to calculate higher order terms (especially for longer pulse sequences).
+
 ``RL has been advancing rapidly in recent years, useful tool for tackling a wide range of problems''
 
 Are there better approaches to Hamiltonian engineering using RL?
@@ -201,6 +204,10 @@ From \cite{sutton2018reinforcement}.
     % TODO double check if I'm using this or average gate fidelity
 \end{itemize}
 
+\note{
+With RL, potential for tailored pulse sequences for particular systems (e.g. strongly coupled vs weakly coupled), learned robustness to errors.
+}
+
 \end{frame}
 
 \begin{frame}{Constructing pulse sequences using AlphaZero}
@@ -216,13 +223,13 @@ Implemented AlphaZero algorithm (\cite{Silver1140}, originally for Chess, Shogi,
 
 \note{
 
-With RL, potential for tailored pulse sequences for particular systems (e.g. strongly coupled vs weakly coupled), learned robustness to errors.
+% TODO continue updating notes here...
 
 Our collaborators at MIT have explored an alternative approach using evolutionary algorithms and deep learning.
 
-Action space is delay, $\pm$X, $\pm$Y. Target unitary is identity (want no dynamics, refocus/decouple all interactions).
+% Action space is delay, $\pm$X, $\pm$Y. Target unitary is identity (want no dynamics, refocus/decouple all interactions).
 
-Each iteration of algorithm involves collecting data in a tree search and training neural networks on the collected data. Neural network maps state to policy (what pulse should I apply next?) and value (how good will this pulse sequence be?).
+% Each iteration of algorithm involves collecting data in a tree search and training neural networks on the collected data. Neural network maps state to policy (what pulse should I apply next?) and value (how good will this pulse sequence be?).
 
 With tree structure, can optionally add AHT constraints to search.
 
@@ -239,7 +246,7 @@ With tree structure, can optionally add AHT constraints to search.
 % TODO Sekhar: "You don't have a lot of sequences, I'd consider explicitly listing them here"
 % TODO change here... Just list all jobs I ran/have results for
 
-Goal: decouple all interactions (\(\overline{H}=0\)) in strongly coupled spin system with experimental imperfections.
+Goal: decouple all interactions (\(\overline{H}=0\)) in strongly coupled spin systems with experimental imperfections.
 
 \begin{figure}
     \centering
@@ -262,28 +269,15 @@ Goal: decouple all interactions (\(\overline{H}=0\)) in strongly coupled spin sy
 
 \note{
 
-Unconstrained search didn't yield any results for 96-pulse sequence (never found pulse sequence above threshold fidelity.)
+% Unconstrained search didn't yield any results for 96-pulse sequence (never found pulse sequence above threshold fidelity.)
 
 }
-
-\end{frame}
-
-\begin{frame}{Computational results: AlphaZero algorithm learns}
-
-\begin{figure}
-\centering
-\includegraphics[width=.49\textwidth]{az_learning/hist-0000.png}
-\includegraphics[width=.49\textwidth]{az_learning/hist-0030.png} \\
-\includegraphics[width=.49\textwidth]{az_learning/hist-0090.png}
-\includegraphics[width=.49\textwidth]{az_learning/hist-0145.png}
-\end{figure}
 
 \end{frame}
 
 \begin{frame}
 {Fidelity vs. pulse sequence length}
 
-% TODO add robust pulse sequence too!
 \begin{figure}
 \centering
 \includegraphics[width=.9\textwidth]{pulse-sequence-length.pdf}
@@ -292,18 +286,6 @@ Unconstrained search didn't yield any results for 96-pulse sequence (never found
 \note{
 Unconstrained search doesn't learn well for long pulse sequences, but adding lowest-order AHT constraints significantly boosts performance! Perhaps adding more AHT-informed constraints will further boost performance
 }
-
-\end{frame}
-
-\begin{frame}
-{Robustness to errors: unconstrained search}
-
-\begin{figure}
-\centering
-\includegraphics[width=.49\textwidth]{rot_errors-unconstrained.pdf}
-\hfill
-\includegraphics[width=.49\textwidth]{phase_transients-unconstrained.pdf}
-\end{figure}
 
 \end{frame}
 
@@ -348,10 +330,10 @@ Unconstrained search doesn't learn well for long pulse sequences, but adding low
 
 \begin{itemize}
     \item Decoupling dipolar interactions is important for narrowing linewidths, increasing coherence times
-    \item RL is promising new tool to design pulse sequences for Hamiltonian engineering
+    \item RL is promising new tool to design new pulse sequences
     \begin{itemize}
-        \item Useful for tailoring control to specific system characteristics and errors
-        \item Best-performing approach is mix of RL and knowledge from AHT
+        \item Tailored control for specific system characteristics and errors
+        \item Best-performing approach likely is a mix of RL and knowledge from AHT
     \end{itemize}
 \end{itemize}
 
@@ -542,6 +524,30 @@ r = 4 \iff \text{fidelity} = 0.\underline{9999}
 % \note{Can apply RL to discrete control problem (pulse sequences)
 % or continuous control (shaped pulses, continuously-varying control
 % Hamiltonians)}
+
+\end{frame}
+
+\begin{frame}{Computational results: AlphaZero algorithm learns}
+
+\begin{figure}
+\centering
+\includegraphics[width=.49\textwidth]{az_learning/hist-0000.png}
+\includegraphics[width=.49\textwidth]{az_learning/hist-0030.png} \\
+\includegraphics[width=.49\textwidth]{az_learning/hist-0090.png}
+\includegraphics[width=.49\textwidth]{az_learning/hist-0145.png}
+\end{figure}
+
+\end{frame}
+
+\begin{frame}
+{Robustness to errors: unconstrained search}
+
+\begin{figure}
+\centering
+\includegraphics[width=.49\textwidth]{rot_errors-unconstrained.pdf}
+\hfill
+\includegraphics[width=.49\textwidth]{phase_transients-unconstrained.pdf}
+\end{figure}
 
 \end{frame}
 
