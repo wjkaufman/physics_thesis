@@ -73,9 +73,12 @@
 \RequirePackage{lmodern}
 \else % load document packages
 \RequirePackage[margin=1in]{geometry}
-\RequirePackage[colorlinks=true,linkcolor=blue,
-            citecolor=blue,
-            urlcolor=black]{hyperref}
+\RequirePackage[
+colorlinks=true,
+linkcolor=blue,
+citecolor=blue,
+urlcolor=blue
+]{hyperref}
 \fi % end load document-specific packages
 
 \if@revtex
@@ -83,7 +86,7 @@
 % use authoryear citestyle
 \RequirePackage[
 style=nature,
-citestyle=authoryear,
+% citestyle=authoryear,
 uniquename=init,
 backend=biber
 ]{biblatex}
