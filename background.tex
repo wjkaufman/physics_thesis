@@ -3,13 +3,20 @@
 
 \section{Motivation}
 
-Some physicists believe that quantum physics is on the cusp of a ``second quantum revolution''\cite{quantum-rev}. The ability to probe and control quantum systems at the individual level, as opposed to using emergent phenomena that arise due to quantum mechanics, has potential to radically transform many different areas, from sensing problems to quantum computing.
+Some physicists believe that quantum physics is on the cusp of a ``second quantum revolution''\cite{quantum-rev}. The ability to probe quantum systems with finer precision and control them to a greater extent, as opposed to passively observing emergent phenomena that arise, has potential to radically transform many different areas, from sensing to simulation quantum computing.
 
-% TODO describe motivation, spectral lines, spin coherence
+Two specific examples where quantum control can be readily applied include NMR spectroscopy and bath engineering. In NMR spectroscopy, the collective magnetization of spin-1/2 protons in a sample can be measured, and the resulting signal informs the particular chemical environments the spins are in. However, for solid-state samples, magnetic dipolar interactions between spins overwhelm the signal and prevent inhibit our ability to learn about the chemical environments. However, various methods have been developed to effectively \emph{decouple} the magnetic dipolar interactions between spins, improving the signal drastically.
+
+Magnetic dipole interactions between a central spin and many surrounding bath spins (such as an NV center surrounded by many P1 centers) also leads to unwanted effects, in this case a decay of the central spin coherence time. Long coherence times for the system of interest are desirable, and finding ways to decouple interactions between the central spin and bath spins would help that endeavor.
 
 % intro to quantum ideas
 % TODO delete this subsection?
 \section{A Few Foundations from Quantum Mechanics}
+
+This section is meant to present some fundamental ideas that will be used throughout, but for a more thorough description of quantum mechanics see
+% TODO cite McYntire or Sakurai
+.
+In all equations that follow, $\hbar = 1$.
 
 % state of system <-> density operator
 Given a quantum system, a general state can be represented by a density operator $\rho(t)$. The density operator encapsulates all known information about the quantum system, specifically the expectation values associated with well-defined observable. For an observable $A$, the expectation is given by
@@ -23,43 +30,69 @@ The time evolution of the density operator is given by
 \end{equation}
 where the unitary operator $U$ is the ``propagator'' defined by
 \begin{equation}\label{eq:propagator-de}
-    i\hbar \ddt{U(t)} = H(t) U(t), U(0) = \identity
+    i \ddt{U(t)} = H(t) U(t), U(0) = \identity
 \end{equation}
 % TODO decide to include this?
 The two equations above can be combined to yield the Liouville-Von Neumann equation, which explicitly shows the density operator's dependence on the system Hamiltonian.
 \begin{equation}
-    i\hbar \ddt{\rho(t)} = [H(t), \rho(t)]
+    i \ddt{\rho(t)} = [H(t), \rho(t)]
 \end{equation}
 
 When the Hamiltonian is time-independent or if the Hamiltonian commutes with itself at different points in time (i.e. $[H(t_1), H(t_2)] = 0$), equation~\ref{eq:propagator-de} can be solved to obtain the propagator
 \[
-U(t) = \text{exp}\left[ {-i/\hbar \int_0^t H(t') dt'} \right]
+U(t) = \text{exp}\left[ {-i \int_0^t H(t') dt'} \right]
 \]
 However, if the Hamiltonian is time-dependent and doesn't commute with itself at different times, then the above equation is not valid. This difficulty with time-dependent Hamiltonians and methods with dealing with them are further discussed in~\ref{sec:AHT}.
 
-% TODO add section on toggling frames, how that works... (How does it work?)
-\lipsum[1]
-
-% quantum control and quantum sensing
-Two important active fields of research are quantum control and quantum sensing. Quantum control investigates the ability to transform an initial state $\rho(0)$ to a specified final state and time $\rho(T)$, or the ability to create a specified propagator $U(T)$, using some set of controls on the system.\cite{Dong_2010} Systems can be controlled by manipulating parameters in the Hamiltonian, such as the strength or orientation of an external magnetic field.
-Quantum sensing leverages quantized energy levels, coherence, or entanglement properties of systems to precisely measure physical quantities. To measure the desired quantity (such as the strength of an external magnetic field), it is sometimes necessary to minimize the other interactions present in the system. For both control and sensing problems, engineering a specific Hamiltonian is an important step.
+In many cases it can be helpful to consider the \emph{interaction frame} of a particular interaction. If the Hamiltonian is expressed as the sum of two terms
+\[
+H(t) = H_A(t) + H_B(t)
+\]
+then there is a unitary operator $U_A(t)$ given by
+\[
+\frac{d}{dt} U_A(t) = -i H_A(t) U_A(t), \, U_A(0) = \identity
+\]
+that maps from the interaction frame to the lab frame.
+The dynamics in the interaction frame are described by the interaction frame Hamiltonian $\widetilde{H}(t) = {U_A(t)}^{\dagger} H_B(t)U_A(t)$
+\[
+\frac{d}{dt}\widetilde{U}(t) = -i \widetilde{H}(t)\widetilde{U}(t),\, \widetilde{U}(0) = \identity
+\]
+The propagator in the lab frame $U(t)$ is related to $\widetilde{U}(t)$ by first time evolution in the interaction frame, then mapping from the interaction frame to the lab frame
+\[
+U(t) = U_A(t)\widetilde{U}(t).
+\]
 
 \section{Spin-1/2 Systems and Nuclear Magnetic Resonance}
 
-A spin-1/2 particle (such as an electron or proton) has two possible values for its intrinsic angular momentum or ``spin,'' which makes it one of the simplest quantum systems to study. The corresponding Hilbert Space for a single spin-1/2 particle has dimension two.
-Nuclear magnetic resonance (NMR) is a technique % TODO continue describing what NMR is
+A spin-1/2 particle (such as an electron or proton) has two possible values for its intrinsic angular momentum or ``spin,'' so the corresponding Hilbert Space for a single spin-1/2 particle has dimension two.
+Nuclear magnetic resonance (NMR) is a technique
+% TODO continue describing what NMR is
 % TODO Discuss NMR system, general overview
 
+% TODO keep going here, describe NMR more, maybe draw a picture too?
+\cite{1976ii} outlines the interactions present in a nuclear spin Hamiltonian, but the relevant interactions considered in this work are expressed below.%
+\footnote{The quadrupolar interaction and J coupling are not considered here, but it's good to remember they're still there in general.}
+The Zeeman interaction $H_Z$ captures the coupling of spins to the external magnetic field. The Larmor frequency $\omega_i = \gamma_i B_0$ only differs between spins if the gyromagnetic ratio differs (e.g. $H^1$ or $C^{13}$).%
+\footnote{The external magnetic field $B_0$ also varies from spin to spin due to experimental imperfections, but those field inhomogeneities are again ignored.}
+
 \begin{align}\label{eq:nmr-ham}
-    H_\text{total}(t) &= H_0 + H_\text{CS} + H_D + H_\text{rf}(t) \\
-    H_0 &= \sum_i \omega_i I_z^{(i)} \\
-    H_\text{CS} &= ???????????????? \\
+    H(t) &= H_Z + H_\text{CS} + H_D + H_\text{rf}(t) \\
+    H_Z &= \sum_i \omega_i I_z^{(i)} \\
+    H_\text{CS} &= \sum_i \delta_i I_z^i \\
     H_D &= \sum_{i,j} d_{ij} \left( 3I_z^{(i)}I_z^{(j)} - \mathbf{I^{(i)}} \cdot \mathbf{I^{(j)}} \right)
 \end{align}
 
-\lipsum[2]
+% TODO describe process of running an experiment with NMR
+
+% TODO describe motional averaging, liquid vs solid state
+
 
 \section{Quantum Control}
+
+Two important active fields of research are quantum control and quantum sensing. Quantum control investigates the ability to transform an initial state $\rho(0)$ to a specified final state and time $\rho(T)$, or the ability to create a specified propagator $U(T)$, using some set of controls on the system.\cite{Dong_2010} Systems can be controlled by manipulating parameters in the Hamiltonian, such as the strength or orientation of an external magnetic field.
+
+% TODO find a home for this, or remove
+Quantum sensing leverages quantized energy levels, coherence, or entanglement properties of systems to precisely measure physical quantities. To measure the desired quantity (such as the strength of an external magnetic field), it is sometimes necessary to minimize the other interactions present in the system. For both control and sensing problems, engineering a specific Hamiltonian is an important step.
 
 % TODO q control framework, Hsys, Hcontrol
 
