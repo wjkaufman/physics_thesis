@@ -148,7 +148,7 @@ In contrast, solid-state NMR does not have the advantage of motional averaging. 
 
 \section{Quantum Control}
 
-Quantum control theory encompasses many different problems, but they each involve driving quantum phenomena in a desired way using a set of control parameters. Quantum control problems include transforming an initial state $\rho(0)$ to a final state $\rho(T)$, creating a specified propagator $U(T)$, or engineering interactions between a subsystem and its environment.\cite{Dong_2010}\footnote{In this work, only closed quantum systems are considered, so bath engineering is not considered.} Systems can be controlled by manipulating parameters in the Hamiltonian, such as the strength or orientation of an external magnetic field (as in NMR).
+Quantum control theory encompasses many different problems, but they each involve driving quantum phenomena in a desired way using a set of control parameters. Quantum control problems include transforming an initial state $\rho(0)$ to a final state $\rho(T)$, creating a specified unitary transformation $U(T)$, or engineering interactions between a subsystem and its environment.\cite{Dong_2010}\footnote{In this work, only closed quantum systems are considered, so bath engineering is not considered.} Systems can be controlled by manipulating parameters in the Hamiltonian, such as the strength or orientation of an external magnetic field (as in NMR).
 
 The Hamiltonian in the context of quantum control can be expressed as
 \begin{equation}
@@ -164,21 +164,70 @@ where $\{H_k\}$ is a set of time-independent Hermitian operators and $\{u_k(t)\}
 % Two important active fields of research are quantum control and quantum sensing.
 % Quantum sensing leverages quantized energy levels, coherence, or entanglement properties of systems to precisely measure physical quantities. To measure the desired quantity (such as the strength of an external magnetic field), it is sometimes necessary to minimize the other interactions present in the system. For both control and sensing problems, engineering a specific Hamiltonian is an important step.
 
-% TODO q control framework, Hsys, Hcontrol
-
-% TODO different applications (state preparation, dynamics, bath engineering)
-\lipsum[1]
+% TODO describe more, or give example?
 
 \subsection{Hamiltonian Engineering}
 
-\lipsum[1-4]
+Closely related to creating a desired unitary transformation $U(T)$, Hamiltonian engineering is an important problem within quantum control. The goal of Hamiltonian engineering is to choose control parameters $\{u_k(t)\}$ so that, when measured stroboscopically\footnote{Stroboscopically means measured at regular intervals $0, T, 2T, \dots$.}, the system appears to evolve under a target effective Hamiltonian $H_{\text{eff}}$ instead of the system Hamiltonian $H_{\text{sys}}$. In most cases the target Hamiltonian is time-independent.
 
-% \subsection{Unitary Implementation}
-% % TODO do I want to include this?
-%
-% \lipsum[1-3]
+If we are able to engineer an effective Hamiltonian, then we have also created a unitary transformation $U(T) = \exp{-i H_{\text{eff}} T}$. And conversely, if we have implemented a unitary transformation $U(T)$, then there exists an effective time-independent Hamiltonian that characterizes the dynamics over time $T$ (note that this Hamiltonian isn't unique).
+
+% TODO anything more to say here???
 
 \section{Average Hamiltonian Theory}\label{sec:AHT}
+
+Average Hamiltonian theory (AHT) provides a framework with which the Hamiltonian engineering problem can be approached. The following presentation of AHT is inspired from \cite{brinkmann_2016, gerstein-dybowski, 1976ii}.
+
+For a particular Hamiltonian $H(t)$, the propagator $U(t)$ is defined by equation~\ref{eq:propagator-de}
+\[
+i \ddt{U(t)} = H(t) U(t), U(0) = \identity
+\]
+As the name suggests, average Hamiltonian theory lets us express the propagator $U(t)$ at each time $t$ in terms of an \emph{average} time-independent Hamiltonian $\overline{H}$
+\[
+U(t) = \exp{-i \overline{H}(t) t}
+\]
+You might look at the above equation and say ``$\overline{H}(t)$ isn't time-independent because it explicitly has time dependence!'' It is true that $\overline{H}(t)$ isn't necessarily time-independent, but the idea is that \emph{given} a time $T$, we can find $\overline{H}(T)$ so that the propagator $U(T)$ can be expressed \emph{as though} the Hamiltonian were $\overline{H}(T)$ for the time interval $t \in [0, T]$.
+
+How then do we determine the average Hamiltonian? One approach is to use the Magnus Expansion.\cite{Blanes_2009,2010EJPh...31..907B} Given the propagator differential equation (equation~\ref{eq:propagator-de}), the Magnus Expansion begins with the ansatz that an exponential solution exists
+\[
+U(t) = \exp{\Omega(t)}, \Omega(0) = 0
+\]
+and proceeds by finding a series expansion for $\Omega(t)$
+\[
+\Omega(t) = \sum_k \Omega_k(t)
+\]
+The first few terms are presented below
+\begin{align*}
+    \Omega_1(t) &= -i \int_0^t dt_1 H(t_1) \\
+    \Omega_2(t) &= -\frac{1}{2} \int_0^t dt_1 \int_0^{t_1} dt_2 [H(t_1), H(t_2)] \\
+    \vdots
+\end{align*}
+Proofs of the the Magnus Expansion can be found in
+\cite{gerstein-dybowski,Blanes_2009,2010EJPh...31..907B}.
+
+From $\Omega(t)$, an expression for the average Hamiltonian can be derived by making the comparison
+\[
+\Omega(t) = -i \overline{H}(t) t \implies \overline{H}(t) = \frac{i}{t} \Omega(t)
+\]
+This then gives us a series expansion for the average Hamiltonian $\overline{H}(t) = \sum_k \overline{H}^{(k)}(t)$, with the first few terms given below
+\begin{align*}
+    \overline{H}^{(0)} &= \frac{1}{t} \int_0^{t}
+        H(t) dt \\
+    %
+    \overline{H}^{(1)} &= \frac{1}{2it} \int_0^{t} dt_1 \int_0^{t_1} dt_2
+        \left[H(t_1), H(t_2)\right] \\
+    %
+    \overline{H}^{(2)} &= -\frac{1}{6t}
+    \int_0^{t} dt_1 \int_0^{t_1} dt_2 \int_0^{t_2} dt_3
+    \left\{
+    \left[H(t_1), \left[H(t_2), H(t_3)\right]\right] \right. \\
+    & \hspace{13em} + \left.
+    \left[\left[H(t_1), H(t_2)\right], H(t_3)\right]
+    \right\}
+\end{align*}
+
+% TODO continue here.......
+
 
 \lipsum[1-2]
 
