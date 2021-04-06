@@ -3,7 +3,7 @@
 
 \section{Motivation}
 
-Some physicists believe that quantum physics is on the cusp of a ``second quantum revolution''\cite{quantum-rev}. The ability to probe quantum systems with finer precision and control them to a greater extent, as opposed to passively observing emergent phenomena that arise, has potential to radically transform many different areas, from sensing to simulation quantum computing.
+Some physicists believe that quantum physics is on the cusp of a ``second quantum revolution''.\cite{quantum-rev} The ability to probe quantum systems with finer precision and control them to a greater extent, as opposed to passively observing emergent phenomena that arise, has potential to radically transform many different areas, from sensing to simulation quantum computing.
 
 Two specific examples where quantum control can be readily applied include NMR spectroscopy and bath engineering. In NMR spectroscopy, the collective magnetization of spin-1/2 protons in a sample can be measured, and the resulting signal informs the particular chemical environments the spins are in. However, for solid-state samples, magnetic dipolar interactions between spins overwhelm the signal and prevent inhibit our ability to learn about the chemical environments. However, various methods have been developed to effectively \emph{decouple} the magnetic dipolar interactions between spins, improving the signal drastically.
 
@@ -20,9 +20,9 @@ In all equations that follow, $\hbar = 1$.
 
 % state of system <-> density operator
 Given a quantum system, a general state can be represented by a density operator $\rho(t)$. The density operator encapsulates all known information about the quantum system, specifically the expectation values associated with well-defined observable. For an observable $A$, the expectation is given by
-\[
-\langle A \rangle = \Tr{\rho A}
-\]
+\begin{equation}\label{eq:measure}
+    \langle A \rangle = \Tr{\rho A}
+\end{equation}
 
 The time evolution of the density operator is given by
 \begin{equation}\label{eq:density-time}
@@ -72,27 +72,97 @@ Nuclear magnetic resonance (NMR) is a technique
 % TODO keep going here, describe NMR more, maybe draw a picture too?
 \cite{1976ii} outlines the interactions present in a nuclear spin Hamiltonian, but the relevant interactions considered in this work are expressed below.%
 \footnote{The quadrupolar interaction and J coupling are not considered here, but it's good to remember they're still there in general.}
-The Zeeman interaction $H_Z$ captures the coupling of spins to the external magnetic field. The Larmor frequency $\omega_i = \gamma_i B_0$ only differs between spins if the gyromagnetic ratio differs (e.g. $H^1$ or $C^{13}$).%
+The Zeeman interaction $H_Z$ captures the coupling of spins to the external magnetic field. The Larmor frequency $\omega_i = \gamma_i B_0$ only differs between spins if the gyromagnetic ratio differs (e.g. between $H^1$ and $C^{13}$), but assuming all spins are of the same species, we can call the Larmor frequency $\omega_0$.%
 \footnote{The external magnetic field $B_0$ also varies from spin to spin due to experimental imperfections, but those field inhomogeneities are again ignored.}
-
 \begin{align}\label{eq:nmr-ham}
     H(t) &= H_Z + H_\text{CS} + H_D + H_\text{rf}(t) \\
-    H_Z &= \sum_i \omega_i I_z^{(i)} \\
+    H_Z &= \sum_i \omega_0 I_z^{(i)} \\
     H_\text{CS} &= \sum_i \delta_i I_z^i \\
     H_D &= \sum_{i,j} d_{ij} \left( 3I_z^{(i)}I_z^{(j)} - \mathbf{I^{(i)}} \cdot \mathbf{I^{(j)}} \right)
 \end{align}
+The term $I_z^{(i)}$ is shorthand for a tensor product of operators, all identity except for the $i$th operator
+\[
+I_z^{(i)} = \identity \otimes \identity \otimes \dots \otimes I_z \otimes \dots \otimes \identity
+\]
+The time-independent terms in the Hamiltonian are referred to as the internal Hamiltonian or $H_{\text{int}}$.
 
 % TODO describe process of running an experiment with NMR
 
-% TODO describe motional averaging, liquid vs solid state
+In an NMR spectrometer, a sample is placed into an external magnetic field $B_0$ (defining the principal axis, commonly chosen to be the z-axis). The spins in the sample reach thermal equilibrium and are characterized by the density operator
+\[
+\rho_{\text{eq}} = \frac{
+    e^{-\beta H_{\text{int}}}
+    }{
+    \Tr{
+        e^{-\beta H_{\text{int}}}
+     }
+    }
+\]
+The dominant term in the internal Hamiltonian is $H_Z$, which means the first-order approximation for $\rho_{\text{eq}}$ is given by
+\[
+\rho_{\text{eq}} \approx \identity + \epsilon \sum_i I_z^{(i)}
+\]
+The identity term does not contribute to the system's dynamics ($U \identity U^\dagger = \identity$) so we can focus on the collective spin term $\sum_i I_z^{(i)}$.
 
+If we just consider the Zeeman term $H_Z$, then the propagator $U(t)$ is given by
+\[
+U(t) = \exp \left( -it \sum_i \omega_0 I_z^{(i)} \right)
+\]
+which describes rotation about the z-axis with angular velocity $\omega_0$. An intuitive understanding is that the spins precess about the net magnetic field.
+
+
+In addition to the main external magnetic field (with fixed magnitude $B_0$), there is a coil surrounding the sample that can apply a transverse magnetic field, say along the x-axis. If an oscillating transverse magnetic field is applied at the Larmor frequency of the spins
+\[
+B_1(t) = B_1 \cos(\omega_0 t)
+\]
+then this field can be thought of as two counter-rotating magnetic fields whose net effect is $B_1(t)$. In a frame rotating about the z-axis with frequency $\omega_0$, it looks like there a fixed magnetic field (due to $B_0$ and one of the rotating fields) and a counter-rotating field with frequency $2\omega_0$. If we ignore the high-frequency field (i.e. the rotating wave approximation), the spins in the rotating frame see a fixed magnetic field along a different axis, and begin to precess about the new field. By applying this transverse $B_1$ field for a specific duration at a specific phase,
+% TODO should I do the math for this?
+% TODO definitely should describe how Hrf = u_1 Ix + U_2 Iy
+% TODO work in interaction frame, it'll be good...
+the spins can be rotated from the initial equilibrium state to a state with net magnetization along the x-axis. This is called a $\pi/2$-pulse (because it rotates the spins $\pi/2$ radians or $90^\circ$). Increasing the strength of the $B_1$ field or the duration of the pulse increases the rotation angle, and adjusting the phase of the pulse adjusts the rotation axis.
+% TODO mention the pulse frequency to rotate about z?
+
+In NMR experiments, the procedure generally goes as follows
+\begin{enumerate}
+    \item Place the sample in the main magnetic field and wait for the sample to reach thermal equilibrium.
+    \item Apply a $\pi/2$-pulse to rotate the spins into the xy-plane.
+    \item Measure the oscillating induced emf due to the precessing spins. This signal is called the free induction decay (FID).
+\end{enumerate}
+The Fourier transform of the FID gives a spectrum of the sample, including chemical shift frequencies $\delta_i$ of different spin species. There are many, \emph{many} other variations on NMR experiments, but that is the basic methodology.
+
+% TODO put in diagram(s) showing FID, spectrum
+
+
+% TODO clarify my explanation of motional averaging
+If the NMR sample is a liquid, then the sample's molecules are constantly tumbling past each other. As a result, dipolar interactions between spins from different molecules are not constant over the course of the experiment, and in aggregate the dipolar interactions are averaged to zero. This is called ``motional averaging'' of the dipolar interactions
+\[
+H_{\text{int}} = H_Z + H_\text{CS} + 0
+\]
+The chemical shifts for each spin do stay constant (because the local magnetic field due to molecular structure stays the same), so the resulting spectrum clearly resolves chemical shift peaks.
+
+In contrast, solid-state NMR does not have the advantage of motional averaging. Because the spins are in a fixed position relative to other spins in the sample, dipolar interactions can affect the net magnetization of the sample and lead to a broadening of the peaks in the spectrum. This line broadening inhibits accurate measurements of chemical shifts in solid samples, a source of frustration to chemists and anyone looking for long coherence times.
+
+% TODO insert line broadening pictures
+
+% TODO talk about coherence?
 
 \section{Quantum Control}
 
-Two important active fields of research are quantum control and quantum sensing. Quantum control investigates the ability to transform an initial state $\rho(0)$ to a specified final state and time $\rho(T)$, or the ability to create a specified propagator $U(T)$, using some set of controls on the system.\cite{Dong_2010} Systems can be controlled by manipulating parameters in the Hamiltonian, such as the strength or orientation of an external magnetic field.
+Quantum control theory encompasses many different problems, but they each involve driving quantum phenomena in a desired way using a set of control parameters. Quantum control problems include transforming an initial state $\rho(0)$ to a final state $\rho(T)$, creating a specified propagator $U(T)$, or engineering interactions between a subsystem and its environment.\cite{Dong_2010}\footnote{In this work, only closed quantum systems are considered, so bath engineering is not considered.} Systems can be controlled by manipulating parameters in the Hamiltonian, such as the strength or orientation of an external magnetic field (as in NMR).
+
+The Hamiltonian in the context of quantum control can be expressed as
+\begin{equation}
+    H(t) = H_{\text{sys}} + H_{\text{ctrl}}(t)
+\end{equation}
+where $H_{\text{sys}}$ includes interactions in the system that we cannot control, and $H_{\text{ctrl}}(t)$ includes all interactions that we \emph{can} control. In many situations the control Hamiltonian can be expressed as
+\[
+H_{\text{ctrl}}(t) = \sum_k u_k(t) H_k
+\]
+where $\{H_k\}$ is a set of time-independent Hermitian operators and $\{u_k(t)\}$ are real-valued control parameters. In equation~\ref{eq:nmr-ham}, $H_{\text{int}} = H_{\text{sys}}$  and $H_{\text{rf}}(t) = H_{\text{ctrl}}(t)$.
 
 % TODO find a home for this, or remove
-Quantum sensing leverages quantized energy levels, coherence, or entanglement properties of systems to precisely measure physical quantities. To measure the desired quantity (such as the strength of an external magnetic field), it is sometimes necessary to minimize the other interactions present in the system. For both control and sensing problems, engineering a specific Hamiltonian is an important step.
+% Two important active fields of research are quantum control and quantum sensing.
+% Quantum sensing leverages quantized energy levels, coherence, or entanglement properties of systems to precisely measure physical quantities. To measure the desired quantity (such as the strength of an external magnetic field), it is sometimes necessary to minimize the other interactions present in the system. For both control and sensing problems, engineering a specific Hamiltonian is an important step.
 
 % TODO q control framework, Hsys, Hcontrol
 
