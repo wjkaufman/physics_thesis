@@ -209,8 +209,8 @@ From $\Omega(t)$, an expression for the average Hamiltonian can be derived by ma
 \[
 \Omega(t) = -i \overline{H}(t) t \implies \overline{H}(t) = \frac{i}{t} \Omega(t)
 \]
-This then gives us a series expansion for the average Hamiltonian $\overline{H}(t) = \sum_k \overline{H}^{(k)}(t)$, with the first few terms given below
-\begin{align*}
+This then gives us a series expansion for the average Hamiltonian $\overline{H}(t) = \sum_k \overline{H}^{(k)}(t)$, with the first few terms given below.
+\begin{align}\label{eq:AHT-terms}
     \overline{H}^{(0)} &= \frac{1}{t} \int_0^{t}
         H(t) dt \\
     %
@@ -224,18 +224,31 @@ This then gives us a series expansion for the average Hamiltonian $\overline{H}(
     & \hspace{13em} + \left.
     \left[\left[H(t_1), H(t_2)\right], H(t_3)\right]
     \right\}
-\end{align*}
+\end{align}
+
+The convergence of the Magnus Expansion is an important consideration. If the following condition is satisfied
+\begin{equation}\label{eq:AHT-convergence}
+    \int_0^t dt_1 ||H(t)||_2 \ll 1
+\end{equation}
+which effectively requires that we consider timescales much smaller than the natural timescale of the Hamiltonian, then the series $\overline{H}(t)$ converges.\footnote{A much more detailed overview regarding convergence can be found in \cite{Blanes_2009}.}
+
+% TODO talk about AHT in interaction frame, how that works...
+
+
+
+% TODO then talk about pulse sequences, that methodology
+
+
+\subsection{Example}
+
+
+% TODO WHH-4 pulse sequence
 
 % TODO continue here.......
 
-
-\lipsum[1-2]
-
-\subsection{Magnus Expansion}
-
-\lipsum[1-2]
-
 \subsection{Applications to Quantum Control}
+
+% TODO describe more recent work like F-matrix, etc.
 
 \lipsum[1-5]
 
