@@ -49,9 +49,9 @@ In many cases it can be helpful to consider the \emph{interaction frame} of a pa
 H(t) = H_A(t) + H_B(t)
 \]
 then there is a unitary operator $U_A(t)$ given by
-\[
-\frac{d}{dt} U_A(t) = -i H_A(t) U_A(t), \, U_A(0) = \identity
-\]
+\begin{equation}\label{eq:interaction-propagator}
+    \frac{d}{dt} U_A(t) = -i H_A(t) U_A(t), \, U_A(0) = \identity
+\end{equation}
 that maps from the interaction frame to the lab frame.
 The dynamics in the interaction frame are described by the interaction frame Hamiltonian $\widetilde{H}(t) = {U_A(t)}^{\dagger} H_B(t)U_A(t)$
 \[
@@ -70,15 +70,17 @@ Nuclear magnetic resonance (NMR) is a technique
 % TODO Discuss NMR system, general overview
 
 % TODO keep going here, describe NMR more, maybe draw a picture too?
-\cite{1976ii} outlines the interactions present in a nuclear spin Hamiltonian, but the relevant interactions considered in this work are expressed below.%
+\cite{1976ii} outlines the interactions present in a nuclear spin Hamiltonian, but the relevant interactions considered in this work are given below.%
 \footnote{The quadrupolar interaction and J coupling are not considered here, but it's good to remember they're still there in general.}
-The Zeeman interaction $H_Z$ captures the coupling of spins to the external magnetic field. The Larmor frequency $\omega_i = \gamma_i B_0$ only differs between spins if the gyromagnetic ratio differs (e.g. between $H^1$ and $C^{13}$), but assuming all spins are of the same species, we can call the Larmor frequency $\omega_0$.%
+The Zeeman interaction $H_Z$ captures the coupling of spins to the main external magnetic field along the z-axis. The Larmor frequency $\omega_i = \gamma_i B_0$ only differs between spins if the gyromagnetic ratio differs (e.g. between $H^1$ and $C^{13}$), but assuming all spins are of the same species, we can call the Larmor frequency $\omega_0$.%
 \footnote{The external magnetic field $B_0$ also varies from spin to spin due to experimental imperfections, but those field inhomogeneities are again ignored.}
+The chemical shift interaction $H_{\text{CS}}$ captures the local magnetic field differences for each spin, and the dipolar interaction between spins is $H_D$. Finally, $H_\text{rf}(t)$ is the interaction between the spins and a time-varying transverse magnetic field along the x-axis.\footnote{The reason it is labeled as $H_\text{rf}$ is because the field's oscillation frequency is matched to the Larmor frequency $\omega_0$ which is in the radiofrequency range.}
 \begin{align}\label{eq:nmr-ham}
     H(t) &= H_Z + H_\text{CS} + H_D + H_\text{rf}(t) \\
     H_Z &= \sum_i \omega_0 I_z^{(i)} \\
     H_\text{CS} &= \sum_i \delta_i I_z^i \\
-    H_D &= \sum_{i,j} d_{ij} \left( 3I_z^{(i)}I_z^{(j)} - \mathbf{I^{(i)}} \cdot \mathbf{I^{(j)}} \right)
+    H_D &= \sum_{i,j} d_{ij} \left( 3I_z^{(i)}I_z^{(j)} - \mathbf{I^{(i)}} \cdot \mathbf{I^{(j)}} \right) \\
+    H_{\text{rf}}(t) = \omega_1(t) I_x^{(i)}
 \end{align}
 The term $I_z^{(i)}$ is shorthand for a tensor product of operators, all identity except for the $i$th operator
 \[
@@ -86,9 +88,7 @@ I_z^{(i)} = \identity \otimes \identity \otimes \dots \otimes I_z \otimes \dots 
 \]
 The time-independent terms in the Hamiltonian are referred to as the internal Hamiltonian or $H_{\text{int}}$.
 
-% TODO describe process of running an experiment with NMR
-
-In an NMR spectrometer, a sample is placed into an external magnetic field $B_0$ (defining the principal axis, commonly chosen to be the z-axis). The spins in the sample reach thermal equilibrium and are characterized by the density operator
+In an NMR spectrometer, a sample is placed into an external magnetic field $B_0$ (defining the principal axis or z-axis). The spins in the sample reach thermal equilibrium and are characterized by the density operator
 \[
 \rho_{\text{eq}} = \frac{
     e^{-\beta H_{\text{int}}}
@@ -104,14 +104,21 @@ The dominant term in the internal Hamiltonian is $H_Z$, which means the first-or
 \]
 The identity term does not contribute to the system's dynamics ($U \identity U^\dagger = \identity$) so we can focus on the collective spin term $\sum_i I_z^{(i)}$.
 
-If we just consider the Zeeman term $H_Z$, then the propagator $U(t)$ is given by
+If we consider the Zeeman term $H_Z$, then the propagator $U_Z(t)$ is given by
 \[
 U(t) = \exp \left( -it \sum_i \omega_0 I_z^{(i)} \right)
 \]
-which describes rotation about the z-axis with angular velocity $\omega_0$. An intuitive understanding is that the spins precess about the net magnetic field.
+which describes rotation about the z-axis with angular velocity $\omega_0$. An intuitive understanding is that the spins collectively precess about the magnetic field. The interaction frame of the Zeeman term, also known as the ``rotating frame,'' is a helpful frame to work in for many cases. The interaction propagator (equation~\ref{eq:interaction-propagator}) is given by $U_Z(t)$ above, and so the interaction frame Hamiltonian is
+\begin{align*}
+    \widetilde{H}(t) &= {U_Z(t)}^{\dagger} \left[ H_\text{CS} + H_D + H_\text{rf}(t) \right] U_Z(t) \\
+        &= H_\text{CS} + H_D + \widetilde{H_\text{rf}}(t)
+\end{align*}
+Both $H_\text{CS}$ and $H_D$ commute with $H_Z$ and therefore commute with $U_Z(t)$. The rf field $H_\text{rf}(t)$ does not commute with $H_Z$ ($[I_x, I_z] \ne 0$), so the transformed interaction $\widetilde{H_\text{rf}}(t)$ is different.
 
+% TODO describe rotating frame, go through the math
+% TODO assume rotating frame going forward??
 
-In addition to the main external magnetic field (with fixed magnitude $B_0$), there is a coil surrounding the sample that can apply a transverse magnetic field, say along the x-axis. If an oscillating transverse magnetic field is applied at the Larmor frequency of the spins
+If an oscillating transverse magnetic field is applied at the Larmor frequency of the spins
 \[
 B_1(t) = B_1 \cos(\omega_0 t)
 \]
@@ -202,7 +209,7 @@ The first few terms are presented below
     \Omega_2(t) &= -\frac{1}{2} \int_0^t dt_1 \int_0^{t_1} dt_2 [H(t_1), H(t_2)] \\
     \vdots
 \end{align*}
-Proofs of the the Magnus Expansion can be found in
+Derivations of the the Magnus Expansion can be found in
 \cite{gerstein-dybowski,Blanes_2009,2010EJPh...31..907B}.
 
 From $\Omega(t)$, an expression for the average Hamiltonian can be derived by making the comparison
@@ -232,17 +239,32 @@ The convergence of the Magnus Expansion is an important consideration. If the fo
 \end{equation}
 which effectively requires that we consider timescales much smaller than the natural timescale of the Hamiltonian, then the series $\overline{H}(t)$ converges.\footnote{A much more detailed overview regarding convergence can be found in \cite{Blanes_2009}.}
 
+Because convergence requires the norm of the Hamiltonian to be small, there are cases when working in the interaction frame of a strong interaction is desirable. In NMR, going from the rotating frame (of the Zeeman interaction) to the interaction frame of the rf field removes the strongest terms from the nuclear spin Hamiltonian. This interaction frame is commonly called the ``toggling frame.''
+\[
+H(t) = H_{\text{int}} + H_{\text{rf}}(t) \implies \widetilde{H}(t) = \widetilde{H_{\text{int}}}(t)
+\]
+In the toggling frame, the Magnus Expansion can again be used to determine the average Hamiltonian $\overline{\widetilde{H}}(t)$, but using $\widetilde{H_{\text{int}}}(t)$ in place of $H(t)$ in equation~\ref{eq:AHT-terms}. The upshot is that by going into the toggling frame, the smaller-norm average Hamiltonian converges for much longer time values.
+
 % TODO talk about AHT in interaction frame, how that works...
 
+At this point, the identification of an ``average Hamiltonian'' does not give us that much: $\overline{H}(t)$ might be different at different times, and it may be the average Hamiltonian in the \emph{toggling} frame instead of the lab frame. To address these shortcomings, we can introduce two constraints on $H_\text{rf}(t)$. For fixed time $T>0$,
+\begin{align}\label{eq:AHT-constraints}
+    U_{\text{rf}}(T) &= \identity & \quad \text{(cyclic)} \\
+    H_{\text{rf}}(t + NT) &= H_{\text{rf}}(t), N \in \Z & \quad \text{(periodic)}
+\end{align}
+$T$ is called the ``cycle time'' and should be short enough so that the Magnus Expansion converges.
+The cyclic and periodic properties ensure that the average Hamiltonian is \emph{the same} and that the toggling frame coincides with the rotating frame at multiples of the cycle time $NT$.
+
+The AHT framework permits continuous control via the rf field, but we will focus on discrete control, where a finite set of rf field pulses can be applied at multiples of time $\tau$. The set of pulses we will consider are $\pi/2$-pulses about the x- or y-axis, which we will label as $\{ X, Y, \overline{X}, \overline{Y} \}$ where the bar denotes a $-\pi/2$ rotation.
+
+\subsection{Examples}
+
+One of the first pulse sequences developed for NMR was the WAHUHA-4 pulse sequence (WHH-4).\cite{PhysRevLett.20.180}
+% TODO continue with WHH-4 example
 
 
-% TODO then talk about pulse sequences, that methodology
+% TODO cory48?
 
-
-\subsection{Example}
-
-
-% TODO WHH-4 pulse sequence
 
 % TODO continue here.......
 
