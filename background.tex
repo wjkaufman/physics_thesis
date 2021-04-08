@@ -77,15 +77,16 @@ The Zeeman interaction $H_Z$ captures the coupling of spins to the main external
 The chemical shift interaction $H_{\text{CS}}$ captures the local magnetic field differences for each spin, and the dipolar interaction between spins is $H_D$. Finally, $H_\text{rf}(t)$ is the interaction between the spins and a time-varying transverse magnetic field along the x-axis.\footnote{The reason it is labeled as $H_\text{rf}$ is because the field's oscillation frequency is matched to the Larmor frequency $\omega_0$ which is in the radiofrequency range.}
 \begin{align}\label{eq:nmr-ham}
     H(t) &= H_Z + H_\text{CS} + H_D + H_\text{rf}(t) \\
-    H_Z &= \sum_i \omega_0 I_z^{(i)} \\
-    H_\text{CS} &= \sum_i \delta_i I_z^i \\
-    H_D &= \sum_{i,j} d_{ij} \left( 3I_z^{(i)}I_z^{(j)} - \mathbf{I^{(i)}} \cdot \mathbf{I^{(j)}} \right) \\
-    H_{\text{rf}}(t) = \omega_1(t) I_x^{(i)}
+    H_Z &= \sum_j \omega_0 I_z^{(j)} \\
+    H_\text{CS} &= \sum_j \delta_i I_z^{(j)} \\
+    H_D &= \sum_{j,k} d_{jk} \left( 3I_z^{(j)}I_z^{(k)} - \mathbf{I^{(j)}} \cdot \mathbf{I^{(k)}} \right) \\
+    H_{\text{rf}}(t) &=  u_1(t) \sum_j \omega_1 I_x^{(j)}
 \end{align}
-The term $I_z^{(i)}$ is shorthand for a tensor product of operators, all identity except for the $i$th operator
+The term $I_z^{(j)}$ is shorthand for a tensor product of operators, all identity except for the $j$th operator
 \[
-I_z^{(i)} = \identity \otimes \identity \otimes \dots \otimes I_z \otimes \dots \otimes \identity
+I_z^{(j)} = \identity \otimes \identity \otimes \dots \otimes I_z \otimes \dots \otimes \identity
 \]
+Similarly, the term $I_z^{(j)}I_z^{(k)}$ is shorthand for a product of identity operators except for the $j$th and $k$th operators
 The time-independent terms in the Hamiltonian are referred to as the internal Hamiltonian or $H_{\text{int}}$.
 
 In an NMR spectrometer, a sample is placed into an external magnetic field $B_0$ (defining the principal axis or z-axis). The spins in the sample reach thermal equilibrium and are characterized by the density operator
@@ -100,13 +101,13 @@ In an NMR spectrometer, a sample is placed into an external magnetic field $B_0$
 \]
 The dominant term in the internal Hamiltonian is $H_Z$, which means the first-order approximation for $\rho_{\text{eq}}$ is given by
 \[
-\rho_{\text{eq}} \approx \identity + \epsilon \sum_i I_z^{(i)}
+\rho_{\text{eq}} \approx \identity + \epsilon \sum_j I_z^{(j)}
 \]
-The identity term does not contribute to the system's dynamics ($U \identity U^\dagger = \identity$) so we can focus on the collective spin term $\sum_i I_z^{(i)}$.
+The identity term does not contribute to the system's dynamics ($U \identity U^\dagger = \identity$) so we can focus on the collective spin term $\sum_j I_z^{(j)}$.
 
 If we consider the Zeeman term $H_Z$, then the propagator $U_Z(t)$ is given by
 \[
-U(t) = \exp \left( -it \sum_i \omega_0 I_z^{(i)} \right)
+U(t) = \exp \left( -it \sum_j \omega_0 I_z^{(j)} \right)
 \]
 which describes rotation about the z-axis with angular velocity $\omega_0$. An intuitive understanding is that the spins collectively precess about the magnetic field. The interaction frame of the Zeeman term, also known as the ``rotating frame,'' is a helpful frame to work in for many cases. The interaction propagator (equation~\ref{eq:interaction-propagator}) is given by $U_Z(t)$ above, and so the interaction frame Hamiltonian is
 \begin{align*}
@@ -217,13 +218,13 @@ From $\Omega(t)$, an expression for the average Hamiltonian can be derived by ma
 \Omega(t) = -i \overline{H}(t) t \implies \overline{H}(t) = \frac{i}{t} \Omega(t)
 \]
 This then gives us a series expansion for the average Hamiltonian $\overline{H}(t) = \sum_k \overline{H}^{(k)}(t)$, with the first few terms given below.
-\begin{align}\label{eq:AHT-terms}
-    \overline{H}^{(0)} &= \frac{1}{t} \int_0^{t}
-        H(t) dt \\
-    %
+\begin{align}
+    \label{eq:AHT-term-0}
+    \overline{H}^{(0)} &= \frac{1}{t} \int_0^{t} dt_1 H(t_1) \\
+    \label{eq:AHT-term-1}
     \overline{H}^{(1)} &= \frac{1}{2it} \int_0^{t} dt_1 \int_0^{t_1} dt_2
         \left[H(t_1), H(t_2)\right] \\
-    %
+    \label{eq:AHT-term-2}
     \overline{H}^{(2)} &= -\frac{1}{6t}
     \int_0^{t} dt_1 \int_0^{t_1} dt_2 \int_0^{t_2} dt_3
     \left\{
@@ -232,6 +233,7 @@ This then gives us a series expansion for the average Hamiltonian $\overline{H}(
     \left[\left[H(t_1), H(t_2)\right], H(t_3)\right]
     \right\}
 \end{align}
+Although there appears to be a simple pattern to the terms, this is not the case. Higher-order terms can be determined through a recursive relationship or through particularly nasty explicit forms.
 
 The convergence of the Magnus Expansion is an important consideration. If the following condition is satisfied
 \begin{equation}\label{eq:AHT-convergence}
@@ -243,9 +245,7 @@ Because convergence requires the norm of the Hamiltonian to be small, there are 
 \[
 H(t) = H_{\text{int}} + H_{\text{rf}}(t) \implies \widetilde{H}(t) = \widetilde{H_{\text{int}}}(t)
 \]
-In the toggling frame, the Magnus Expansion can again be used to determine the average Hamiltonian $\overline{\widetilde{H}}(t)$, but using $\widetilde{H_{\text{int}}}(t)$ in place of $H(t)$ in equation~\ref{eq:AHT-terms}. The upshot is that by going into the toggling frame, the smaller-norm average Hamiltonian converges for much longer time values.
-
-% TODO talk about AHT in interaction frame, how that works...
+In the toggling frame, the Magnus Expansion can again be used to determine the average Hamiltonian $\overline{\widetilde{H}}(t)$, but using $\widetilde{H_{\text{int}}}(t)$ in place of $H(t)$ in equation~\ref{eq:AHT-terms}. The upshot is that by going into the toggling frame, the smaller-norm average Hamiltonian converges for longer time values.
 
 At this point, the identification of an ``average Hamiltonian'' does not give us that much: $\overline{H}(t)$ might be different at different times, and it may be the average Hamiltonian in the \emph{toggling} frame instead of the lab frame. To address these shortcomings, we can introduce two constraints on $H_\text{rf}(t)$. For fixed time $T>0$,
 \begin{align}\label{eq:AHT-constraints}
@@ -255,11 +255,66 @@ At this point, the identification of an ``average Hamiltonian'' does not give us
 $T$ is called the ``cycle time'' and should be short enough so that the Magnus Expansion converges.
 The cyclic and periodic properties ensure that the average Hamiltonian is \emph{the same} and that the toggling frame coincides with the rotating frame at multiples of the cycle time $NT$.
 
-The AHT framework permits continuous control via the rf field, but we will focus on discrete control, where a finite set of rf field pulses can be applied at multiples of time $\tau$. The set of pulses we will consider are $\pi/2$-pulses about the x- or y-axis, which we will label as $\{ X, Y, \overline{X}, \overline{Y} \}$ where the bar denotes a $-\pi/2$ rotation.
+The AHT framework permits continuous control via the rf field, but we will focus on discrete control, where a finite set of rf field pulses can be applied at multiples of time $\tau$. The set of pulses we will consider are $\pi/2$-pulses about the x- or y-axis, which we will label as $\{ X, Y, \overline{X}, \overline{Y} \}$ where the bar denotes a $-\pi/2$ rotation. In the delta-pulse limit (i.e. the pulses are implemented instantaneously), an $X$ pulse corresponds to the unitary operator $U_X = e^{-i \pi/2 \sum_j I_x^{(j)}}$, and a $Y$ pulse similarly corresponds to $U_Y = e^{-i \pi/2 \sum_j I_y^{(j)}}$.
+% note that I_x is the spin operator, so I_x = hbar/2 * sigma_x
 
 \subsection{Examples}
 
-One of the first pulse sequences developed for NMR was the WAHUHA-4 pulse sequence (WHH-4).\cite{PhysRevLett.20.180}
+One of the first pulse sequences developed for NMR was the WAHUHA-4 pulse sequence (WHH-4).\cite{PhysRevLett.20.180} The pulse sequence is defined as
+\begin{equation}
+    \tau, X, \tau, \overline{Y}, \tau, \tau, Y, \tau, \overline{X}, \tau
+\end{equation}
+where the sequence should be read from left to right (an $X$ pulse is applied first). The propagator for a single cycle of the WHH-4 sequence is
+\[
+U_{\text{WHH-4}} =
+    e^{-i H_{\text{int}} \tau} U_{\overline{X}}
+    e^{-i H_{\text{int}} \tau} U_Y
+    e^{-i H_{\text{int}} 2\tau} U_{\overline{Y}}
+    e^{-i H_{\text{int}} \tau} U_X
+    e^{-i H_{\text{int}} \tau}
+\]
+
+Now comes the fun bit. Using AHT, we will express $U_{\text{WHH-4}} = e^{-i \overline{H_{\text{WHH-4}}} 6\tau}$ and find an approximation for the average Hamiltonian $\overline{H_{\text{WHH-4}}}$. The toggling frame propagator as well as the toggled $I_z^{(j)}$ and $I_z^{(j)}I_z^{(k)}$ terms are determined by the four pulses in the sequence. For $t \in [0, \tau]$, the toggling frame corresponds to the lab frame.
+But after the $X$ pulse, the toggling frame propagator is now $U_X$, so the toggled spin terms are $\widetilde{I_z}^{(j)} = U_X^\dagger I_z^{(j)} U_X = I_y^{(j)}$
+\footnote{
+This can be seen by noting that $e^{-i \theta I_x} = e^{-i \theta/2 \sigma_x} = \cos(\theta/2) \identity - i\sin(\theta/2) \sigma_x$, then using the commutation relations for Pauli matrices to simplify. As a rule of thumb, $U_X$ rotates the y-axis into the z-axis, and $U_Y$ rotates z into y.
+}
+The toggling frame and corresponding terms for each time interval are given in table~\ref{tab:WHH-4}.
+
+\begin{table}
+    \centering
+    \caption{The WHH-4 toggling frame propagator and toggled terms at different time intervals.}
+    \label{tab:WHH-4}
+    \begin{tabular}{c c c c}
+        Time interval & Toggling frame propagator $U_{\text{rf}}$ & $\widetilde{I_z}^{(j)}$ & $\widetilde{I_z}^{(j)}\widetilde{I_z}^{(k)}$ \\
+        \hline
+        $[0, \tau]$ & $\identity$ & $I_z^{(j)}$ & $I_z^{(j)}I_z^{(k)}$ \\
+        $[\tau, 2\tau]$ & $U_X$ & $I_z^{(j)}$ & $I_z^{(j)}I_z^{(k)}$ \\
+        $[2\tau, 4\tau]$ & $U_{\overline{Y}} U_X$ & $I_z^{(j)}$ & $I_z^{(j)}I_z^{(k)}$ \\
+        $[4\tau, 5\tau]$ & $U_X$ & $I_z^{(j)}$ & $I_z^{(j)}I_z^{(k)}$ \\
+        $[5\tau, 6\tau]$ & $\identity$ & $I_z^{(j)}$ & $I_z^{(j)}I_z^{(k)}$ \\
+    \end{tabular}
+\end{table}
+
+Note that in the dipolar interaction $H_D$, the isotropic term $\mathbf{I^{(j)}} \cdot \mathbf{I^{(k)}}$ is invariant under rotations and therefore not transformed by the toggling frame.
+
+We see that WHH-4 is cyclic because $U_{\text{rf}}(6\tau) = \identity$. To determine the lowest-order term in the Magnus Expansion $\overline{H}^{(0)}$, we use the toggled terms from table~\ref{tab:WHH-4} in equation~\ref{eq:AHT-terms-0}.
+\begin{align*}
+    \overline{H}^{(0)} &= \frac{1}{6\tau} \int_0^{6\tau} dt_1
+    \widetilde{H_{\text{int}}}(t_1) \\
+    &= \frac{1}{6\tau} \left[
+        \sum_j \delta_j \left(2\tau I_z^{(j)} + 2\tau I_y^{(j)} + 2\tau I_x^{(j)} \right) +
+        \sum_{jk} d_{jk} \left(3(
+            2\tau I_z^{(j)}I_z^{(k)} + 2\tau I_y^{(j)}I_y^{(k)} + 2\tau I_x^{(j)}I_x^{(k)}
+        ) - 6\tau \mathbf{I^{(j)}} \cdot \mathbf{I^{(k)}} \right)
+    \right] \\
+    &= \left[
+        1/3 \sum_j \delta_j \left(I_z^{(j)} + I_y^{(j)} + I_x^{(j)} \right) +
+        \sum_{jk} \d_{jk} \left(I_z^{(j)}I_z^{(k)} + I_y^{(j)}I_y^{(k)} + I_x^{(j)}I_x^{(k)} - \mathbf{I^{(j)}} \cdot \mathbf{I^{(k)}} \right)
+    \right] \\
+    &= 1/3 \sum_j \delta_j \left(I_z^{(j)} + I_y^{(j)} + I_x^{(j)} \right)
+\end{align*}
+
 % TODO continue with WHH-4 example
 
 
@@ -278,34 +333,10 @@ One of the first pulse sequences developed for NMR was the WAHUHA-4 pulse sequen
 % % TODO include?
 % \lipsum[1-5]
 
-\section{Examples}
-
-\lipsum[1]
-
-\subsection{WHH-4 Pulse Sequence}
-
-\lipsum[1-3]
-
-\subsection{CORY-48 Pulse Sequence}
-
-\lipsum[1-3]
-
 % TODO include figure of average correlation for FID, WHH, CORY
 
 % \subsection{GRAPE Shaped Pulses}
 % % TODO include?
 % \lipsum[1-3]
 
-\section{Reinforcement Learning}
-
-\lipsum[1-3]
-
-\subsection{Reinforcement Learning Taxonomy}
-
-\lipsum[1-5]
-
-\subsection{Algorithm Examples}
-
-% TODO describe AlphaZero algorithm, others I tried?
-
-\lipsum[1-5]
+\input{bg-rl}
