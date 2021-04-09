@@ -11,12 +11,12 @@ Magnetic dipole interactions between a central spin and many surrounding bath sp
 
 % intro to quantum ideas
 % TODO delete this subsection?
-\section{A Few Foundations from Quantum Mechanics}
+\section{Important Quantum Mechanics Concepts}
 
 This section is meant to present some fundamental ideas that will be used throughout, but for a more thorough description of quantum mechanics see
-% TODO cite McYntire or Sakurai
+\cite{mcintyre2012quantum, sakurai2017modern}.
 .
-In all equations that follow, $\hbar = 1$.
+In all equations that follow, $\hbar = 1$ is assumed.
 
 % state of system <-> density operator
 Given a quantum system, a general state can be represented by a density operator $\rho(t)$. The density operator encapsulates all known information about the quantum system, specifically the expectation values associated with well-defined observable. For an observable $A$, the expectation is given by
@@ -32,8 +32,7 @@ where the unitary operator $U$ is the ``propagator'' defined by
 \begin{equation}\label{eq:propagator-de}
     i \ddt{U(t)} = H(t) U(t), U(0) = \identity
 \end{equation}
-% TODO decide to include this?
-The two equations above can be combined to yield the Liouville-Von Neumann equation, which explicitly shows the density operator's dependence on the system Hamiltonian.
+The two equations above can be combined to yield the Liouville-Von Neumann equation, which explicitly shows the density operator's time evolution from the system Hamiltonian.
 \begin{equation}
     i \ddt{\rho(t)} = [H(t), \rho(t)]
 \end{equation}
@@ -64,30 +63,31 @@ U(t) = U_A(t)\widetilde{U}(t).
 
 \section{Spin-1/2 Systems and Nuclear Magnetic Resonance}
 
-A spin-1/2 particle (such as an electron or proton) has two possible values for its intrinsic angular momentum or ``spin,'' so the corresponding Hilbert Space for a single spin-1/2 particle has dimension two.
-Nuclear magnetic resonance (NMR) is a technique
-% TODO continue describing what NMR is
-% TODO Discuss NMR system, general overview
+A spin-1/2 particle (such as an electron or proton) has two possible values for its intrinsic angular momentum or ``spin,'' so the corresponding Hilbert Space for a single spin-1/2 particle has dimension two. $I_x, I_y$ and $I_z$ denote the operators for nuclear spin along $x, y$, and $z$, respectively. For a collection of $N$ spin-1/2 particles, the corresponding Hilbert Space has dimension $2^N$.
+For an ensemble of spins, the term $I_z^{(j)}$ is shorthand for a tensor product of operators, all identity except for the $j$th operator
+\[
+I_z^{(j)} = \identity \otimes \identity \otimes \dots \otimes I_z \otimes \dots \otimes \identity
+\]
+Similarly, the term $I_z^{(j)}I_z^{(k)}$ is shorthand for a product of identity operators except for the $j$th and $k$th operators.
 
-% TODO keep going here, describe NMR more, maybe draw a picture too?
+% TODO continue describing what NMR is, discuss NMR system, general overview
+Nuclear magnetic resonance (NMR) encompasses the study of nuclear spins and the various interactions they have with external fields and with each other.
 \cite{1976ii} outlines the interactions present in a nuclear spin Hamiltonian, but the relevant interactions considered in this work are given below.%
 \footnote{The quadrupolar interaction and J coupling are not considered here, but it's good to remember they're still there in general.}
-The Zeeman interaction $H_Z$ captures the coupling of spins to the main external magnetic field along the z-axis. The Larmor frequency $\omega_i = \gamma_i B_0$ only differs between spins if the gyromagnetic ratio differs (e.g. between $H^1$ and $C^{13}$), but assuming all spins are of the same species, we can call the Larmor frequency $\omega_0$.%
-\footnote{The external magnetic field $B_0$ also varies from spin to spin due to experimental imperfections, but those field inhomogeneities are again ignored.}
-The chemical shift interaction $H_{\text{CS}}$ captures the local magnetic field differences for each spin, and the dipolar interaction between spins is $H_D$. Finally, $H_\text{rf}(t)$ is the interaction between the spins and a time-varying transverse magnetic field along the x-axis.\footnote{The reason it is labeled as $H_\text{rf}$ is because the field's oscillation frequency is matched to the Larmor frequency $\omega_0$ which is in the radiofrequency range.}
+The Zeeman interaction $H_Z$ captures the coupling of spins to the main external magnetic field along the z-axis. The Larmor frequency $\omega_0 = \gamma_i B_0$ only differs between spins if the gyromagnetic ratio differs (e.g. between $H^1$ and $C^{13}$), but we assume all spins are of the same species.%
+\footnote{The external magnetic field $B_0$ also varies from spin to spin due to experimental imperfections, but those field inhomogeneities are also ignored.}
+The chemical shift interaction $H_{\text{CS}}$ captures the local magnetic field differences for each spin, and the dipolar interaction between spins is $H_D$. Finally, $H_\text{rf}(t)$ is the interaction between the spins and a time-varying transverse magnetic field along the x-axis.%
+\footnote{The reason it is labeled as $H_\text{rf}$ is because the field's oscillation frequency is matched to the Larmor frequency $\omega_0$ which is in the radiofrequency range.}
 \begin{align}\label{eq:nmr-ham}
     H(t) &= H_Z + H_\text{CS} + H_D + H_\text{rf}(t) \\
-    H_Z &= \sum_j \omega_0 I_z^{(j)} \\
+    H_Z &= \omega_0 \sum_j I_z^{(j)} \\
     H_\text{CS} &= \sum_j \delta_i I_z^{(j)} \\
     H_D &= \sum_{j,k} d_{jk} \left( 3I_z^{(j)}I_z^{(k)} - \mathbf{I^{(j)}} \cdot \mathbf{I^{(k)}} \right) \\
     H_{\text{rf}}(t) &=  u_1(t) \sum_j \omega_1 I_x^{(j)}
 \end{align}
-The term $I_z^{(j)}$ is shorthand for a tensor product of operators, all identity except for the $j$th operator
-\[
-I_z^{(j)} = \identity \otimes \identity \otimes \dots \otimes I_z \otimes \dots \otimes \identity
-\]
-Similarly, the term $I_z^{(j)}I_z^{(k)}$ is shorthand for a product of identity operators except for the $j$th and $k$th operators
 The time-independent terms in the Hamiltonian are referred to as the internal Hamiltonian or $H_{\text{int}}$.
+
+% TODO include diagram of NMR setup too?
 
 In an NMR spectrometer, a sample is placed into an external magnetic field $B_0$ (defining the principal axis or z-axis). The spins in the sample reach thermal equilibrium and are characterized by the density operator
 \[
@@ -107,27 +107,35 @@ The identity term does not contribute to the system's dynamics ($U \identity U^\
 
 If we consider the Zeeman term $H_Z$, then the propagator $U_Z(t)$ is given by
 \[
-U(t) = \exp \left( -it \sum_j \omega_0 I_z^{(j)} \right)
+U(t) = \exp \left( -i \omega_0 t \sum_j I_z^{(j)} \right)
 \]
 which describes rotation about the z-axis with angular velocity $\omega_0$. An intuitive understanding is that the spins collectively precess about the magnetic field. The interaction frame of the Zeeman term, also known as the ``rotating frame,'' is a helpful frame to work in for many cases. The interaction propagator (equation~\ref{eq:interaction-propagator}) is given by $U_Z(t)$ above, and so the interaction frame Hamiltonian is
 \begin{align*}
     \widetilde{H}(t) &= {U_Z(t)}^{\dagger} \left[ H_\text{CS} + H_D + H_\text{rf}(t) \right] U_Z(t) \\
         &= H_\text{CS} + H_D + \widetilde{H_\text{rf}}(t)
 \end{align*}
-Both $H_\text{CS}$ and $H_D$ commute with $H_Z$ and therefore commute with $U_Z(t)$. The rf field $H_\text{rf}(t)$ does not commute with $H_Z$ ($[I_x, I_z] \ne 0$), so the transformed interaction $\widetilde{H_\text{rf}}(t)$ is different.
+Both $H_\text{CS}$ and $H_D$ commute with $H_Z$ and therefore commute with $U_Z(t)$. The rf field $H_\text{rf}(t)$ does not commute with $H_Z$ ($[I_x, I_z] \ne 0$), so we need to consider how exactly the rf field interaction transforms in the rotating frame.
 
-% TODO describe rotating frame, go through the math
 % TODO assume rotating frame going forward??
 
-If an oscillating transverse magnetic field is applied at the Larmor frequency of the spins
+If the oscillating transverse magnetic field is applied at the Larmor frequency of the spins
 \[
-B_1(t) = B_1 \cos(\omega_0 t)
+\mathbf{B_1}(t) = B_1 \cos(\omega_0 t + \phi) \mathbf{\hat{x}}
 \]
-then this field can be thought of as two counter-rotating magnetic fields whose net effect is $B_1(t)$. In a frame rotating about the z-axis with frequency $\omega_0$, it looks like there a fixed magnetic field (due to $B_0$ and one of the rotating fields) and a counter-rotating field with frequency $2\omega_0$. If we ignore the high-frequency field (i.e. the rotating wave approximation), the spins in the rotating frame see a fixed magnetic field along a different axis, and begin to precess about the new field. By applying this transverse $B_1$ field for a specific duration at a specific phase,
-% TODO should I do the math for this?
-% TODO definitely should describe how Hrf = u_1 Ix + U_2 Iy
-% TODO work in interaction frame, it'll be good...
-the spins can be rotated from the initial equilibrium state to a state with net magnetization along the x-axis. This is called a $\pi/2$-pulse (because it rotates the spins $\pi/2$ radians or $90^\circ$). Increasing the strength of the $B_1$ field or the duration of the pulse increases the rotation angle, and adjusting the phase of the pulse adjusts the rotation axis.
+then this field can be thought of as two counter-rotating magnetic fields whose net effect is $B_1(t)$
+\[
+\mathbf{B_1}(t) = \frac{1}{2} \left[
+    B_1 (\cos(\omega_0 t + \phi) \mathbf{\hat{x}} + \sin(\omega_0 t + \phi) \mathbf{\hat{y}}) +
+    B_1 (\cos(\omega_0 t + \phi) \mathbf{\hat{x}} - \sin(\omega_0 t + \phi) \mathbf{\hat{y}})
+\right]
+\]
+% TODO do formal math for this?
+In a frame rotating about the z-axis with frequency $\omega_0$, it looks like there a fixed magnetic field from one of the rotating fields and a counter-rotating field with frequency $2\omega_0$. If we ignore the high-frequency field (i.e. the rotating wave approximation), the spins in the rotating frame see a fixed magnetic field along a different axis, and begin to precess about the new field.
+By applying this transverse $B_1$ field for a specific duration with phase $\phi$, the system in the rotating frame is transformed according to the unitary operator
+\[
+U = e^{-i \omega_1 t (\cos(\phi) I_x + \sin(\phi) I_y)}
+\]
+In particular, if $t = \frac{\pi}{2 \omega_1}$, the spins can be rotated from the initial equilibrium state to a state with net magnetization in the xy-plane. This is called a $\pi/2$-pulse (because it rotates the spins $\pi/2$ radians or $90^\circ$). Increasing the strength of the $B_1$ field or the duration of the pulse increases the rotation angle, and adjusting the phase of the pulse adjusts the rotation axis.
 % TODO mention the pulse frequency to rotate about z?
 
 In NMR experiments, the procedure generally goes as follows
@@ -152,8 +160,6 @@ In contrast, solid-state NMR does not have the advantage of motional averaging. 
 
 % TODO insert line broadening pictures
 
-% TODO talk about coherence?
-
 \section{Quantum Control}
 
 Quantum control theory encompasses many different problems, but they each involve driving quantum phenomena in a desired way using a set of control parameters. Quantum control problems include transforming an initial state $\rho(0)$ to a final state $\rho(T)$, creating a specified unitary transformation $U(T)$, or engineering interactions between a subsystem and its environment.\cite{Dong_2010}\footnote{In this work, only closed quantum systems are considered, so bath engineering is not considered.} Systems can be controlled by manipulating parameters in the Hamiltonian, such as the strength or orientation of an external magnetic field (as in NMR).
@@ -168,19 +174,11 @@ H_{\text{ctrl}}(t) = \sum_k u_k(t) H_k
 \]
 where $\{H_k\}$ is a set of time-independent Hermitian operators and $\{u_k(t)\}$ are real-valued control parameters. In equation~\ref{eq:nmr-ham}, $H_{\text{int}} = H_{\text{sys}}$  and $H_{\text{rf}}(t) = H_{\text{ctrl}}(t)$.
 
-% TODO find a home for this, or remove
-% Two important active fields of research are quantum control and quantum sensing.
-% Quantum sensing leverages quantized energy levels, coherence, or entanglement properties of systems to precisely measure physical quantities. To measure the desired quantity (such as the strength of an external magnetic field), it is sometimes necessary to minimize the other interactions present in the system. For both control and sensing problems, engineering a specific Hamiltonian is an important step.
-
-% TODO describe more, or give example?
-
 \subsection{Hamiltonian Engineering}
 
 Closely related to creating a desired unitary transformation $U(T)$, Hamiltonian engineering is an important problem within quantum control. The goal of Hamiltonian engineering is to choose control parameters $\{u_k(t)\}$ so that, when measured stroboscopically\footnote{Stroboscopically means measured at regular intervals $0, T, 2T, \dots$.}, the system appears to evolve under a target effective Hamiltonian $H_{\text{eff}}$ instead of the system Hamiltonian $H_{\text{sys}}$. In most cases the target Hamiltonian is time-independent.
 
 If we are able to engineer an effective Hamiltonian, then we have also created a unitary transformation $U(T) = \exp{-i H_{\text{eff}} T}$. And conversely, if we have implemented a unitary transformation $U(T)$, then there exists an effective time-independent Hamiltonian that characterizes the dynamics over time $T$ (note that this Hamiltonian isn't unique).
-
-% TODO anything more to say here???
 
 \section{Average Hamiltonian Theory}\label{sec:AHT}
 
@@ -245,7 +243,7 @@ Because convergence requires the norm of the Hamiltonian to be small, there are 
 \[
 H(t) = H_{\text{int}} + H_{\text{rf}}(t) \implies \widetilde{H}(t) = \widetilde{H_{\text{int}}}(t)
 \]
-In the toggling frame, the Magnus Expansion can again be used to determine the average Hamiltonian $\overline{\widetilde{H}}(t)$, but using $\widetilde{H_{\text{int}}}(t)$ in place of $H(t)$ in equation~\ref{eq:AHT-terms}. The upshot is that by going into the toggling frame, the smaller-norm average Hamiltonian converges for longer time values.
+In the toggling frame, the Magnus Expansion can again be used to determine the average Hamiltonian $\overline{\widetilde{H}}(t)$, but using $\widetilde{H_{\text{int}}}(t)$ in place of $H(t)$ in equation~\ref{eq:AHT-term-0}. The upshot is that by going into the toggling frame, the smaller-norm average Hamiltonian converges for longer time values.
 
 At this point, the identification of an ``average Hamiltonian'' does not give us that much: $\overline{H}(t)$ might be different at different times, and it may be the average Hamiltonian in the \emph{toggling} frame instead of the lab frame. To address these shortcomings, we can introduce two constraints on $H_\text{rf}(t)$. For fixed time $T>0$,
 \begin{align}\label{eq:AHT-constraints}
@@ -286,19 +284,19 @@ The toggling frame and corresponding terms for each time interval are given in t
     \caption{The WHH-4 toggling frame propagator and toggled terms at different time intervals.}
     \label{tab:WHH-4}
     \begin{tabular}{c c c c}
-        Time interval & Toggling frame propagator $U_{\text{rf}}$ & $\widetilde{I_z}^{(j)}$ & $\widetilde{I_z}^{(j)}\widetilde{I_z}^{(k)}$ \\
+        Time interval & Toggling frame propagator $U_{\text{rf}}$ & $\widetilde{I_z}$ & $\widetilde{I_z}\widetilde{I_z}$ \\
         \hline
-        $[0, \tau]$ & $\identity$ & $I_z^{(j)}$ & $I_z^{(j)}I_z^{(k)}$ \\
-        $[\tau, 2\tau]$ & $U_X$ & $I_z^{(j)}$ & $I_z^{(j)}I_z^{(k)}$ \\
-        $[2\tau, 4\tau]$ & $U_{\overline{Y}} U_X$ & $I_z^{(j)}$ & $I_z^{(j)}I_z^{(k)}$ \\
-        $[4\tau, 5\tau]$ & $U_X$ & $I_z^{(j)}$ & $I_z^{(j)}I_z^{(k)}$ \\
-        $[5\tau, 6\tau]$ & $\identity$ & $I_z^{(j)}$ & $I_z^{(j)}I_z^{(k)}$ \\
+        $[0, \tau]$ & $\identity$ & $I_z$ & $I_z^{(j)}I_z^{(k)}$ \\
+        $[\tau, 2\tau]$ & $U_X$ & $I_y$ & $I_y^{(j)}I_y^{(k)}$ \\
+        $[2\tau, 4\tau]$ & $U_{\overline{Y}} U_X$ & $I_x$ & $I_x^{(j)}I_x^{(k)}$ \\
+        $[4\tau, 5\tau]$ & $U_X$ & $I_y$ & $I_y^{(j)}I_y^{(k)}$ \\
+        $[5\tau, 6\tau]$ & $\identity$ & $I_z$ & $I_z^{(j)}I_z^{(k)}$ \\
     \end{tabular}
 \end{table}
 
 Note that in the dipolar interaction $H_D$, the isotropic term $\mathbf{I^{(j)}} \cdot \mathbf{I^{(k)}}$ is invariant under rotations and therefore not transformed by the toggling frame.
 
-We see that WHH-4 is cyclic because $U_{\text{rf}}(6\tau) = \identity$. To determine the lowest-order term in the Magnus Expansion $\overline{H}^{(0)}$, we use the toggled terms from table~\ref{tab:WHH-4} in equation~\ref{eq:AHT-terms-0}.
+We see that WHH-4 is cyclic because $U_{\text{rf}}(6\tau) = \identity$. To determine the lowest-order term in the Magnus Expansion $\overline{H}^{(0)}$, we use the toggled terms from table~\ref{tab:WHH-4} in equation~\ref{eq:AHT-term-0}.
 \begin{align*}
     \overline{H}^{(0)} &= \frac{1}{6\tau} \int_0^{6\tau} dt_1
     \widetilde{H_{\text{int}}}(t_1) \\
@@ -312,31 +310,24 @@ We see that WHH-4 is cyclic because $U_{\text{rf}}(6\tau) = \identity$. To deter
         1/3 \sum_j \delta_j \left(I_z^{(j)} + I_y^{(j)} + I_x^{(j)} \right) +
         \sum_{jk} \d_{jk} \left(I_z^{(j)}I_z^{(k)} + I_y^{(j)}I_y^{(k)} + I_x^{(j)}I_x^{(k)} - \mathbf{I^{(j)}} \cdot \mathbf{I^{(k)}} \right)
     \right] \\
-    &= 1/3 \sum_j \delta_j \left(I_z^{(j)} + I_y^{(j)} + I_x^{(j)} \right)
+    % \boxed{\overline{H}^{(0)} &= 1/3 \sum_j \delta_j \left(I_z^{(j)} + I_y^{(j)} + I_x^{(j)} \right)}
+    % TODO fix ^
 \end{align*}
-
-% TODO continue with WHH-4 example
-
-
-% TODO cory48?
+The WHH-4 sequence, to lowest order, refocuses (or ``cancels out'') the dipolar interaction between spins while retaining the chemical shift term. Instead of the principal axis being along z, however, the spin operator acts along the diagonal axis $(1,1,1)$.
 
 
-% TODO continue here.......
+% TODO ideal6 sequence, or some other short time suspension sequence?
 
-\subsection{Applications to Quantum Control}
-
-% TODO describe more recent work like F-matrix, etc.
-
-\lipsum[1-5]
-
-% \section{GRAPE}
-% % TODO include?
-% \lipsum[1-5]
+% \subsection{Applications to Quantum Control}
+%
+% % TODO describe more recent work like F-matrix, etc.
+%
+% % \section{GRAPE}
+% % % TODO include?
 
 % TODO include figure of average correlation for FID, WHH, CORY
 
 % \subsection{GRAPE Shaped Pulses}
 % % TODO include?
-% \lipsum[1-3]
 
 \input{bg-rl}
