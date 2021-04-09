@@ -83,11 +83,16 @@ The chemical shift interaction $H_{\text{CS}}$ captures the local magnetic field
     H_Z &= \omega_0 \sum_j I_z^{(j)} \\
     H_\text{CS} &= \sum_j \delta_i I_z^{(j)} \\
     H_D &= \sum_{j,k} d_{jk} \left( 3I_z^{(j)}I_z^{(k)} - \mathbf{I^{(j)}} \cdot \mathbf{I^{(k)}} \right) \\
-    H_{\text{rf}}(t) &=  u_1(t) \sum_j \omega_1 I_x^{(j)}
+    H_{\text{rf}}(t) &=  u_1(t) \omega_1 \sum_j I_x^{(j)}
 \end{align}
 The time-independent terms in the Hamiltonian are referred to as the internal Hamiltonian or $H_{\text{int}}$.
 
-% TODO include diagram of NMR setup too?
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=.5\textwidth]{example-image}
+    \caption{NMR experimental setup.}
+    \label{fig:NMR-setup}
+\end{figure}
 
 In an NMR spectrometer, a sample is placed into an external magnetic field $B_0$ (defining the principal axis or z-axis). The spins in the sample reach thermal equilibrium and are characterized by the density operator
 \[
@@ -116,8 +121,6 @@ which describes rotation about the z-axis with angular velocity $\omega_0$. An i
 \end{align*}
 Both $H_\text{CS}$ and $H_D$ commute with $H_Z$ and therefore commute with $U_Z(t)$. The rf field $H_\text{rf}(t)$ does not commute with $H_Z$ ($[I_x, I_z] \ne 0$), so we need to consider how exactly the rf field interaction transforms in the rotating frame.
 
-% TODO assume rotating frame going forward??
-
 If the oscillating transverse magnetic field is applied at the Larmor frequency of the spins
 \[
 \mathbf{B_1}(t) = B_1 \cos(\omega_0 t + \phi) \mathbf{\hat{x}}
@@ -135,7 +138,11 @@ By applying this transverse $B_1$ field for a specific duration with phase $\phi
 \[
 U = e^{-i \omega_1 t (\cos(\phi) I_x + \sin(\phi) I_y)}
 \]
-In particular, if $t = \frac{\pi}{2 \omega_1}$, the spins can be rotated from the initial equilibrium state to a state with net magnetization in the xy-plane. This is called a $\pi/2$-pulse (because it rotates the spins $\pi/2$ radians or $90^\circ$). Increasing the strength of the $B_1$ field or the duration of the pulse increases the rotation angle, and adjusting the phase of the pulse adjusts the rotation axis.
+In particular, if $t = \frac{\pi}{2 \omega_1}$, the spins can be rotated from the initial equilibrium state to a state with net magnetization in the xy-plane. This is called a $\pi/2$-pulse (because it rotates the spins $\pi/2$ radians or $90^\circ$). Increasing the strength of the $B_1$ field or the duration of the pulse increases the rotation angle, and adjusting the phase of the pulse adjusts the rotation axis. In the rotating frame, the rf Hamiltonian effectively becomes
+\[
+H_{\text{rf}}(t) = u_1(t) \omega_1 \sum_j I_x^{(j)} + u_2(t) \omega_1 \sum_j I_y^{(j)}
+\]
+From this point forward, we will work in the rotating frame unless otherwise specified.
 % TODO mention the pulse frequency to rotate about z?
 
 In NMR experiments, the procedure generally goes as follows
@@ -147,6 +154,13 @@ In NMR experiments, the procedure generally goes as follows
 The Fourier transform of the FID gives a spectrum of the sample, including chemical shift frequencies $\delta_i$ of different spin species. There are many, \emph{many} other variations on NMR experiments, but that is the basic methodology.
 
 % TODO put in diagram(s) showing FID, spectrum
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=.75\textwidth]{example-image}
+    % TODO replace this with my own data
+    \caption{An observed FID from an NMR experiment and the corresponding spectrum.}
+    \label{fig:NMR-FID-spectrum}
+\end{figure}
 
 
 % TODO clarify my explanation of motional averaging
@@ -156,9 +170,14 @@ H_{\text{int}} = H_Z + H_\text{CS} + 0
 \]
 The chemical shifts for each spin do stay constant (because the local magnetic field due to molecular structure stays the same), so the resulting spectrum clearly resolves chemical shift peaks.
 
-In contrast, solid-state NMR does not have the advantage of motional averaging. Because the spins are in a fixed position relative to other spins in the sample, dipolar interactions can affect the net magnetization of the sample and lead to a broadening of the peaks in the spectrum. This line broadening inhibits accurate measurements of chemical shifts in solid samples, a source of frustration to chemists and anyone looking for long coherence times.
+In contrast, solid-state NMR does not have the advantage of motional averaging. Because the spins are in a fixed position relative to other spins in the sample, dipolar interactions can affect the net magnetization of the sample and lead to a broadening of the peaks in the spectrum. This line broadening inhibits accurate measurements of chemical shifts in solid samples, a source of frustration to chemists and anyone looking for long coherence times. See figure~\ref{fig:NMR-averaging} for a comparison of spectra between liquid- and solid-state NMR.
 
-% TODO insert line broadening pictures
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=.5\textwidth]{1H-NMR.jpg}
+    \caption{NMR spectra for a solid sample, solid sample with magic-angle spinning, and liquid sample. From \cite{Ottowa-NMR}.}
+    \label{fig:NMR-averaging}
+\end{figure}
 
 \section{Quantum Control}
 
@@ -279,7 +298,7 @@ This can be seen by noting that $e^{-i \theta I_x} = e^{-i \theta/2 \sigma_x} = 
 }
 The toggling frame and corresponding terms for each time interval are given in table~\ref{tab:WHH-4}.
 
-\begin{table}
+\begin{table}[H]
     \centering
     \caption{The WHH-4 toggling frame propagator and toggled terms at different time intervals.}
     \label{tab:WHH-4}

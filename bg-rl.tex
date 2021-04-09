@@ -17,20 +17,10 @@ Hamiltonian engineering fits into the RL paradigm by considering discrete time s
 In the language of RL, an \emph{agent} is responsible for performing \emph{actions} on the \emph{environment} to maximize a \emph{reward signal} (or reward). The agent can see the \emph{state} of the environment which informs what actions to take. See figure~\ref{fig:RL} for a diagram of the agent-environment interactions. In turn, the agent's actions may affect the environment state. The agent must then balance exploration of the environment by choosing a variety of actions and exploitation of its prior knowledge to maximize rewards.
 For a more detailed description of the RL framework, see \cite{sutton2018reinforcement}.
 
-\begin{figure}
+\begin{figure}[H]
     \centering
-    % \scalebox{.5}{
-    \begin{tikzpicture}[->, thick]
-         %nodes
-         \node[draw] at (-2,0) (agent) {Agent ($\pi$)}; % : S \to \mathcal{P}(A)
-         \node[draw] at (2,0) (env) {Environment};
-         \path
-             (agent.north) edge[bend left=30] node[above] {Action ($a$)} (env.north)
-             (env.south) edge[bend left=30] node[below] {State ($s$)} (agent.south)
-             (env.west) edge node[below] {Reward ($r$)} (agent.east);
-    \end{tikzpicture}
-    % }
-    \caption{The general reinforcement learning paradigm.}
+    \includegraphics[width=.75\textwidth]{rl.png}
+    \caption{The general reinforcement learning paradigm. From \cite{sutton2018reinforcement}.}
     \label{fig:RL}
 \end{figure}
 
