@@ -84,21 +84,19 @@ The state space is the set of all possible states of the system. A possible appr
 
 An alternative state representation is the sequence of past actions applied to the system.  This representation generally requires less memory and computation, and may also be better suited to more robust control.
 
-\subsection{Reinforcement Learning Taxonomy}
-
-% TODO put in a diagram showing model-free, model, online, offline, etc....
-
 \subsection{Algorithm Examples}
 
-% TODO describe AlphaZero algorithm, others I tried?
-
-There are many RL algorithms that have been developed, tailored to the specific characteristics of the problem. The relevant characteristics include
+There are many RL algorithms that have been developed, tailored to different characteristics of the RL problem. The relevant characteristics include
 \begin{description}
     \item[Model] An agent in a \emph{model-free} RL algorithm learns a policy directly from observations of the environment. An agent in a \emph{model-based} RL algorithm instead uses observations to model the environment, then uses that model to learn a policy.
     \item[Policy] An \emph{on-policy} algorithm improves the policy that is used to interact with the environment. An \emph{off-policy} algorithm has separate policies for improvement and environment interaction.
     \item[Action space] As mentioned before, an action space can be \emph{discrete} (finitely many actions) or \emph{continuous} (infinitely many actions).
 \end{description}
 In addition to the above characteristics, there are general classes of RL algorithms, such as temporal-difference learning policy gradient methods. More information on RL can be found in \cite{sutton2018reinforcement}.
+
+% TODO put in a diagram showing model-free, model, online, offline, etc....
+
+The AlphaZero algorithm was used as the primary RL algorithm in this work, and a more complete description of the algorithm can be found in the Methods section. The other algorithms listed below were explored as potential options for Hamiltonian engineering, but ultimately were not as effective as AlphaZero.
 
 \subsubsection{Q-learning and DQN}
 
@@ -111,22 +109,30 @@ To encourage exploration of the state and action spaces, the agent typically fol
 
 If the state and action spaces are small, then it's feasible for all the $Q$-values to be stored in memory. In general, though, the action-value function is approximated using a neural network, and the parameters are updated to minimize the loss given by \ref{eq:Q_learning_update}. This approach is called ``deep Q-network'' or DQN \cite{mnih2013playing}. DQN is suitable for large state spaces (as demonstrated through Atari games in \cite{mnih2013playing}), but still requires the action space to be discrete.
 
-\subsubsection{DDPG}
+% TODO include DDPG??
+% \subsubsection{DDPG}
+%
+% ``Deep deterministic policy gradient'' (DDPG) extends the idea of deep reinforcement learning in DQNs to continuous action spaces \cite{lillicrap2015continuous}. As with DQN, DDPG is a model-free, off-policy algorithm, but uses an actor-critic framework that separates the policy and the value function estimators. In addition, the policy is deterministic, so it returns a single action instead of a distribution over actions. As the agent interacts with the environment, the experiences are recorded in a \emph{replay buffer} on which the actor and critic are trained. The critic is updated by minimizing the sampled value estimate errors,
+% % TODO include update equation?
+% % \begin{align}\label{eq:DDPG_critic_update}
+% %     L = \frac{1}{N} \sum_i (y_i - Q(S_i, A_i | \theta^Q))^2 \\
+% %     y_i = R_i + \gamma Q'(S_{i+1}, \mu'(S_{i+1}|\theta^{\mu'}) |\theta^{Q'})
+% % \end{align}
+% and the actor is updated using the sampled policy gradient%
+% % TODO include?
+% % \begin{equation}
+% %     \nabla_{\theta^\mu} J \approx \frac{1}{N} \sum_i
+% %     \nabla_a Q(s, a | theta^Q)|_{s=s_i, a=\mu(s_i)}
+% %     \nabla_{\theta^\mu} \mu(s|\theta^\mu)|_{s_i}
+% % \end{equation}
+% .
 
-``Deep deterministic policy gradient'' (DDPG) extends the idea of deep reinforcement learning in DQNs to continuous action spaces \cite{lillicrap2015continuous}. As with DQN, DDPG is a model-free, off-policy algorithm, but uses an actor-critic framework that separates the policy and the value function estimators. In addition, the policy is deterministic, so it returns a single action instead of a distribution over actions. As the agent interacts with the environment, the experiences are recorded in a \emph{replay buffer} on which the actor and critic are trained. The critic is updated by minimizing the sampled value estimate errors,
-% TODO include update equation?
-% \begin{align}\label{eq:DDPG_critic_update}
-%     L = \frac{1}{N} \sum_i (y_i - Q(S_i, A_i | \theta^Q))^2 \\
-%     y_i = R_i + \gamma Q'(S_{i+1}, \mu'(S_{i+1}|\theta^{\mu'}) |\theta^{Q'})
-% \end{align}
-and the actor is updated using the sampled policy gradient%
-% TODO include?
-% \begin{equation}
-%     \nabla_{\theta^\mu} J \approx \frac{1}{N} \sum_i
-%     \nabla_a Q(s, a | theta^Q)|_{s=s_i, a=\mu(s_i)}
-%     \nabla_{\theta^\mu} \mu(s|\theta^\mu)|_{s_i}
-% \end{equation}
-.
+\subsubsection{AlphaZero}
+
+
+AlphaZero is a model-based, off-policy, actor-critic algorithm that was originally developed to play Chess, Shogi, and Go \cite{Silver1140}. There are two major components to the algorithm: self-play and training. Because AlphaZero is a model-based algorithm, the agent is able to consider the state space without necessarily interacting with the environment. The agent plays many episodes against itself, using a neural network to estimate a policy $\pi(s)$ and a value function $v_\pi(s)$. During self-play, the agent rolls out many possible state-action trajectories, chooses an action that maximizes the expected reward, and collects data on the state, which actions it considered, and the final reward at the end of the episode. The collected data in turn is used to train the policy and value neural networks $\{ \pi, v_\pi \}$.
+
+% TODO more here, also include diagram?
 
 \subsubsection{PPO}
 
