@@ -2,6 +2,9 @@
 
 \section{Reinforcement Learning}
 
+
+% TODO explain episode, timesteps
+% TODO rephrase as observations from state? Instead of seeing all of state?
 % TODO think about what I want to put in here vs what I want to put into the methods section. Just put high-level introduction, and possible relevant to ham engineering?
 
 \begin{quote}
@@ -10,7 +13,7 @@
 Reinforcement learning  (RL) has been applied to a variety of different problems, including interacting with physical environments such as balancing a pole \cite{lillicrap2015continuous} or playing games such as chess or Go \cite{Silver1140}. A significant attraction of RL is its generality: in most cases no prior knowledge of the problem is assumed. As a result, any problem that can be formulated as a Markov decision process (MDP) can be approached with RL.
 
 % potential application to Ham engineering
-Hamiltonian engineering fits into the RL paradigm by considering discrete time steps. Changes to the control Hamiltonian parameters are actions applied to the environment, the propagator is the state, and the overlap or fidelity of the propagator with the target propagator is the reward.  Each of these are developed in more detail below.
+Hamiltonian engineering fits into the RL paradigm by considering discrete time steps. The environment is the quantum system we are trying to control, the actions are control Hamiltonian parameters at a given time step, the state of the system is the propagator, and the reward is the overlap or fidelity of the propagator with the target propagator.  Each of these are developed in more detail below.
 
 % \subsection{Important RL Concepts}
 
@@ -39,7 +42,7 @@ Finally, the \emph{action-value function} is the expected return from taking an 
     q_\pi(s, a) \defeq \E[G_t | S_t = s, A_t = a]
 \end{equation}
 
-\subsection{Action space}
+\subsection{Action Space}
 
 The action space can generally be discrete (there are finitely many actions that can be performed) or continuous  (infinitely many actions). The size of the action space determines the type of RL algorithm that can be used. In discrete action spaces, the policy can be stochastic and learn a probability distribution over every action. In continuous action spaces, where it's impractical to learn an arbitrary probability distribution over all actions, the policy can either be stochastic and learn parameters of a general probability distribution (such as a multivariate Gaussian) or deterministic and return the action.
 
@@ -49,7 +52,7 @@ allow the control Hamiltonian amplitudes to vary continuously.
 
 Both discrete and continuous action spaces were tested, and the results of each are shared below in the sections for each corresponding RL algorithm.
 
-\subsection{Reward schemes}
+\subsection{Reward Function}
 
 The goal of Hamiltonian engineering is to control the system so that its time-evolution appears to be under some effective Hamiltonian. The reward signal should then be larger when the actual evolution is ``close'' to the target evolution. One measure of ``closeness'' is the fidelity function for two unitary operators
 \begin{equation} % TODO make sure this is right
@@ -68,7 +71,7 @@ Dense rewards make sense when the fidelity matters at every time step, such as i
 % TODO does ^ make sense? May need to explain more...
 Sparse rewards make sense when the fidelity only matters at certain points in time, such as in stroboscopic measurements and pulse sequences.
 
-\subsection{State space and state representation}
+\subsection{State Space and State Representation}
 
 The state space is the set of all possible states of the system. A possible approach would be to encode the state as the density matrix or propagator at the current time step. However, the density matrix and propagator grow exponentially as the system size increases, and the complete characterization of the quantum system is unrealistic for any experimental application.
 
@@ -120,7 +123,7 @@ If the state and action spaces are small, then it's feasible for all the $Q$-val
 \subsubsection{AlphaZero}
 
 
-AlphaZero is a model-based, off-policy, actor-critic algorithm that was originally developed to play Chess, Shogi, and Go \cite{Silver1140}. There are two major components to the algorithm: self-play and training. Because AlphaZero is a model-based algorithm, the agent is able to consider the state space without necessarily interacting with the environment. The agent plays many episodes against itself, using a neural network to estimate a policy $\pi(s)$ and a value function $v_\pi(s)$. During self-play, the agent rolls out many possible state-action trajectories, chooses an action that maximizes the expected reward, and collects data on the state, which actions it considered, and the final reward at the end of the episode. The collected data in turn is used to train the policy and value neural networks $\{ \pi, v_\pi \}$.
+AlphaZero is a model-based, off-policy, actor-critic algorithm that was originally developed to play Chess, Shogi, and Go \cite{Silver1140}. There are two major components to the algorithm: self-play and neural network training. Because AlphaZero is a model-based algorithm, the agent is able to consider the state space without necessarily interacting with the environment. The agent plays many episodes against itself, using a neural network to estimate a policy $\pi(s)$ and a value function $v_\pi(s)$. During self-play, the agent rolls out many possible state-action trajectories, chooses an action that maximizes the expected reward, and collects data on the state, which actions it considered, and the final reward at the end of the episode. The collected data in turn is used to train the policy and value neural networks $\{ \pi, v_\pi \}$.
 
 % TODO more here, also include diagram?
 
