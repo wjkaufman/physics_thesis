@@ -1,27 +1,182 @@
+%!TEX root=thesis.tex
+
 \chapter{Methods} % Reinforcement Learning for Hamiltonian Engineering
+
+% TODO make sure it's clear what the goal is: Hamiltonian engineering
 
 % physical constraints
 % parameters for sequences
 
-% TODO make sure it's clear what the goal is: Hamiltonian engineering
+% TODO make this nicer...
+The code for this project can be found at \url{https://github.com/wjkaufman/rl_pulse}.
 
-\section{State Space}
+\section{Simulated Spin Systems}
 
-\lipsum[1-2]
+Spin systems composed of a small number of spins can be easily simulated on a classical computer. Because the Hilbert Space grows exponentially as the spins increase ($2^N$ basis states for $N$ spins and $2^{2N}$ matrix elements for associated operators), it rapidly becomes impractical to simulate large numbers of spins. In this work, $N=3$ spin-1/2 systems were used in the reinforcement learning algorithm, and $N=4$ spin-1/2 systems were used to evaluate pulse sequences. The QuTiP Python package was used for all simulations \cite{Johansson_2013}.
 
-\section{Action Space}
+In any real physical system, system-environment interactions are present and the spin system must be treated as open, but for simulation purposes the system is assumed to be isolated. % TODO or "closed"?
+Consequently, the dynamics are given by unitary time-evolution operators. In principle, though, simulations of open quantum systems could be used with reinforcement learning algorithms, and may lead to better control by accounting for non-unitary system dynamics.
 
-\lipsum[1-2]
+In each simulated $N$-spin system, the chemical shift strengths $\{\delta_j\}_j$ and the dipolar coupling strengths $\{d_{jk}\}_{j,k}$ are both drawn from normal distributions
+\begin{align*}
+    \delta_j &\sim \mathcal{N}(\mu=0, \sigma=1) \\
+    d_{jk} &\sim \mathcal{N}(\mu=0, \sigma=D)
+\end{align*}
+so that the energy scale of the system is defined by the standard deviation of the chemical shifts. The parameter $D$ controls the regime of the spin system, where $D \gg 1$ is a ``strongly coupled'' spin system and $D \ll 1$ is ``weakly coupled.'' We focus on strongly coupled spin systems in this work, and set $D = 100$ unless otherwise specified. With the chemical shift and dipolar coupling strengths, the internal Hamiltonian $H_{\text{int}}$ can be calculated (see equation~\ref{eq:nmr-ham}).
 
-\section{Reward Function}
+As an example, in a $3$-spin system, there will be three chemical shift terms, six dipolar coupling terms, and $H_{\text{int}}$ will be an $8
+\times 8$ Hermitian matrix.
 
-\lipsum[1-2]
+Once $H_{\text{int}}$ has been calculated, the free evolution propagator $U(t)$ can be calculated via matrix exponentiation (see equation~\ref{eq:propagator-ti})
+and
+the pulse operators $\{ U_X, U_{\overline{X}}, U_Y, U_{\overline{Y}} \}$ can be calculated using equation~\ref{eq:X-pulse}.
 
-\section{AlphaZero Algorithm}
+Because the (random) choice of chemical shift and dipolar coupling strengths affects the behavior of the spin system, an ensemble of spin systems was used both in the reinforcement learning algorithm and in subsequent evaluation of pulse sequences.
+Each spin system used different random chemical shift and dipolar coupling strengths drawn from the same distributions (i.e. the dipolar strength parameter $D$ was the same for all systems). If experimental imperfections were also included, then each system also used different random error magnitudes.
+% TODO cont
+The reinforcement learning algorithm used $50$ spin systems and evaluation used $100$ spin systems.
 
-\lipsum[1-6]
+\section{Reinforcement Learning Implementation}
 
-\section{Neural Network Architecture}
+The reinforcement learning methodology is sufficiently general to be applied to a wide range of problems, and in a variety of different ways.  The following sections describe how the Hamiltonian engineering problem is approached with RL.
+
+\subsection{Action Space and Representation}
+
+In an NMR spectrometer, the actions we can perform, or the ``knobs'' we can turn, are the rf field amplitudes in equation~\ref{eq:nmr-ham-rf}.
+% TODO change this reference to something in the rotating frame
+% with two control amplitudes, makes much more sense
+The spectrometer's electronics limit the strength and the granularity of the rf field,
+% TODO is granularity the right word?
+but this still allows for a staggeringly large action space. Instead of allowing for complete continuous control of the rf field%
+\footnote{
+Which is done in the GRAPE algorithm \cite{Khaneja-2005}.
+}
+, we will only consider a finite set of pulses (as we did in the introduction to AHT), each with an interval of free evolution after the pulse. The set of pulses we use is the set of $\pi/2$ rotations about the x- or y-axis along with a ``null pulse'' or delay. The action set is represented as $\{ D, X, \overline{X}, Y, \overline{Y} \}$.
+
+% TODO continue here
+In the physical system, the actions correspond to unitary operators that determine the overall propagator. If the free evolution interval has length $\tau$, then the $D$ action corresponds to propagator
+\[
+U_{\tau} = \exp\{ -i H_{\text{int}} \tau \}
+\]
+And the other pulse actions have corresponding propagators
+\begin{align*}
+    X \implies U_{\tau} U_X
+    \overline{X} \implies U_{\tau} U_{\overline{X}}
+    Y \implies U_{\tau} U_Y
+    \overline{Y} \implies U_{\tau} U_{\overline{Y}}
+\end{align*}
+Where $U_X$ is defined in equation~\ref{eq:X-pulse}). In the simulations done, the $\tau$ delay is set to $10^{-4}$ and the pulse width $t_p$ is set to $10^{-5}$ unless otherwise specified.
+% TODO give any more justification to this?
+% TODO mention Clifford gates/group?
+See figure~\ref{fig:actions} for the relationship between rf field amplitudes, unitary operators, and the actions.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=.5\textwidth]{example-image}
+    \caption{The rf field amplitudes, the unitary operators, and corresponding actions.}
+    \label{fig:actions}
+\end{figure}
+
+In principle, the actions could also be defined as pulses without a $\tau$ delay of free evolution. However, in practice this leads to poor performance: for episodes with a fixed number of timesteps, the actions taken influence how much time elapses in the simulation. As a result, the ``optimal'' performance is found to minimze the elapsed time by applying alternating pulses (e.g. $X, \overline{X}, X, \overline{X}, \dots$).
+The unitary operator fidelity generally improves as the time interval decreases, so this is an unhelpful solution when we ideally want high fidelity at longer time intervals.
+
+\subsection{State Space and Representation}
+
+The ``state'' can refer to the physics notion of state (e.g. the density operator $\rho$ of a quantum system) or the RL notion of state (a particular context in which the agent must choose an action). They are closely related but not the same.
+The ``physical'' state space is comprised of every reachable state $\rho(t)$ of the spin system given an initial thermalized state, the free evolution dynamics from $H_{\text{int}}$, and the control Hamiltonian given by the rf field $H_{\text{rf}}$.
+In an RL context, however, the agent does not observe the complete state of the system at each point in time. Instead, the agent only knows the sequence of actions that have been performed on the system and any measurements that have been made on the system.
+Therefore, a more realistic state space for the RL problem is all possible sequences of actions performed on the system.%
+\footnote{
+Making measurements on the system could also be considered an action (measurement affects the physical state), and the resulting measurement outcome could be included in the state. This possibility, however, is not explored here.
+% TODO cite Riccardo Porotti maybe? Measurement-based control
+% https://arxiv.org/abs/1901.06603
+}
+This is more ``realistic'' in the sense that the agent only knows what the experimenter would know, without getting any additional information ``for free.''
+
+% \subsection{Reward Function}
+% TODO should I even include this here?
+%
+% The agent tries to learn an optimal policy $\pi^*$ that maximizes a reward signal. In the Hamiltonian engineering problem, we want to push the dynamics as close as we can toward the target Hamiltonian, which we can quantify with the average gate fidelity % TODO cite this
+% \begin{equation}
+%     % TODO find out what this is...
+% \end{equation}
+
+
+\subsection{AlphaZero Algorithm}
+
+As mentioned in the introduction, the AlphaZero algorithm has two main components: self-play and neural network training. The original publication and its supplementary materials has a complete description of the algorithm \cite{Silver1140}, but pseudocode is presented below as well.
+
+% TODO describe self-play, search statistics
+% PUCT algorithm \cite{Rosin:2011uu}
+
+
+% TODO redo formatting for state/action/probability, want s^{(i)} instead?
+\begin{algorithm}[H]
+\KwData{Current state $s = (a_0, \dots, a_{i-1})$, policy and value networks $(\pi, v)$, number of rollouts $n_\text{roll}$, Dirichlet noise parameter $\alpha$, noise weight $w \in [0,1]$, PUCT parameters $c_\text{base}, c_\text{init}$}
+\KwResult{Probabilities of selecting action $k$ ($\{p^{(k)}\}$) from state $s$, and randomly sampled action $a$}
+\BlankLine
+Initialize root node associated with current state $s$ \;
+Create child nodes of the root node corresponding to each action in the action space \;
+Initialize set of statistics $\{ N(s,a)=0, W(s,a)=0, Q(s,a)=0, P(s,a)= p_a \}$ for each child node, where $N$ is the visit count, $W$ is the total value, $Q$ is the mean value, and $P$ is the prior probability from $\pi$ \;
+
+Sample Dirichlet noise from $\text{Dir}(\alpha)$ and add it to the priors $P(s, a)$ \;
+\For{$n_\text{roll}$ tree rollouts}{
+Set $s_0 \leftarrow s$, $i \leftarrow 0$ \;
+\While{$s_i$ is not a leaf node}{
+Select a child node $s_{i+1}$ of $s_i$ associated with action $a_i$ by maximizing $Q(s_i, a_i) + U(s_i, a_i)$ where
+\[
+U(s, a) = C(s) P(s,a) \sqrt{N(s)}/(1+N(s,a))
+\]
+And $C(s) = \log((1+N(s) + c_\text{base})/c_\text{base}) + c_\text{init}$ \;
+}
+
+\If{
+the leaf node $s_L$ represents a pulse sequence with the desired length
+}{
+calculate the reward $r$ from fidelity of unitary operator \;
+}
+\Else{
+evaluate the leaf node $s_L$ using $(\pi, v)$ to create child nodes for $s_L$ with initialized statistics $\{ N(s_L,a)=0, W(s_L,a)=0, Q(s_L,a)=0, P(s_L,a)= p_a \}$, and an estimated reward $r = v(s_L)$ \;
+}
+For each of the nodes $s_i$ visited from $s_0$ to $s_L$, update the visit counts $N(s_i, a_i) = N(s_i, a_i) + 1$ and the values $W(s_i, a_i) = W(s_i, a_i) + r, Q(s_i, a_i) = \frac{W(s_i, a_i)}{N(s_i, a_i)}$ \;
+}
+
+Calculate estimated probabilities $p_k \leftarrow N(s, a_k) / N(s)$ for all actions \;
+Randomly sample an action $a_k$ from the distribution $\{ p_k \}$ \;
+
+\caption{Monte Carlo Tree Search (MCTS) for selecting the next action. \label{al:mcts}}
+\end{algorithm}
+
+% TODO include graphic of MCTS
+
+
+\begin{algorithm}[H]
+\KwData{Pulse sequence length $T$}
+\KwResult{Search statistics $S$}
+\BlankLine
+Initialize empty search statistics $S \leftarrow \{\}$
+and initial state $s_0 \leftarrow ()$
+\;
+\While{Pulse sequence length is less than $T$}{
+Perform MCTS from state $s_i$ to get probabilities of selecting action $k$ ($\{p_i^{(k)}\}$) and randomly sample the next action $a_i$ \;
+
+Append $(s_i, \{p_i^{(k)}\})$ to the search statistics $S$ \;
+Apply action $a_i$, get updated state $s_{i+1} \leftarrow (a_0, \dots, a_i)$ \;
+}
+Calculate the reward $r$ for the final pulse sequence \;
+Include the reward $r$ in each element in the search statistics $S$, so $S = \{ (s_i, \{p_i^{(k)}\}, r) \}$ \;
+\caption{Pulse sequence construction via self-play. \label{al:make_sequence}}
+\end{algorithm}
+
+% TODO justification, some problems associated with it
+% eg training on MCTS just reinforces how it's already searching
+% if there are intial biases in branches it explores, then
+% training will reinforce that (somewhat fixed with noisy priors)
+
+\subsection{Neural Network Architecture}
+
+% TODO talk about state/action representations
+% action:
 
 \lipsum[1-2]
 
@@ -31,6 +186,19 @@
 % equal time on each axis, cyclic property
 
 \lipsum[1-2]
+
+
+% TODO include helpful table with all the parameters?
+% - number of spins
+% - chemical shift
+% - dipolar coupling strength
+% - pulse width
+% - delay between pulses
+% - rotation errors
+% - offset errors
+% - phase transient errors
+% - pulse sequence length/episode length
+% -
 
 
 
