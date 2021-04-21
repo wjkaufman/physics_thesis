@@ -7,8 +7,7 @@
 % physical constraints
 % parameters for sequences
 
-% TODO make this nicer...
-The code for this project can be found at \url{https://github.com/wjkaufman/rl_pulse}.
+The code for this work can be found at \url{https://github.com/wjkaufman/rl_pulse}.
 
 \section{Simulated Spin Systems}
 
@@ -33,7 +32,6 @@ the pulse operators $\{ U_X, U_{\overline{X}}, U_Y, U_{\overline{Y}} \}$ can be 
 
 Because the (random) choice of chemical shift and dipolar coupling strengths affects the behavior of the spin system, an ensemble of spin systems was used both in the reinforcement learning algorithm and in subsequent evaluation of pulse sequences.
 Each spin system used different random chemical shift and dipolar coupling strengths drawn from the same distributions (i.e. the dipolar strength parameter $D$ was the same for all systems). If experimental imperfections were also included, then each system also used different random error magnitudes.
-% TODO cont
 The reinforcement learning algorithm used $50$ spin systems and evaluation used $100$ spin systems.
 
 \section{Reinforcement Learning Implementation}
@@ -53,26 +51,27 @@ Which is done in the GRAPE algorithm \cite{Khaneja-2005}.
 }
 , we will only consider a finite set of pulses (as we did in the introduction to AHT), each with an interval of free evolution after the pulse. The set of pulses we use is the set of $\pi/2$ rotations about the x- or y-axis along with a ``null pulse'' or delay. The action set is represented as $\{ D, X, \overline{X}, Y, \overline{Y} \}$.
 
-% TODO continue here
+
+
 In the physical system, the actions correspond to unitary operators that determine the overall propagator. If the free evolution interval has length $\tau$, then the $D$ action corresponds to propagator
 \[
 U_{\tau} = \exp\{ -i H_{\text{int}} \tau \}
 \]
 And the other pulse actions have corresponding propagators
 \begin{align*}
-    X \implies U_{\tau} U_X
-    \overline{X} \implies U_{\tau} U_{\overline{X}}
-    Y \implies U_{\tau} U_Y
-    \overline{Y} \implies U_{\tau} U_{\overline{Y}}
+    X &\implies U_{\tau} U_X \\
+    \overline{X} &\implies U_{\tau} U_{\overline{X}} \\
+    Y & \implies U_{\tau} U_Y \\
+    \overline{Y} &\implies U_{\tau} U_{\overline{Y}}
 \end{align*}
 Where $U_X$ is defined in equation~\ref{eq:X-pulse}). In the simulations done, the $\tau$ delay is set to $10^{-4}$ and the pulse width $t_p$ is set to $10^{-5}$ unless otherwise specified.
 % TODO give any more justification to this?
 % TODO mention Clifford gates/group?
 See figure~\ref{fig:actions} for the relationship between rf field amplitudes, unitary operators, and the actions.
 
-\begin{figure}
+\begin{figure}[H]
     \centering
-    \includegraphics[width=.5\textwidth]{example-image}
+    \includegraphics[width=.8\textwidth]{rf-unitary-action.jpeg}
     \caption{The rf field amplitudes, the unitary operators, and corresponding actions.}
     \label{fig:actions}
 \end{figure}
@@ -114,6 +113,9 @@ The agent performs many rollouts of selecting actions, estimating the rewards, a
 See figure~\ref{fig:mcts} for a visual depiction of the MCTS process.
 
 % TODO redo formatting for state/action/probability, want s^{(i)} instead?
+% TODO
+% TODO
+% TODO
 \begin{algorithm}[H]
 \KwData{Current state $s = (a_0, \dots, a_{i-1})$, policy and value networks $(\pi, v)$, number of rollouts $n_\text{roll}$, Dirichlet noise parameter $\alpha$, noise weight $w \in [0,1]$, PUCT parameters $c_\text{base}, c_\text{init}$}
 \KwResult{Probabilities of selecting action $k$ ($\{p^{(k)}\}$) from state $s$, and randomly sampled action $a$}
@@ -150,9 +152,9 @@ Randomly sample an action $a_k$ from the distribution $\{ p_k \}$ \;
 \caption{Monte Carlo Tree Search (MCTS) for selecting the next action. \label{al:mcts}}
 \end{algorithm}
 
-\begin{figure}
+\begin{figure}[H]
     \centering
-    \includegraphics[width=.7\textwidth]{example-image}
+    \includegraphics[width=.7\textwidth]{MCTS.jpeg}
     \caption{Monte Carlo Tree Search (MCTS) visual.}
     \label{fig:mcts}
 \end{figure}
@@ -187,9 +189,9 @@ Which is simply the squared error of the reward estimates, the cross-entropy los
 The two processes of self-play and training are done simultaneously, with multiple agent processes constructing pulse sequences and generating data that is then used to train the policy and value networks. In turn, the updated network parameters $\theta$ are shared with the agents. The flow of information is shown in figure~\ref{fig:az-parallel}.
 
 
-\begin{figure}
+\begin{figure}[H]
     \centering
-    \includegraphics{example-image}
+    \includegraphics[width=.8\textwidth]{az-parallel.jpeg}
     \caption{The parallelized execution of the AlphaZero algorithm. Many agent processes construct pulse sequences and feed the generated data to a training process. The updated network parameters $\theta$ are then shared with the agents.}
     \label{fig:az-parallel}
 \end{figure}
@@ -201,17 +203,26 @@ The two processes of self-play and training are done simultaneously, with multip
 
 \subsection{Neural Network Architecture}
 
-As in the original AlphaZero implementation, the policy and the value networks were combined into a single neural network $f_\theta(s) = (\pi(s), v(s))$. This adds an additional degree of regularization, because any shared parameters must minimize the loss for both the policy and the value estimates. The combined network includes a shared set of layers that transform the state to a hidden representation, and two separate sets of layers (called ``heads'') that return the policy and value estimates.
+As in the original AlphaZero implementation, the policy and the value networks were combined into a single neural network $f_\theta(s) = (\pi(s), v(s))$. This adds an additional degree of regularization, because any shared parameters must minimize the loss for both the policy and the value estimates. The combined network includes a shared set of layers that transform the state to a hidden representation, and two separate sets of layers (called ``heads'') that return the policy and value estimates. See figure~\ref{fig:nn} for the complete neural network architecture.
 
-% TODO talk about state/action representations
-% TODO...
+The state is represented by the sequence of actions performed on the system and an additional \texttt{START} ``action.''
+Because the action space is discrete ($\{ D, X, \overline{X}, Y, \overline{Y} \}$), each action is represented by a one-hot vector. For example, the \texttt{START} action corresponds to the vector $[1,0,0,0,0]$, a delay $D$ corresponds to the vector $[0,1,0,0,0,0]$, and $\overline{Y}$ corresponds to $[0,0,0,0,0,1]$. The sequence of pulses $[\overline{X}, Y, D]$ is then represented by the 2D-array
+\begin{align*}
+    [&[1,0,0,0,0,0], \\
+    &[0,0,0,1,0,0], \\
+    &[0,0,0,0,1,0], \\
+    &[0,1,0,0,0,0]]
+\end{align*}
+Because the state is represented by a sequence of actions, the size of the state depends on the length of the pulse sequence.
+The policy head outputs a $1 \times 5$ vector of probabilities associated with each of the possible actions. The value head outputs a single scalar for the estimated reward of the pulse sequence so far.
 
 The nature of the state representation (i.e. as a sequence of actions) lends itself nicely to using a recurrent neural network architecture for the policy and value networks. A gated recurrent unit (GRU) was used, though a long-short term memory (LSTM) layer performed similarly \cite{cho2014learning, lstm}.
 Both GRUs and LSTMs are capable of mapping variable-length input to a fixed-length output space, which is precisely what we need to do when mapping the actions we have performed so far to the estimated policy and value of that state.
 
-\begin{figure}
+\begin{figure}[H]
     \centering
-    \includegraphics{example-image}
+    \input{tikz/neural_network}
+    % \includegraphics{example-image}
     \caption{The policy and value network architecture.}
     \label{fig:nn}
 \end{figure}
@@ -219,10 +230,24 @@ Both GRUs and LSTMs are capable of mapping variable-length input to a fixed-leng
 
 \section{AHT-Constrained Search}
 
-% TODO include constraints on action space:
-% equal time on each axis, cyclic property
+Because actions are explored and selected via tree search, additional constraints can be added to prune branches of the tree that are unlikely to yield high rewards. Thankfully, AHT gives us a straightforward constraint so that pulse sequences have the desired lowest-order average Hamiltonian $\overline{H}^{(0)}$.
 
-\lipsum[1-2]
+When the target effective Hamiltonian is $H_\text{eff} = 0$, all interactions must be decoupled. If the toggling frame is defined so that $\widetilde{I_z}(t) = I_z$ and $\widetilde{I_z}(t) = -I_z$ for equal durations, then the lowest-order average $\overline{I_z}^{(0)} = 1/2(I_z - I_z) = 0$. In general, any term containing $I_z$ will average to zero to lowest order when $\widetilde{I_z}$ is toggled for equal time along opposite axes (i.e. equal time on $+x$ and $-x$, $+y$ and $-y$, and $+z$ and $-z$-axes).
+
+We saw in section~\ref{subsec:examples} that the dipolar interaction term is decoupled when $I_z^{(j)}I_z^{(k)}$ is toggled to $I_z^{(j)}I_z^{(k)}, I_y^{(j)}I_y^{(k)}$, and $I_x^{(j)}I_x^{(k)}$ for equal times. Note that if $\widetilde{I_z} = -I_z$, then $\widetilde{I_z^{(j)}}\widetilde{I_z^{(k)}} = I_z^{(j)}I_z^{(k)}$.
+Therefore the dipolar interaction is decoupled to lowest order when $I_z^{(j)}I_z^{(k)}$ is toggled for equal time along the $x, y$, and $z$-axes.
+
+To decouple all interactions, both constraints above must be satisfied, which is achieved when $I_z$ is toggled along each of the six axes for equal time ($\pm x, \pm y, \pm z$). By keeping track of the toggled operator $\widetilde{I_z}$ while constructing the pulse sequence, it is possible to prune branches of the tree that would violate this constraint%
+% (see figure~\ref{fig:tree-prune})%
+.
+
+% TODO include if I have time...
+% \begin{figure}[H]
+%     \centering
+%     \includegraphics[width=.5\textwidth]{example-image}
+%     \caption{Branches of the pulse sequence tree are pruned using the lowest-order average Hamiltonian constraints.}
+%     \label{fig:tree-prune}
+% \end{figure}
 
 
 % TODO include helpful table with all the parameters?
