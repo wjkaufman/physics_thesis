@@ -150,15 +150,12 @@ Randomly sample an action $a_k$ from the distribution $\{ p_k \}$ \;
 \caption{Monte Carlo Tree Search (MCTS) for selecting the next action. \label{al:mcts}}
 \end{algorithm}
 
-
-
-
-
-
-% TODO include graphic of MCTS
-
-
-
+\begin{figure}
+    \centering
+    \includegraphics[width=.7\textwidth]{example-image}
+    \caption{Monte Carlo Tree Search (MCTS) visual.}
+    \label{fig:mcts}
+\end{figure}
 
 The agent will repeat the process of MCTS and action sampling until it has constructed a pulse sequence with the desired length. The agent then records search statistics from each step of the pulse sequence construction: the state $s_i$, the empirical probability distribution of actions from MCTS, and the final reward $r$ of the pulse sequence. These statistics are then used to train the policy and value neural networks $(\pi, v)$.
 
@@ -206,8 +203,8 @@ The two processes of self-play and training are done simultaneously, with multip
 
 As in the original AlphaZero implementation, the policy and the value networks were combined into a single neural network $f_\theta(s) = (\pi(s), v(s))$. This adds an additional degree of regularization, because any shared parameters must minimize the loss for both the policy and the value estimates. The combined network includes a shared set of layers that transform the state to a hidden representation, and two separate sets of layers (called ``heads'') that return the policy and value estimates.
 
-
 % TODO talk about state/action representations
+% TODO...
 
 The nature of the state representation (i.e. as a sequence of actions) lends itself nicely to using a recurrent neural network architecture for the policy and value networks. A gated recurrent unit (GRU) was used, though a long-short term memory (LSTM) layer performed similarly \cite{cho2014learning, lstm}.
 Both GRUs and LSTMs are capable of mapping variable-length input to a fixed-length output space, which is precisely what we need to do when mapping the actions we have performed so far to the estimated policy and value of that state.
@@ -251,25 +248,3 @@ Both GRUs and LSTMs are capable of mapping variable-length input to a fixed-leng
 % - value weight
 % - tree constraints
 % - neural network architecture
-
-
-
-
-% \section{Unitary Implementation}
-%
-% \lipsum[1]
-%
-% \subsection{State and Action Spaces}
-%
-% \lipsum[1-2]
-%
-% \subsection{Reinforcement Learning Algorithm}
-%
-% \lipsum[1-6]
-%
-% \subsection{Neural Network Architecture}
-%
-% \lipsum[1-2]
-
-% \section{Sampling Methods for Pulse Sequence Construction}
-% what was this^^? Can't remember...
