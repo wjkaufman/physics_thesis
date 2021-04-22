@@ -13,7 +13,7 @@
 Reinforcement learning  (RL) has been applied to a variety of different problems, including interacting with physical environments such as balancing a pole \cite{lillicrap2015continuous} or playing games such as chess or Go \cite{Silver1140}. A significant attraction of RL is its generality: in most cases no prior knowledge of the problem is assumed. As a result, any problem that can be formulated as a Markov decision process (MDP) can be approached with RL.
 
 % potential application to Ham engineering
-Hamiltonian engineering fits into the RL paradigm by considering discrete time steps. The environment is the quantum system we are trying to control, the actions are control Hamiltonian parameters at a given time step, the state of the system is the propagator, and the reward is the overlap or fidelity of the propagator with the target propagator.  Each of these are developed in more detail below.
+Hamiltonian engineering fits into the RL paradigm by considering discrete time steps. The environment is the quantum system we are trying to control, the actions are control Hamiltonian parameters at a given time step, the state of the system is the propagator, and the reward is the fidelity of the propagator with the target propagator.  Each of these are developed in more detail below.
 
 % \subsection{Important RL Concepts}
 
@@ -123,7 +123,7 @@ If the state and action spaces are small, then it's feasible for all the $Q$-val
 \subsubsection{AlphaZero}
 
 
-AlphaZero is a model-based, off-policy, actor-critic algorithm that was originally developed to play Chess, Shogi, and Go \cite{Silver1140}. There are two major components to the algorithm: self-play and neural network training. Because AlphaZero is a model-based algorithm, the agent is able to consider the state space without necessarily interacting with the environment. The agent plays many episodes against itself, using a neural network to estimate a policy $\pi(s)$ and a value function $v_\pi(s)$. During self-play, the agent rolls out many possible state-action trajectories, chooses an action that maximizes the expected reward, and collects data on the state, which actions it considered, and the final reward at the end of the episode. The collected data in turn is used to train the policy and value neural networks $\{ \pi, v_\pi \}$.
+AlphaZero is a model-based, off-policy, actor-critic algorithm that was originally developed to play Chess, shogi, and Go \cite{Silver1140}. There are two major components to the algorithm: self-play and neural network training. Because AlphaZero is a model-based algorithm, the agent is able to consider the state space without necessarily interacting with the environment. The agent plays many episodes against itself, using a neural network to estimate a policy $\pi(s)$ and a value function $v_\pi(s)$. During self-play, the agent rolls out many possible state-action trajectories, chooses an action that maximizes the expected reward, and collects data on the state, which actions it considered, and the final reward at the end of the episode. The collected data in turn is used to train the policy and value neural networks $\{ \pi, v_\pi \}$.
 
 % TODO more here, also include diagram?
 
