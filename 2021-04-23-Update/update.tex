@@ -12,24 +12,29 @@
 \begin{document}
 \maketitle
 
-The ability to control certain interactions in quantum systems is highly desirable for a variety of problems. In solid-state NMR spectroscopy, the magnetic dipolar interaction between spins leads to decoherence of the initial magnetized state, broadening spectral lines and and inhibiting our ability to obtain useful information from those spectra. In systems with a central spin surrounded by bath spins (such as an NV center surrounded by many P1 centers),
-magnetic dipolar interactions also leads to unwanted decay of the central spin coherence time. Decoupling dipolar interactions would narrow spectral lines in NMR and increase coherence times. This problem is a specific example of Hamiltonian engineering, where the system can be driven by a control Hamiltonian $H_{\text{ctrl}}(t)$ so the dynamics appear to be under a target effective Hamiltonian $H_{\text{eff}}$ rather than the system Hamiltonian $H_{\text{sys}}$.
+The ability to control certain interactions in quantum systems is highly desirable for a variety of problems. In solid-state NMR spectroscopy, the magnetic dipolar interaction between spins leads to decoherence of the initial magnetized state, broadening spectral lines and and limiting the scope of experiments that can be performed. For a central spin surrounded by bath spins (such as an NV center surrounded by many P1 centers),
+magnetic dipolar interactions causes unwanted decay of the central spin coherence time. Decoupling dipolar interactions is highly desirable, as it would narrow spectral lines in NMR and increase coherence times for the central spin. Decoupling dipolar interactions is a specific example of Hamiltonian engineering, where the system can be driven by a control Hamiltonian $H_{\text{ctrl}}(t)$ so the dynamics appear to be under a target effective Hamiltonian $H_{\text{eff}}$ rather than the system Hamiltonian $H_{\text{sys}}$.
 
-An effective framework that has been applied to Hamiltonian engineering is average Hamiltonian theory (AHT). If the control Hamiltonian $H_{\text{ctrl}}(t)$ satisfies certain constraints over a period $0 \le t \le T$, then AHT gives a series expansion for the time-independent average Hamiltonian $\overline{H}$ that characterizes the system's dynamics \cite{1976ii, gerstein-dybowski}. AHT has been used to create pulse sequences that decouple dipolar interactions such as the WAHUHA 4-pulse sequence \cite{PhysRevLett.20.180} and the CORY 48-pulse sequence \cite{CORY1990205}.
-These pulse sequences dramatically improve the coherence time in NMR spectroscopy, but there is still room for improvement to increase coherence times further (see figure~\ref{fig:decay_plot}).
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=.7\textwidth]{decay_plot.pdf}
-    \caption{Decay of magnetization signal in Adamantane sample for free induction decay (blue), WAHUHA 4-pulse sequence (orange), and CORY 48-pulse sequence (green). The $T_1$ time for Adamantane is shown in black.}
-    \label{fig:decay_plot}
-\end{figure}
-
+A common approach to Hamiltonian engineering is average Hamiltonian theory (AHT) \cite{1976ii, gerstein-dybowski}.
+% If the control Hamiltonian $H_{\text{ctrl}}(t)$ satisfies certain constraints over a period $0 \le t \le T$, then AHT gives a series expansion for the time-independent average Hamiltonian $\overline{H}$ that characterizes the system's dynamics \cite{1976ii, gerstein-dybowski}.
+AHT has been used to create pulse sequences that decouple dipolar interactions such as the WAHUHA 4-pulse sequence \cite{PhysRevLett.20.180} and the CORY 48-pulse sequence \cite{CORY1990205}.
+These pulse sequences dramatically improve the coherence time in NMR spectroscopy, but there is still room for improvement to increase coherence times further%
+% (see figure~\ref{fig:decay_plot})%
+.
 This project explores the use of reinforcement learning to address the Hamiltonian engineering problem in NMR systems.
-Reinforcement learning (RL) has recently gained popularity as a method of controlling complex systems, and has been applied to a variety of different problems, including robot locomotion \cite{lillicrap2015continuous} or playing games such as chess or Go \cite{Silver1140}. A significant attraction of RL is its generality: in most cases no prior knowledge of the problem is assumed.
+
+% \begin{figure}[H]
+%     \centering
+%     \includegraphics[width=.7\textwidth]{decay_plot.pdf}
+%     \caption{Decay of magnetization signal in Adamantane sample for free induction decay (blue), WAHUHA 4-pulse sequence (orange), and CORY 48-pulse sequence (green). The $T_1$ time for Adamantane is shown in black.}
+%     \label{fig:decay_plot}
+% \end{figure}
+
+Reinforcement learning (RL) has recently gained popularity as a method of controlling complex systems, and has been applied to a variety of different problems, including robot locomotion \cite{lillicrap2015continuous} or playing games such as chess and Go \cite{Silver1140}. A significant attraction of RL is its generality: no domain-specific knowledge is necessarily required, only a simulation of the relevant system.
 Hamiltonian engineering readily fits into the RL paradigm: the RL agent can choose actions corresponding to control Hamiltonian values, and the reward signal it receives is the fidelity of the propagator with the target propagator determined by the target Hamiltonian.
 
-The AlphaZero algorithm, originally designed to play chess, shogi, and Go, was used to construct pulse sequences for Hamiltonian engineering \cite{Silver1140}. There are two major components to the algorithm: ``self-play'' exploration of new pulse sequences, and training neural networks based on the pulse sequences from self-play. The pulse sequences are constructed using Monte Carlo Tree Search (MCTS), which uses policy and value neural networks to preferentially search branches with high expected rewards. The neural networks are then trained on the pulse sequence's propagator fidelity (to improve the value network's accuracy) and observed state-action probabilities (to improve the policy network's prior estimates).
+The AlphaZero algorithm, originally designed to play chess, shogi, and Go, was used to construct pulse sequences for Hamiltonian engineering \cite{Silver1140}. There are two major components of the algorithm: ``self-play'' exploration of new pulse sequences, and training neural networks using data from self-play.
+% The pulse sequences are constructed using Monte Carlo Tree Search (MCTS), which uses policy and value neural networks to preferentially search branches with high expected rewards. The neural networks are then trained on the pulse sequence's propagator fidelity (to improve the value network's accuracy) and observed state-action probabilities (to improve the policy network's prior estimates).
 % This procedure is visualized in figure~\ref{fig:alpha_zero}.
 
 % \begin{figure}[H]
@@ -39,21 +44,24 @@ The AlphaZero algorithm, originally designed to play chess, shogi, and Go, was u
 %     \label{fig:alpha_zero}
 % \end{figure}
 
-The specific Hamiltonian engineering problem we address is decoupling all interactions, so the target effective Hamiltonian $H_{\text{eff}} = 0$. Without any constraints on the pulse sequence search, AlphaZero failed to identify any pulse sequences with comparable fidelity to state-of-the-art pulse sequences for decoupling all interactions (see figure~\ref{fig:fidelity-length}). Given the large state space of partial sequences of pulses, AlphaZero is unable to learn a useful policy or value estimate.
+The target Hamiltonian for this project was $H_{\text{eff}} = 0$, decoupling all interactions.
+The AlphaZero algorithm was run for different pulse sequence lengths ($12, 24, 36$, and $48$ actions).
+Without any modifications to the original algorithm, AlphaZero failed to identify pulse sequences with comparable fidelity to state-of-the-art pulse sequences for decoupling all interactions (see figure~\ref{fig:fidelity-length}).
+The poor performance is likely due to the large state space, the sparsity of rewards, and the difficulties of credit assignment (learning what actions lead to greater rewards, even when the actions are temporally separated).
 
-\begin{figure}[H]
+\begin{figure}%[H]
     \centering
-    \includegraphics[width=.8\textwidth]{pulse-sequence-length.pdf}
-    \caption{Pulse sequences of various lengths identified by AlphaZero, as well as other pulse sequences designed to decouple all interactions in an NMR system. The unconstrained AlphaZero search (blue) identified low-fidelity pulse sequences, but adding constraints according to the lowest-order average Hamiltonian (red) drastically improved fidelity. The yxx48 pulse sequence was also developed using reinforcement learning \cite{peng2021deep}, and CORY48 was developed using analytical techniques \cite{CORY1990205}.}
+    \includegraphics[width=.7\textwidth]{pulse-sequence-length.pdf}
+    \caption{Pulse sequences of various lengths identified by AlphaZero, as well as other pulse sequences, designed to decouple all interactions in an NMR system. The unconstrained AlphaZero search (blue) identified low-fidelity pulse sequences, but adding constraints motivated by AHT (red) drastically improved fidelity. The yxx48 pulse sequence was also developed using reinforcement learning \cite{peng2021deep}, and CORY48 was developed using analytical techniques \cite{CORY1990205}.}
     \label{fig:fidelity-length}
 \end{figure}
 
 
-The tree search in AlphaZero was improved dramatically by adding constraints from AHT. If the next action in a pulse sequence would prevent the lowest-order term in the average Hamiltonian from equaling zero (to decouple all interactions), then that action's branch is pruned from the search. By only allowing AlphaZero to search pulse sequences that satisfy the lowest-order average Hamiltonian, the algorithm converges much more rapidly to pulse sequences with much higher fidelities.
+The tree search in AlphaZero was improved dramatically by adding constraints motivated by AHT. If the next action in a pulse sequence would prevent the lowest-order term in the average Hamiltonian from equaling zero (to decouple all interactions), then that action's branch is pruned from the search. By only allowing AlphaZero to search pulse sequences that satisfy the lowest-order average Hamiltonian, the algorithm converges much more rapidly to pulse sequences with much higher fidelities.
 
-By including experimental imperfections (such as finite pulse widths, rotation errors, and phase transient errors) in the spin system simulations, the RL algorithm learns to make pulse sequences that are robust to those imperfections. We included $1\%$ rotation errors and $.001\%$ phase transient errors in simulations, and the resulting pulse sequence was observed to be robust in those levels of error (see figure~\ref{fig:fidelity-robust}).
+By including experimental imperfections (such as finite pulse widths, rotation errors, and phase transient errors) in the spin system simulations, the RL algorithm learns to make pulse sequences that are robust to those imperfections. The simulations used $1\%$ rotation errors and $.001\%$ phase transient errors, and the resulting pulse sequence was observed to be robust to those magnitudes of error (see figure~\ref{fig:fidelity-robust}).
 
-\begin{figure}[H]
+\begin{figure}%[H]
     \centering
     \begin{subfigure}{.49\textwidth}
         \centering
@@ -64,11 +72,11 @@ By including experimental imperfections (such as finite pulse widths, rotation e
         \centering
         \includegraphics[width=\textwidth]{phase_transients-constrained.pdf}
     \end{subfigure}
-    \caption{The pulse sequence identified with AlphaZero (``az48/AHT'', blue) is robust against small rotation errors (smaller than $1\%$) and phase transient errors (smaller than $.001\%$), which correspond to the magnitude of errors from training. At larger errors, the yxx48 pulse sequence (green) outperforms az48. The CORY48 pulse sequence (orange) has the highest fidelity at all error values.}
+    \caption{The pulse sequence identified with AlphaZero (blue) is robust against small rotation errors ($< 1\%$) and phase transient errors ($< .001\%$), which were the magnitudes of errors in training. At larger errors, the yxx48 pulse sequence (green) outperforms az48. At all error values, the CORY48 pulse sequence (orange) has the highest fidelity.}
     \label{fig:fidelity-robust}
 \end{figure}
 
-Reinforcement learning is a promising tool for Hamiltonian engineering, but current implementations do not outperform existing pulse sequences. By further optimizing AlphaZero's hyperparameters for pulse sequence construction, adding additional constraints to the tree search, and testing other possible improvements such as curriculum learning, the RL approach may become comparable to the best existing methods. Further, the ability to tailor simulations used in training could prove useful for developing pulse sequences for particular systems or experimental conditions.
+Reinforcement learning is a promising tool for Hamiltonian engineering, but current implementations for decoupling all interactions do not outperform existing pulse sequences. By further optimizing AlphaZero's hyperparameters for Hamiltonian engineering, adding additional constraints to the tree search, and exploring other possible improvements such as curriculum learning, the resulting pulse sequences may become comparable to the best existing methods. Further, the ability to tailor simulations used in training to particular systems or experimental conditions could prove useful for developing specialized, robust pulse sequences.
 
 \printbibliography
 
