@@ -1,16 +1,150 @@
 %!TEX root=thesis.tex
 \chapter{Results}
 
-% problems: refocusing, quantum sensing
-% discussion of results
+To analyze the performance of the AlphaZero algorithm for constructing pulse sequences, several different permutations or algorithm hyperparameters were used. First, AlphaZero was run with no additional constraints to the tree search (i.e. the state space was all possible sequences of pulses), and the simulated spin systems were idealized (i.e. delta-pulses, no errors in offset frequency, pulse rotations, or phase transients). Additional constraints were then added to the tree search while keeping idealized spin system simulations. Finally, experimental imperfections were introduced to the simulations.
 
-% TODO general outline
-% unconstrained search, no errors
-% add AHT0 constraints, no errors
-% add AHT0 constraints + 6tau refocusing, no errors
+For the completely unconstrained search and idealized spin system simulations, AlphaZero converges to an optimal
+% TODO ^ isn't optimal, it's ``suitable''
+policy only for the 12-pulse sequence (figure~\ref{fig:reward_hist-no_errors-no_constraints-12}). AlphaZero tries random pulse sequences with low fidelity early in training, but quickly ``learns'' to construct pulse sequences with fidelity $\approx 1 - 10^{-8}$.
 
-% robustness check, terrible!
-% AHT0 constraints, 6tau refocusing, rotation errors
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}{.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{hists/reward_hist-no_errors-no_constraints-12.pdf}
+        \caption{12-pulse sequence}
+        \label{fig:reward_hist-no_errors-no_constraints-12}
+    \end{subfigure}
+    \begin{subfigure}{.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{hists/reward_hist-no_errors-no_constraints-24.pdf}
+        \caption{24-pulse sequence}
+        \label{fig:reward_hist-no_errors-no_constraints-24}
+    \end{subfigure}
+    \begin{subfigure}{.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{hists/reward_hist-no_errors-no_constraints-48.pdf}
+        \caption{48-pulse sequence}
+        \label{fig:reward_hist-no_errors-no_constraints-48}
+    \end{subfigure}
+    \caption{Distribution of ``rewards'' ($-\log(1 - \text{fidelity})$) during AlphaZero training. No constraints were applied to the tree search, and the simulated spin systems were idealized.}
+    \label{fig:reward_hist-no_errors-no_constraints}
+\end{figure}
+
+However, for longer pulse sequences with 24 or 48 actions, unconstrained search is unable to converge to similarly effective policies as for shorter sequences. For the 24-pulse sequence (figure~\ref{fig:reward_hist-no_errors-no_constraints-24}), the policy after 2000 training steps constructs pulse sequences with fidelity $\approx 1 - 10^{-6}$, about two orders of magnitude worse than for the 12-pulse sequence.
+And for the 48-pulse sequence (figure~\ref{fig:reward_hist-no_errors-no_constraints-24}), the policy constructs pulse sequences with even lower fidelities. Even after 8000 training steps, the policy still constructs pulse sequences with fidelity $\approx 0$ over $30\%$ of the time.
+
+The worsening performance as the pulse sequence length increases is understandable. For an $n$-pulse sequence with $a$ possible actions, there are $a^n$ possible pulse sequences, and $\frac{a^{n+1} - 1}{a-1}$ possible states%
+\footnote{
+This can be seen by counting how many subsequences of length $k$ there are ($a^k$), and adding these for $k = 1, \dots, n$.
+}
+If $n=12$, then there are over $244$ million pulse sequences and over $300$ million states.
+But for $n=24$, then the number of pulse sequences jumps to $6 \times 10^{16}$, and for $n=48$ there are $3.6 \times 10^{33}$. Because AlphaZero begins training \emph{tabula rasa}, none of the states in the astronomically large state space are preferred, so it begins with a purely random search.
+Furthermore, rewards are only received once an \emph{entire pulse sequence} has been constructed. The sparse reward signal (which is the sole driver of learning in RL algorithms) therefore makes it difficult for the agent to associate actions with rewards and learn an effective policy.
+This is known as the ``credit assignment problem'' and is an active area of research.
+As an analogy, suppose you need to pass a test with $100$ questions, and can re-take the test as many times as you want. It would take many more tries to pass if the only feedback you received was your overall score on the test, as opposed to your score on each question.
+
+There is not an immediately obvious way to provide additional rewards to the agent during training\footnote{
+From an experimental perspective, we only care about the fidelity of the pulse sequence overall, not at intermediate times.
+},
+but there are ways to constrain AlphaZero's tree search to only consider subsets of the state space.
+% TODO continue here
+% TODO continue
+% TODO continue
+% TODO continue
+% TODO continue
+
+% TODO AHT0 constraints, no errors
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}{.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{hists/reward_hist-no_errors-AHT0-12.pdf}
+        \caption{12-pulse sequence}
+        \label{fig:reward_hist-no_errors-AHT0-12}
+    \end{subfigure}
+    \begin{subfigure}{.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{hists/reward_hist-no_errors-AHT0-24.pdf}
+        \caption{24-pulse sequence}
+        \label{fig:reward_hist-no_errors-AHT0-24}
+    \end{subfigure}
+    \begin{subfigure}{.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{hists/reward_hist-no_errors-AHT0-48.pdf}
+        \caption{48-pulse sequence}
+        \label{fig:reward_hist-no_errors-AHT0-48}
+    \end{subfigure}
+    \caption{Distribution of ``rewards'' ($-\log(1 - \text{fidelity})$) during AlphaZero training. Lowest-order AHT constraints were applied to the tree search, and the simulated spin systems were idealized.}
+    \label{fig:reward_hist-no_errors-AHT0}
+\end{figure}
+
+
+% TODO add AHT0 constraints + 6tau refocusing, no errors
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}{.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{hists/reward_hist-no_errors-6tau-12.pdf}
+        \caption{12-pulse sequence}
+        \label{fig:reward_hist-no_errors-6tau-12}
+    \end{subfigure}
+    \begin{subfigure}{.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{hists/reward_hist-no_errors-6tau-24.pdf}
+        \caption{24-pulse sequence}
+        \label{fig:reward_hist-no_errors-6tau-24}
+    \end{subfigure}
+    \begin{subfigure}{.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{hists/reward_hist-no_errors-6tau-48.pdf}
+        \caption{48-pulse sequence}
+        \label{fig:reward_hist-no_errors-6tau-48}
+    \end{subfigure}
+    \caption{Distribution of ``rewards'' ($-\log(1 - \text{fidelity})$) during AlphaZero training. Lowest-order AHT constraints and refocusing all interactions every $6\tau$ were applied to the tree search, and the simulated spin systems were idealized.}
+    \label{fig:reward_hist-no_errors-6tau}
+\end{figure}
+
+
+
+% TODO robustness check, terrible!
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=.7\textwidth]{robustness/rot_errors-no_errors.pdf}
+    \caption{Rotation errors. % TODO write more here
+    }
+    \label{fig:rot_errors-no_errors}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=.7\textwidth]{robustness/phase_transients-no_errors.pdf}
+    \caption{Phase transient errors. % TODO write more here
+    }
+    \label{fig:phase_transients-no_errors}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=.7\textwidth]{robustness/offset_errors-no_errors.pdf}
+    \caption{Resonance offset errors. % TODO write more here
+    }
+    \label{fig:offset_errors-no_errors}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=.7\textwidth]{robustness/tau_delay-no_errors.pdf}
+    \caption{Robustness to delay time $\tau$. % TODO write more here
+    }
+    \label{fig:tau_delay-no_errors}
+\end{figure}
+
+
+% TODO AHT0 constraints, 6tau refocusing, rotation errors
 
 % consistency checks, see that it's performing (somewhat) consistently
 
@@ -18,6 +152,10 @@
 % AHT0 constraints, 6tau refocusing, all possible errors
 
 
+
+% TODO what's going on?
+% sparsity of rewards (only at end of episode, so doesn't get immediate feedback)
+% discontinuous reward landscape, sparsity of high rewards (most pulse sequences suck, even when constrained with AHT0)
 
 
 
