@@ -1,15 +1,6 @@
 % !TEX output_directory=output
 \documentclass{beamer}
 
-% TODO
-% * Minimize text in slides
-% * Make slides stand alone (provide enough information to get gist)
-% * Make it simple (e.g. “higher is better in this plot”, “reward of 4 means 0.9999”)
-% * Get to my data/results by 5 minute mark
-
-% TODO make sure I have most up-to-date data for AHT-constrained
-% search and robust pulse sequence
-
 \usepackage[beamer]{../wjk}
 
 % uncomment to only show notes in PDF
@@ -19,37 +10,86 @@
 \graphicspath{{../graphics/}}
 
 \title[RL for Quantum Control in NMR]{Using Reinforcement Learning for Quantum Control in Magnetic Resonance}
-\author[Will Kaufman]{Will Kaufman\inst{1} \and Benjamin Alford\inst{1} \and Pai Peng\inst{2} \and \\
-Xiaoyang Huang\inst{2} \and Linta Joseph\inst{1} \and Paola Cappellaro\inst{2} \and Chandrasekhar Ramanathan\inst{1}}
-\date[March Meeting 2021]{APS March Meeting 2021 \\
-Session X32: Quantum Machine Learning III \\
-{\footnotesize NSF support under Grants OIA-1921199, PHY1734011, and PHY1915218.}}
-\institute[Dartmouth and MIT]{
+\author[Will Kaufman]{
+Will Kaufman\inst{1}
+% \and Benjamin Alford\inst{1}
+% \and Pai Peng\inst{2} \\
+% \and Xiaoyang Huang\inst{2}
+% \and Linta Joseph\inst{1}
+% \and Paola Cappellaro\inst{2}
+% \and Chandrasekhar Ramanathan\inst{1}
+}
+\date[Spring 2021]{May 24, 2021 \\
+% {\footnotesize NSF support under Grants OIA-1921199, PHY1734011, and PHY1915218.}
+}
+\institute[Dartmouth College]{
 \inst{1}Department of Physics and Astronomy, Dartmouth College \\
 Hanover, NH 03755, USA
-\and
-\inst{2}Research Laboratory of Electronics, Massachusetts Institute of Technology \\
-Cambridge, Massachusetts 02139, USA}
+% \and
+% \inst{2}Research Laboratory of Electronics, Massachusetts Institute of Technology \\
+% Cambridge, Massachusetts 02139, USA
+}
 
 \titlegraphic{
 \includegraphics[height=.06\textheight]{qisD.png}
 \hfill
 \includegraphics[height=.06\textheight]{Dartmouth.pdf}
-\hfill
-\includegraphics[height=.06\textheight]{mit_logo.png}
+% \hfill
+% \includegraphics[height=.06\textheight]{mit_logo.png}
 }
 
 \begin{document}
 
 \frame{\titlepage}
-% TODO need [plain]?
 
 % \begin{frame}
 % \frametitle{Table of Contents}
 % \tableofcontents
 % \end{frame}
 
-\section{Hamiltonian engineering}
+\section{Spin systems}
+
+
+\begin{frame}{NMR and spin systems}
+
+Diagram of NMR setup
+
+Description of interactions
+
+\begin{figure}
+\centering
+\input{../tikz/spin_system.tex}
+\end{figure}
+
+\[
+    H_{\text{ctrl}}(t) = -B_1(t) \sum_i \gamma_n^i I_x^i -B_2(t) \sum_i \gamma_n^i I_y^i
+\]
+
+\note{
+Only focusing on closed system dynamics with global control (spins are not addressed individually).
+}
+
+\end{frame}
+
+
+\begin{frame}{Quantum control in spin systems}
+
+Talk about pulses, common errors
+% TODO
+
+\begin{figure}
+    \centering
+    \scalebox{.5}{
+    \input{../tikz/rotation-error.tex}
+    }
+    \hspace{1em}
+    \includegraphics[width=.49\textwidth]{phase_transients_viz.png}
+    % TODO make this side-by-side and larger
+\end{figure}
+
+
+\end{frame}
+
 
 \begin{frame}{Magnetic dipolar interactions in solids}
 
@@ -58,7 +98,7 @@ Cambridge, Massachusetts 02139, USA}
 \includegraphics[width=0.4\textwidth]{1H-NMR.jpg}
 \hfill
 \scalebox{.6}{
-\input{tikz/bath-spins.tex}
+\input{../tikz/bath-spins.tex}
 }
 \end{figure}
 \vspace{-1em}
@@ -87,6 +127,44 @@ Decoupling dipolar interactions would narrow spectral lines and increase coheren
 
 \end{frame}
 
+\section{Hamiltonian engineering}
+
+
+\begin{frame}{Hamiltonian engineering}
+
+% set up Hamiltonian engineering
+
+\[
+H(t) = H_{\text{sys}} + H_{\text{ctrl}}(t)
+\]
+
+Goal: ``engineer'' an effective Hamiltonian $H_{\text{eff}}$ using $H_{\text{ctrl}}(t)$
+
+\[
+U(T) = Te^{\int_0^T dt -i H t } = e^{-i H_{\text{eff}} T}
+\]
+
+% TODO Bloch sphere example showing ideal6 or something for time suspension
+\begin{figure}
+$H_{\text{eff}} = 0$
+\includegraphics[width=.5\textwidth]{hamiltonian_engineering.jpeg}
+\end{figure}
+
+
+\note{
+Hamiltonian engineering used for:
+
+\begin{itemize}
+    \item Sensing (decoupling dipolar interactions while keeping chemical shift, e.g. $H_\text{eff} = \beta \textcolor[rgb]{0,0.69,0}{H_{\text{CS}}}$)
+    \item Quantum memory (decoupling all interactions, $H_\text{eff} = 0$)
+    \item Quantum simulation
+\end{itemize}
+}
+
+\end{frame}
+
+
+
 \begin{frame}{Average Hamiltonian theory}
 
 If\dots
@@ -102,7 +180,7 @@ If\dots
 \begin{figure}
 \centering
 \scalebox{.7}{
-\input{tikz/AHT_diagram.tex}
+\input{../tikz/AHT_diagram.tex}
 }
 \end{figure}
 % and include diagram showing difficulty with different time terms
@@ -184,9 +262,9 @@ Are there better approaches to Hamiltonian engineering using RL?
 
 
 
-\section{Reinforcement learning for Hamiltonian engineering}
+\section{Reinforcement learning (RL) for Hamiltonian engineering}
 
-\begin{frame}{Reinforcement learning for Hamiltonian engineering}
+\begin{frame}{Reinforcement learning}
 
 \begin{figure}
 \centering
@@ -195,30 +273,43 @@ Are there better approaches to Hamiltonian engineering using RL?
 From \cite{sutton2018reinforcement}.
 \end{figure}
 
+\begin{figure}
+\centering
+\includegraphics{tetris.png}
+\end{figure}
+
+\end{frame}
+
+
+\begin{frame}{RL for Hamiltonian engineering}
+%
+
 \begin{itemize}
     \item State $\to$ propagator
-    \item Action $\to$ control pulses
+    \item Action $\to$ control pulse from $\{ D, X, \overline{X}, Y, \overline{Y} \}$
     \item Reward $\to$ propagator fidelity $\left(\Re{
         \frac{\Tr{U_\text{target}^\dagger U(t)}}{\Tr{\identity}}
     }\right)$
     % TODO double check if I'm using this or average gate fidelity
 \end{itemize}
 
+Better state representation: sequence of pulses already applied
+
 \note{
 With RL, potential for tailored pulse sequences for particular systems (e.g. strongly coupled vs weakly coupled), learned robustness to errors.
 }
 
+
 \end{frame}
+
 
 \begin{frame}{Constructing pulse sequences using AlphaZero}
 
-Implemented AlphaZero algorithm (\cite{Silver1140}, originally for Chess, Shogi, and Go), though there are many different RL approaches (\cite{peng2021deep}, P33.00001).
+Implemented AlphaZero algorithm (\cite{Silver1140}, originally for Chess, Shogi, and Go), though there are many different RL approaches (\cite{peng2021deep}).
 
 \begin{figure}
 \centering
-\scalebox{.7}{
-\input{tikz/mcts.tex}
-}
+\includegraphics[width=.8\textwidth]{az-parallel.jpeg}
 \end{figure}
 
 \note{
@@ -241,6 +332,34 @@ With tree structure, can optionally add AHT constraints to search.
 
 \end{frame}
 
+
+
+\begin{frame}{AlphaZero: tree search}
+%
+\begin{figure}
+\centering
+\scalebox{.7}{
+\input{../tikz/mcts.tex}
+}
+\end{figure}
+
+% TODO make "animation", walk through carefully how this works
+% TODO also talk about adding additional constraints
+
+\end{frame}
+
+
+\begin{frame}{AlphaZero: network training}
+
+
+\[
+    L(\theta) = (r_i - v_\theta(s_i))^2 - \pi_\theta(s_i) \cdot \log \mathbf{p_i} + c ||\theta||^2
+\]
+
+\end{frame}
+
+
+
 \begin{frame}{Computational results}
 
 % TODO Sekhar: "You don't have a lot of sequences, I'd consider explicitly listing them here"
@@ -248,71 +367,189 @@ With tree structure, can optionally add AHT constraints to search.
 
 Goal: decouple all interactions (\(\overline{H}=0\)) in strongly coupled spin systems with experimental imperfections.
 
-\begin{figure}
-    \centering
-    \scalebox{.5}{
-    \input{tikz/rotation-error.tex}
-    }
-    \hspace{1em}
-    \includegraphics[width=.49\textwidth]{phase_transients_viz.png}
-    % TODO make this side-by-side and larger
-\end{figure}
-
 \begin{itemize}
-    \item Unconstrained search (\emph{tabula rasa}, no AHT knowledge), 1\% pulse rotation error, different pulse sequence lengths ($12\tau, 24\tau, 36\tau, 48\tau$)
-    \item AHT-constrained search, 1\% pulse rotation error, $48\tau$ sequence length
-    % \item AHT-constrained search, 5\% pulse rotation error, .1\% phase transient error, $48\tau$ sequence length
+    \item Consistency checks: $10$ identical runs using same parameters
+    \item Unconstrained search (\emph{tabula rasa}, no AHT knowledge), no errors
+    \item Constrained tree search with AHT, no errors
+    \item Constrained tree search with AHT and $6\tau$ refocusing, no errors
+    \item Constrained tree search, simulated errors
 \end{itemize}
 
-% TODO identify fidelities obtained under ideal conditions
-% TODO were they designed to be robust at all?
-
 \note{
-
-% Unconstrained search didn't yield any results for 96-pulse sequence (never found pulse sequence above threshold fidelity.)
 
 }
 
 \end{frame}
 
-\begin{frame}
-{Fidelity vs. pulse sequence length}
+
+
+\begin{frame}{Consistency check}
 
 \begin{figure}
 \centering
-\includegraphics[width=.9\textwidth]{pulse-sequence-length.pdf}
+\includegraphics[width=.7\textwidth]{az-consistency.pdf}
 \end{figure}
 
 \note{
-Unconstrained search doesn't learn well for long pulse sequences, but adding lowest-order AHT constraints significantly boosts performance! Perhaps adding more AHT-informed constraints will further boost performance
+$24\tau$ sequence, no errors, AHT0 and 6tau constraints.
+}
+
+\end{frame}
+
+
+\begin{frame}{Unconstrained tree search}
+%
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}{.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{hists/reward_hist-no_errors-no_constraints-12.pdf}
+        \caption{$12\tau$ sequence}
+        \label{fig:reward_hist-no_errors-no_constraints-12}
+    \end{subfigure}
+    \begin{subfigure}{.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{hists/reward_hist-no_errors-no_constraints-24.pdf}
+        \caption{$24\tau$ sequence}
+        \label{fig:reward_hist-no_errors-no_constraints-24}
+    \end{subfigure}
+    \begin{subfigure}{.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{hists/reward_hist-no_errors-no_constraints-48.pdf}
+        \caption{$48\tau$ sequence}
+        \label{fig:reward_hist-no_errors-no_constraints-48}
+    \end{subfigure}
+\end{figure}
+
+\note{
+Distribution of ``rewards'' ($-\log(1 - \text{fidelity})$) during AlphaZero training. No constraints were applied to the tree search, and the simulated spin systems were idealized.
+}
+
+\end{frame}
+
+
+
+
+
+\begin{frame}{Constrained tree search with AHT}
+%
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}{.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{hists/reward_hist-no_errors-AHT0-12.pdf}
+        \caption{$12\tau$ sequence}
+        \label{fig:reward_hist-no_errors-AHT0-12}
+    \end{subfigure}
+    \begin{subfigure}{.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{hists/reward_hist-no_errors-AHT0-24.pdf}
+        \caption{$24\tau$ sequence}
+        \label{fig:reward_hist-no_errors-AHT0-24}
+    \end{subfigure}
+    \begin{subfigure}{.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{hists/reward_hist-no_errors-AHT0-48.pdf}
+        \caption{$48\tau$ sequence}
+        \label{fig:reward_hist-no_errors-AHT0-48}
+    \end{subfigure}
+\end{figure}
+
+\note{
+Distribution of ``rewards'' ($-\log(1 - \text{fidelity})$) during AlphaZero training. Lowest-order AHT constraints were applied to the tree search, and the simulated spin systems were idealized.
+}
+
+\end{frame}
+
+
+\begin{frame}{Constrained tree search with AHT and $6\tau$ refocusing}
+%
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}{.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{hists/reward_hist-no_errors-6tau-12.pdf}
+        \caption{$12\tau$ sequence}
+        \label{fig:reward_hist-no_errors-6tau-12}
+    \end{subfigure}
+    \begin{subfigure}{.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{hists/reward_hist-no_errors-6tau-24.pdf}
+        \caption{$24\tau$ sequence}
+        \label{fig:reward_hist-no_errors-6tau-24}
+    \end{subfigure}
+    \begin{subfigure}{.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{hists/reward_hist-no_errors-6tau-48.pdf}
+        \caption{$48\tau$ sequence}
+        \label{fig:reward_hist-no_errors-6tau-48}
+    \end{subfigure}
+\end{figure}
+
+\note{
+Distribution of ``rewards'' ($-\log(1 - \text{fidelity})$) during AlphaZero training. Lowest-order AHT constraints and refocusing all interactions every $6\tau$ were applied to the tree search, and the simulated spin systems were idealized.
 }
 
 \end{frame}
 
 \begin{frame}
-{Robustness to pulse rotation error: AHT constraints}
+{Robustness to rotation errors (no errors in training)}
+
+Training policy without any errors leads to terrible pulse sequences!
 
 \begin{figure}
-\centering
-\includegraphics[width=.9\textwidth]{rot_errors-constrained.pdf}
+    \centering
+    \includegraphics[width=.7\textwidth]{robustness/rot_errors-no_errors.pdf}
+\end{figure}
+
+\note{
+Robustness against rotation errors, relative to a $\pi/2$-pulse. The pulse sequences identified using AlphaZero have very poor robustness to rotation errors, while the CORY48 sequence (which was designed using AHT to be robust to such errors) has high fidelity for a much broader range of rotation errors.
+}
+
+\end{frame}
+
+\begin{frame}{Robustness to phase transient errors  (no errors in training)}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=.7\textwidth]{robustness/phase_transients-no_errors.pdf}
 \end{figure}
 
 \end{frame}
 
-\begin{frame}{Robustness to phase transient error}
+\begin{frame}{Robustness to resonance offset errors  (no errors in training)}
 
 \begin{figure}
-\centering
-\includegraphics[width=.9\textwidth]{phase_transients-constrained.pdf}
+    \centering
+    \includegraphics[width=.7\textwidth]{robustness/offset_errors-no_errors.pdf}
 \end{figure}
 
 \end{frame}
 
-\begin{frame}{Fidelity vs. tau spacing}
+
+\begin{frame}{Robustness to rotation errors (errors in training)}
 
 \begin{figure}
-\centering
-\includegraphics[width=.9\textwidth]{tau_delay.pdf}
+    \centering
+    \includegraphics[width=.7\textwidth]{example-image}
+\end{figure}
+
+\end{frame}
+
+\begin{frame}{Robustness to phase transient errors (errors in training)}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=.7\textwidth]{example-image}
+\end{figure}
+
+\end{frame}
+
+\begin{frame}{Robustness to resonance offset errors (errors in training)}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=.7\textwidth]{example-image}
 \end{figure}
 
 \end{frame}
@@ -345,6 +582,17 @@ Unconstrained search doesn't learn well for long pulse sequences, but adding low
 
 \end{frame}
 
+
+\begin{frame}{Next steps}
+
+\begin{itemize}
+    \item Further tune algorithm hyperparameters for consistency, better performance
+    \item Add additional constraints on tree search for higher-order terms in average Hamiltonian
+\end{itemize}
+
+\end{frame}
+
+
 \begin{frame}[allowframebreaks]
 \frametitle{References}
 
@@ -370,51 +618,7 @@ Unconstrained search doesn't learn well for long pulse sequences, but adding low
 \section{Appendix}
 
 
-\begin{frame}{Quantum control in spin systems}
 
-\[
-    H(t) = H_{\text{sys}} + H_{\text{ctrl}}(t)
-\]
-
-Can use $H_{\text{ctrl}}(t)$ to achieve
-% state-to-state transfer ($\rho_0 \to \rho$) or
-a unitary transformation $U$ given by an effective Hamiltonian $H_\text{eff}$.
-
-\begin{figure}
-\centering
-\input{tikz/spin_system.tex}
-\end{figure}
-
-\note{
-Only focusing on closed system dynamics with global control (spins are not addressed individually).
-
-% Different types of spin systems: \emph{strongly} coupled (solid state NMR) and \emph{weakly} coupled (ESR, NV/P1 centers)
-
-Hamiltonian engineering used for:
-
-\begin{itemize}
-    \item Sensing (decoupling dipolar interactions while keeping chemical shift, e.g. $H_\text{eff} = \beta \textcolor[rgb]{0,0.69,0}{H_{\text{CS}}}$)
-    \item Quantum memory (decoupling all interactions, $H_\text{eff} = 0$)
-    \item Quantum simulation
-\end{itemize}
-
-}
-\end{frame}
-
-
-\begin{frame}{Quantum control in spin systems}
-
-
-\begin{align*}
-    H_{\text{sys}} &= \sum_i \delta_i I_z^i + \sum_{i,j} d_{ij} \left( 3I_z^iI_z^j - \mathbf{I^i} \cdot \mathbf{I^j} \right) \\
-        &= H_\text{CS} + H_\text{D}
-\end{align*}
-
-\[
-    H_{\text{ctrl}}(t) = -B_1(t) \sum_i \gamma_n^i I_x^i -B_2(t) \sum_i \gamma_n^i I_y^i
-\]
-
-\end{frame}
 
 
 \begin{frame}{Average Hamiltonian Theory (AHT)}
@@ -539,18 +743,6 @@ r = 4 \iff \text{fidelity} = 0.\underline{9999}
 
 \end{frame}
 
-\begin{frame}
-{Robustness to errors: unconstrained search}
-
-\begin{figure}
-\centering
-\includegraphics[width=.49\textwidth]{rot_errors-unconstrained.pdf}
-\hfill
-\includegraphics[width=.49\textwidth]{phase_transients-unconstrained.pdf}
-\end{figure}
-
-\end{frame}
-
 \begin{frame}{Comparison between RL approaches}
 
 Different RL algorithm used by our collaborators (\cite{peng2021deep}).
@@ -582,7 +774,7 @@ Different RL algorithm used by our collaborators (\cite{peng2021deep}).
 \begin{figure}
 \centering
 \scalebox{.6}{
-\input{tikz/neural_network.tex}
+\input{../tikz/neural_network.tex}
 }
 \end{figure}
 
