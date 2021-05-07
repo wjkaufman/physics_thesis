@@ -1,11 +1,6 @@
 %!TEX root=thesis.tex
 \chapter{Results}
 
-% TODO figure out a place to introduce/talk about errors
-% TODO talk about phase transients, how I model them,
-% TODO and talk about resonance offsets too...
-
-
 To analyze the performance of the AlphaZero algorithm for constructing pulse sequences, different sets of algorithm hyperparameters and system parameters were tested. AlphaZero was first run with no additional constraints to the tree search (i.e. the state space was all possible sequences of pulses), and the simulated spin systems were idealized (i.e. delta-pulses, no errors in offset frequency, pulse rotations, or phase transients). Additional constraints were then added to the tree search while keeping idealized spin system simulations. Finally, experimental imperfections were introduced to the simulations.
 
 
@@ -20,8 +15,7 @@ As a preliminary consistency check, the AlphaZero algorithm was run with identic
 \end{figure}
 
 
-For the completely unconstrained search and idealized spin system simulations, AlphaZero converges to an optimal
-% TODO ^ isn't optimal, it's ``suitable''
+For the completely unconstrained search and idealized spin system simulations, AlphaZero converges to an effective
 policy only for the 12-pulse sequence (figure~\ref{fig:reward_hist-no_errors-no_constraints-12}). AlphaZero tries random pulse sequences with low fidelity early in training, but quickly ``learns'' to construct pulse sequences with fidelity $\approx 1 - 10^{-8}$.
 
 \begin{figure}[H]
@@ -122,9 +116,32 @@ There are $200$ sequences of length $6\tau$ that will decouple interactions to l
     \label{fig:reward_hist-no_errors-6tau}
 \end{figure}
 
+The $6\tau$ refocusing constraint, while empirically beneficial for the AlphaZero tree search, raises some questions. By introducing this constraint, is the algorithm restricted to searching mediocre pulse sequences, where most sequences do not have low fidelity but none are extraordinarily high? The CORY48 pulse sequence does not refocus all interactions to lowest order until the end of the pulse sequence, and its fidelity is much higher than any pulse sequence found using AlphaZero.
+
+% TODO include figure showing refocusing interactions
+% TODO...
+
 The AlphaZero algorithm was originally designed to play board games, where the trained policy function defined on the entire state space is more important than the specific sequence of moves played in training games. In contrast, for designing pulse sequences, the final policy is less important than identifying a single pulse sequence with high fidelity and robustness to errors. The policy is only a tool for exploring the state space for high-fidelity pulse sequences. Therefore, pulse sequences with fidelity above a given threshold are recorded during training, and the highest-fidelity pulse sequence is used.
 
 % TODO talk about alternative pulse sequence construction using policy?
+% i.e. using policy and even longer MCTS to select a pulse sequence
+
+
+
+
+
+
+% TODO talk about errors here...
+% TODO talk about phase transients, how I model them,
+% TODO and talk about resonance offsets too...
+
+
+
+
+
+
+
+
 
 The highest-fidelity pulse sequences from the $12\tau, 24\tau$, and $48\tau$ searches\footnote{
 See the appendix for an explicit presentation of these pulse sequences.
@@ -144,9 +161,9 @@ This is not entirely unexpected however: the spin systems during training were i
 \end{figure}
 
 % TODO introduce phase transient error, offset error somewhere...
-Similarly, the pulse sequences are much less robust to phase transient error (figure~\ref{fig:phase_transients-no_errors}),
-resonance offset error (\ref{fig:offset_errors-no_errors}),
-or increasing th delay $\tau$ between pulses (\ref{fig:tau_delay-no_errors}).
+Similarly, the pulse sequences are much less robust to phase transient error (figure~\ref{fig:phase_transients-no_errors}), or
+resonance offset error (\ref{fig:offset_errors-no_errors}).
+% or increasing th delay $\tau$ between pulses (\ref{fig:tau_delay-no_errors}).
 
 
 \begin{figure}[H]
@@ -166,13 +183,13 @@ or increasing th delay $\tau$ between pulses (\ref{fig:tau_delay-no_errors}).
     \label{fig:offset_errors-no_errors}
 \end{figure}
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=.7\textwidth]{robustness/tau_delay-no_errors.pdf}
-    \caption{Robustness against longer $\tau$ delays between pulses.
-    }
-    \label{fig:tau_delay-no_errors}
-\end{figure}
+% \begin{figure}[H]
+%     \centering
+%     \includegraphics[width=.7\textwidth]{robustness/tau_delay-no_errors.pdf}
+%     \caption{Robustness against longer $\tau$ delays between pulses.
+%     }
+%     \label{fig:tau_delay-no_errors}
+% \end{figure}
 
 
 To search for \emph{robust} pulse sequences, errors were intentionally introduced into the spin systems during training. First, only rotation errors were included by sampling a random rotation error $\epsilon_r \sim \mathcal{N}(\mu=0, \sigma=.01)$ for each spin system during training. Then instead of having perfect $\pi/2$-pulses, all pulses in a particular spin system rotate the spins by $\pi/2(1+\epsilon_r)$. The resulting pulse sequences were significantly more robust to rotation errors (figure~\ref{fig:rot_errors-rot_errors})
@@ -180,7 +197,7 @@ compared to training without any errors (figure~\ref{fig:rot_errors-no_errors}).
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=.7\textwidth]{robustness/rot_errors-rot_errors.pdf}
+    \includegraphics[width=.7\textwidth]{robustness/rot_errors-rot_errs.pdf}
     \caption{Robustness against rotation errors, relative to a $\pi/2$-pulse. The pulse sequences identified using AlphaZero have very poor robustness to rotation errors, while the CORY48 sequence (which was designed using AHT to be robust to such errors) has high fidelity for a much broader range of rotation errors.
     }
     \label{fig:rot_errors-rot_errors}
@@ -188,39 +205,61 @@ compared to training without any errors (figure~\ref{fig:rot_errors-no_errors}).
 
 
 Finally, the AlphaZero algorithm was run with multiple experimental imperfections: rotation error $\epsilon_r \sim \mathcal{N}(0, .01)$, $.01\%$ phase transient error $\epsilon_{pt} \sim \mathcal{N}(0, 10^{-4})$, and resonance offset error $\epsilon_o \sim \mathcal{N}(0, 10^1)$.
-The policy function was rewarded for high-fidelity pulse sequences in the presence of those errors, and consequently identifies pulse subsequences robust to multiple errors.
+The policy function was rewarded for high-fidelity pulse sequences in the presence of those errors, and consequently should identify pulse subsequences robust to multiple errors. For a range of rotation, phase transient, and resonance offset error (figures~\ref{fig:rot_errors-all_errors} to~\ref{fig:offset_errors-all_errors}), the pulse sequences from training \emph{with} simulated errors are more robust than those from training with no errors.
 
-% TODO put in figures for pulse sequence robustness...
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=.7\textwidth]{robustness/rot_errors-all_errors.pdf}
+    \caption{
+    Robustness against pulse rotation errors. The $12\tau, 24\tau$, and $48\tau$ pulse sequences were identified during training with rotation, phase transient, and resonance offset errors.
+    }
+    \label{fig:rot_errors-all_errors}
+\end{figure}
 
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=.7\textwidth]{robustness/phase_transients-all_errors.pdf}
+    \caption{
+    Robustness against phase transient errors, where the quadrature rotations are relative to a $\pi/2$-pulse. The $12\tau, 24\tau$, and $48\tau$ pulse sequences were identified during training with rotation, phase transient, and resonance offset errors.
+    }
+    \label{fig:phase_transients-all_errors}
+\end{figure}
 
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=.7\textwidth]{robustness/offset_errors-all_errors.pdf}
+    \caption{
+    Robustness against resonance offset errors, relative to chemical shift strength. The $12\tau, 24\tau$, and $48\tau$ pulse sequences were identified during training with rotation, phase transient, and resonance offset errors.
+    }
+    \label{fig:offset_errors-all_errors}
+\end{figure}
 
-% TODO what's going on?
-% sparsity of rewards (only at end of episode, so doesn't get immediate feedback)
-% discontinuous reward landscape, sparsity of high rewards (most pulse sequences suck, even when constrained with AHT0)
-
-
-\section{Algorithm Performance}
-
-% TODO convergence, computational resources
-
-% TODO could be fun to look more closely at neural network, see if
-% it (re)learns AHT knowledge
-
-\section{Computational Simulations}
-
-% fidelity vs pulse sequence length
-% robustness to imperfections (rotation, pt, tau spacing)
-
-% TODO if I have time, do it for refocusing all interactions and for sensing
-
-
-
-The $6\tau$ refocusing constraint, while empirically beneficial for the AlphaZero tree search, raises some questions. By introducing this constraint, is the algorithm restricted to searching mediocre pulse sequences, where most sequences do not have low fidelity but none are extraordinarily high? The CORY48 pulse sequence does not refocus all interactions to lowest order until the end of the pulse sequence, and its fidelity is much higher than any pulse sequence found using AlphaZero.
-
-% TODO include figure showing refocusing interactions
+Despite the improved robustness by including errors in training, the resulting pulse sequences still have significantly lower rewards (and thus lower fidelity) than the CORY48 pulse sequence in simulated spin systems. This holds true across different possible errors and at every magnitude of error tested. In short, the reinforcement learning approach tried in this work is not as effective as the AHT-based analytical process used to design CORY48.
 
 
 
 \section{Experimental Validation}
 
-% TODO average correlations
+% TODO
+% explain which sequence is tested
+In addition to computational simulations, the best-performing $48\tau$ pulse sequence was also tested against the CORY48 pulse sequence in a solid-state NMR spectrometer.
+% TODO find out the magnet specs, bruker magnet _._T
+An adamantane sample was used.
+% TODO find out/look up sample specs, e.g. dipolar strength is ___, CS is ___
+
+While the fidelity of a unitary matrix is straightforward to calculate in simulation, measuring the fidelity in experiment is much more diffcult, as it would require evaluation on a complete basis of states (i.e. quantum process tomography).
+% TODO cite above
+Instead, the fidelity is qualitatively approximated by the average correlation $C_\text{avg}$ \cite{peng2021deep}
+\[
+C_\text{avg} = (C_{XX} C_{YY} C_{ZZ})^{1/3}
+\]
+where the correlation function $C_{XX}(t)$ is the expected signal from initializing the state along $X$ and measuring magnetization along $X$. $C_{YY}(t)$ and $C_{ZZ}(t)$ are defined similarly.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=.7\textwidth]{decay_plot_2.pdf}
+    \caption{The average correlation in an adamantane sample for the $48\tau$-pulse sequence identified using AlphaZero, and for the CORY48 pulse sequence.}
+    \label{fig:decay_plot}
+\end{figure}
+
+The experimental correlation functions (figure~\ref{fig:decay_plot}) further support the computational results: the RL-based $48\tau$ pulse sequence does decouple interactions, but not as effectively as the CORY48 pulse sequence.
