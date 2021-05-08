@@ -3,22 +3,18 @@
 
 % high level
 
-% machine learning for optimizing pulse sequences designed for Hamiltonian engineering
+% reinforcement learning for designing pulse sequences designed for Hamiltonian engineering
 %
 % studying the solution space for unitary operators, including metrics on the space and ideas of robustness
 %
 %
-Quantum simulation permits the study of quantum systems that are difficult to observe experimentally and intractable to simulate on classical computers. To perform quantum simulations, the ``effective Hamiltonian'' must be engineered to match the desired quantum system.
-% include quantum simulation as high-level motivation
-% TODO fill in
-In a variety of quantum systems methods have been developed for altering the effective Hamiltonian.
-%For nuclear or electronic systems, % need to specify?
-In some cases, as in nuclear or electronic spin systems, applying a time-dependent external magnetic field can be used to alter the Hamiltonian, allowing the system to evolve under a desired ``effective'' Hamiltonian that may eliminate the effects of certain interactions or lead to new phenomena not typically observed in nature. Average Hamiltonian Theory provides a framework in which the effective Hamiltonian can be built by a periodic sequence of magnetic field pulses. The system, observed at ``window times'' within each period appears to evolve under the average effective Hamiltonian.
+Hamiltonian engineering encompasses a variety of important problems in quantum physics and quantum control. For spin systems in particular, the ability to engineer an effective Hamiltonian to decouple dipolar interactions is desirable for improving spectroscopy and increasing spin coherence times.
+Average Hamiltonian theory (AHT) has been used effectively to design pulse sequences for Hamiltonian engineering, but has inherent limitations in the computational complexity of calculating higher-order terms.
 % my project
-In this thesis, machine learning techniques for optimizing pulse sequences will be studied. This includes exploring different metrics to quantify the fidelity of unitary operators, optimizing over the parameter space for pulse sequences to obtain the desired Hamiltonian, as well as understanding the robustness of solutions. Simulations of small-scale quantum systems will primarily be used to explore these techniques, and extensions to experimental systems with large ensembles of spins will also be considered.
+This work explores reinforcement learning as an alternative approach to designing pulse sequences for Hamiltonian engineering. The AlphaZero algorithm was trained to construct pulse sequences of varying lengths to decouple all interactions in spin systems. High-fidelity pulse sequences were identified after introducing additional constraints to the algorithm's tree search, and were trained to be robust to multiple sources of error by including those errors in training. The RL-based pulse sequences have lower fidelity than the CORY48 pulse sequence both in computational simulations and experiment, indicating that the current RL implementation does not outperform existing approaches using AHT.
 % scope of project
 % ???
 % who cares?
-This work will improve our ability to control and measure quantum systems, with applications in solid state NMR, quantum sensing, and quantum computing.
+% This work will improve our ability to control and measure quantum systems, with applications in solid state NMR, quantum sensing, and quantum computing.
 
 \end{abstract}

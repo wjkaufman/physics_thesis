@@ -71,7 +71,9 @@ See figure~\ref{fig:actions} for the relationship between rf field amplitudes, u
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=.8\textwidth]{rf-unitary-action.jpeg}
+    % \scalebox{.8}{
+    \input{tikz/Pulse-Action.tex}
+    % }
     \caption{The rf field amplitudes, the unitary operators, and corresponding actions.}
     \label{fig:actions}
 \end{figure}
@@ -154,7 +156,10 @@ Randomly sample an action $a_k$ from the distribution $\{ p_k \}$ \;
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=.7\textwidth]{MCTS.jpeg}
+    % \includegraphics[width=.7\textwidth]{MCTS.jpeg}
+    % \scalebox{.8}{
+    \input{tikz/MCTS/MCTS-5.txt}
+    % }
     \caption{Monte Carlo Tree Search (MCTS) visual.}
     \label{fig:mcts}
 \end{figure}
@@ -186,15 +191,18 @@ As the agent continually generates search statistics from self-play, the policy 
 \end{equation}
 Which is simply the squared error of the reward estimates, the cross-entropy loss of the policy estimates, and $L_2$ regularization of the neural network parameters. The constant $c$ controls the weight of $L_2$ regularization (in this work $c = 10^{-6}$).
 
-The two processes of self-play and training are done simultaneously, with multiple agent processes constructing pulse sequences and generating data that is then used to train the policy and value networks. In turn, the updated network parameters $\theta$ are shared with the agents. The flow of information is shown in figure~\ref{fig:az-parallel}.
+The two processes of self-play and training are done simultaneously, with multiple agent processes constructing pulse sequences and generating data that is then used to train the policy and value networks. In turn, the updated network parameters $\theta$ are shared with the agents.
+% The flow of information is shown in figure~\ref{fig:az-parallel}.
+% TODO make az-parallel figure if I have time!!!
 
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=.8\textwidth]{az-parallel.jpeg}
-    \caption{The parallelized execution of the AlphaZero algorithm. Many agent processes construct pulse sequences and feed the generated data to a training process. The updated network parameters $\theta$ are then shared with the agents.}
-    \label{fig:az-parallel}
-\end{figure}
+% \begin{figure}[H]
+%     \centering
+%     \includegraphics[width=.8\textwidth]{az-parallel.jpeg}
+%     \caption{The parallelized execution of the AlphaZero algorithm. Many agent processes construct pulse sequences and feed the generated data to a training process. The updated network parameters $\theta$ are then shared with the agents.}
+%     \label{fig:az-parallel}
+% \end{figure}
+% TODO do this if I have time!!!
 
 % TODO justification, some problems associated with it
 % eg training on MCTS just reinforces how it's already searching
@@ -260,8 +268,8 @@ To decouple all interactions, both constraints above must be satisfied, which is
 % - rotation errors
 % - offset errors
 % - phase transient errors
-% - pulse sequence length/episode length
 % RL algorithm parameters
+% - pulse sequence length/episode length
 % - num_simulations
 % - Dirichlet noise parameter
 % - exploration fraction
