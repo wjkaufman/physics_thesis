@@ -137,7 +137,7 @@ The AlphaZero algorithm was originally designed to play board games, where the t
 
 
 
-
+Rotation errors, either under- or over-rotating the spins, are common in NMR systems due to limited precision in both the rf-field strength and the pulse width $t_p$.
 
 
 
@@ -145,11 +145,17 @@ The AlphaZero algorithm was originally designed to play board games, where the t
 
 The highest-fidelity pulse sequences from the $12\tau, 24\tau$, and $48\tau$ searches\footnote{
 See the appendix for an explicit presentation of these pulse sequences.
-} were evaluated for robustness against several common experimental imperfections. Rotation errors, either under- or over-rotating the spins, are common in NMR systems due to limited precision in both the rf-field strength and the pulse width $t_p$. For small rotation errors ($<1\%$ of a $\pi/2$-pulse) the fidelity for all pulse sequences declines dramatically (see figure~\ref{fig:rot_errors-no_errors}).
+} were evaluated for robustness against several common experimental imperfections.
+% TODO actually put pulse sequences in appendix!!!
+% TODO explain evaluation, the whole 288tau thing...
+
+
+
+For small rotation errors ($<1\%$ of a $\pi/2$-pulse) the fidelity for all pulse sequences declines dramatically (see figure~\ref{fig:rot_errors-no_errors}).
 This is not entirely unexpected however: the spin systems during training were idealized, so no errors of any kind were included. As a result, there was no reward signal for constructing \emph{robust} pulse sequences, only pulse sequences that did well under ideal conditions.
 
 
-% TODO explain evaluation, the whole 288tau thing...
+
 
 
 \begin{figure}[H]
@@ -160,7 +166,6 @@ This is not entirely unexpected however: the spin systems during training were i
     \label{fig:rot_errors-no_errors}
 \end{figure}
 
-% TODO introduce phase transient error, offset error somewhere...
 Similarly, the pulse sequences are much less robust to phase transient error (figure~\ref{fig:phase_transients-no_errors}), or
 resonance offset error (\ref{fig:offset_errors-no_errors}).
 % or increasing th delay $\tau$ between pulses (\ref{fig:tau_delay-no_errors}).
@@ -246,8 +251,9 @@ In addition to computational simulations, the best-performing $48\tau$ pulse seq
 % TODO find out the magnet specs, bruker magnet _._T
 An adamantane sample was used.
 % TODO find out/look up sample specs, e.g. dipolar strength is ___, CS is ___
+% the CORY48 paper has stats on adamantane
 
-While the fidelity of a unitary matrix is straightforward to calculate in simulation, measuring the fidelity in experiment is much more diffcult, as it would require evaluation on a complete basis of states (i.e. quantum process tomography).
+While the fidelity of a unitary matrix is straightforward to calculate in simulation, measuring the fidelity in experiment is much more difficult, as it would require evaluation on a complete basis of states (i.e. quantum process tomography).
 % TODO cite above
 Instead, the fidelity is qualitatively approximated by the average correlation $C_\text{avg}$ \cite{peng2021deep}
 \[

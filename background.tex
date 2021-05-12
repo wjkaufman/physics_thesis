@@ -1,13 +1,6 @@
 %!TEX root=thesis.tex
 \chapter{Background}
 
-% TODO
-%
-% - mention experimental imperfections
-%   - also include rotation error, phase transient error in equations (or at least describe them somewhere...)
-% - talk about unitary vs non-unitary dynamics, open quantum systems
-
-
 \section{Motivation}
 
 Some physicists believe that quantum physics is on the cusp of a ``second quantum revolution''.\cite{quantum-rev} The ability to probe quantum systems with finer precision and control them to a greater extent, as opposed to passively observing emergent phenomena that arise, has potential to radically transform many different areas, from sensing to simulation quantum computing.
@@ -18,8 +11,6 @@ and overwhelm the signal and inhibit our ability to learn about the chemical env
 
 Magnetic dipole interactions between a central spin and many surrounding bath spins (such as an NV center surrounded by many P1 centers) also leads to unwanted effects, in this case a decay of the central spin coherence time. Long coherence times for the system of interest are desirable, and finding ways to decouple interactions between the central spin and bath spins would help that endeavor.
 
-% intro to quantum ideas
-% TODO delete this subsection?
 \section{Important Quantum Mechanics Concepts}
 
 This section is meant to present some fundamental ideas that will be used throughout, but for a more thorough description of quantum mechanics see
@@ -79,7 +70,6 @@ I_z^{(j)} = \identity \otimes \identity \otimes \dots \otimes I_z \otimes \dots 
 \]
 Similarly, the term $I_z^{(j)}I_z^{(k)}$ is shorthand for a product of identity operators except for the $j$th and $k$th operators.
 
-% TODO continue describing what NMR is, discuss NMR system, general overview
 Nuclear magnetic resonance (NMR) encompasses the study of nuclear spins and the various interactions they have with external fields and with each other.
 The key interactions considered in this work are given below, but a complete description of the interactions present in NMR can be found in \cite{1976ii}.%
 \footnote{The quadrupolar interaction and J coupling are not considered here, but it's good to remember they're still there in general.}
@@ -181,8 +171,6 @@ The Fourier transform of the FID gives a spectrum of the sample, including chemi
 %     \label{fig:NMR-FID-spectrum}
 % \end{figure}
 
-
-% TODO clarify my explanation of motional averaging
 If the NMR sample is a liquid, then the sample's molecules are constantly tumbling past each other. As a result, dipolar interactions between spins from different molecules are not constant over the course of the experiment, and in aggregate the dipolar interactions are averaged to zero. This is called ``motional averaging'' of the dipolar interactions
 \[
 H_{\text{int}} = H_Z + H_\text{CS} + 0
@@ -356,6 +344,8 @@ We see that WHH-4 is cyclic because $U_{\text{rf}}(6\tau) = \identity$. To deter
 \end{align*}
 The WHH-4 sequence, to lowest order, refocuses (or ``cancels out'') the dipolar interaction between spins while retaining the chemical shift term. Instead of the principal axis being along z, however, the spin operator acts along the diagonal axis $(1,1,1)$.
 
+% TODO ideal6 sequence, or some other short time suspension sequence?
+
 % TODO
 % TODO
 % TODO
@@ -368,14 +358,6 @@ The WHH-4 sequence, to lowest order, refocuses (or ``cancels out'') the dipolar 
 % TODO
 
 
-% TODO ideal6 sequence, or some other short time suspension sequence?
-
-% \subsection{Applications to Quantum Control}
-%
-% % TODO describe more recent work like F-matrix, etc.
-%
-% % \section{GRAPE}
-% % % TODO include?
 
 % TODO include figure of average correlation for FID, WHH, CORY
 

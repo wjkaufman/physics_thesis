@@ -13,7 +13,7 @@ The code for this work can be found at \url{https://github.com/wjkaufman/rl_puls
 
 Spin systems composed of a small number of spins can be easily simulated on a classical computer. Because the Hilbert Space grows exponentially as the spins increase ($2^N$ basis states for $N$ spins and $2^{2N}$ matrix elements for associated operators), it rapidly becomes impractical to simulate large numbers of spins. In this work, $N=3$ spin-1/2 systems were used in the reinforcement learning algorithm, and $N=4$ spin-1/2 systems were used to evaluate pulse sequences. The QuTiP Python package was used for all simulations \cite{Johansson_2013}.
 
-In any real physical system, system-environment interactions are present and the spin system must be treated as open, but for simulation purposes the system is assumed to be isolated. % TODO or "closed"?
+In any real physical system, system-environment interactions are present and the spin system must be treated as open, but for simulation purposes the system is assumed to be isolated.
 Consequently, the dynamics are given by unitary time-evolution operators. In principle, though, simulations of open quantum systems could be used with reinforcement learning algorithms, and may lead to better control by accounting for non-unitary system dynamics.
 
 In each simulated $N$-spin system, the chemical shift strengths $\{\delta_j\}_j$ and the dipolar coupling strengths $\{d_{jk}\}_{j,k}$ are both drawn from normal distributions
@@ -44,7 +44,6 @@ In an NMR spectrometer, the actions we can perform, or the ``knobs'' we can turn
 % TODO change this reference to something in the rotating frame
 % with two control amplitudes, makes much more sense
 The spectrometer's electronics limit the strength and the granularity of the rf field,
-% TODO is granularity the right word?
 but this still allows for a staggeringly large action space. Instead of allowing for complete continuous control of the rf field%
 \footnote{
 Which is done in the GRAPE algorithm \cite{Khaneja-2005}.
@@ -94,10 +93,10 @@ Making measurements on the system could also be considered an action (measuremen
 }
 This is more ``realistic'' in the sense that the agent only knows what the experimenter would know, without getting any additional information ``for free.''
 
-% \subsection{Reward Function}
-% TODO should I even include this here?
-%
-% The agent tries to learn an optimal policy $\pi^*$ that maximizes a reward signal. In the Hamiltonian engineering problem, we want to push the dynamics as close as we can toward the target Hamiltonian, which we can quantify with the average gate fidelity % TODO cite this
+\subsection{Reward Function}
+
+% TODO revise below
+%The agent tries to learn an optimal policy $\pi^*$ that maximizes a reward signal. In the Hamiltonian engineering problem, we want to push the dynamics as close as we can toward the target Hamiltonian, which we can quantify with the average gate fidelity % TODO cite this
 % \begin{equation}
 %     % TODO find out what this is...
 % \end{equation}
@@ -108,8 +107,7 @@ This is more ``realistic'' in the sense that the agent only knows what the exper
 As mentioned in the introduction, the AlphaZero algorithm has two main components: self-play and neural network training. The original publication and its supplementary materials has a complete description of the algorithm \cite{Silver1140}, but pseudocode is presented below as well.
 
 During self-play, the agent iteratively constructs a pulse sequence by performing Monte Carlo Tree Search (MCTS) from the current state. From state $s_i$ (which is represented by the sequence of actions performed so far, $(a_0, \dots, a_i)$), the agent stochastically samples actions based on the prior probability from the policy $\pi$, the number of times the agent has already ``visited'' that action, and the average estimated reward (or value) of that branch of the tree. The agent is more likely to select actions that have a higher prior probability, a lower visit count, and a higher average reward. The exact formula for selection is given in algorithm~\ref{al:mcts},
-% TODO check below, and
-and is a variant of the PUCT algorithm from  \cite{Rosin:2011uu}.
+and is a variant of the PUCT algorithm from \cite{Rosin:2011uu}.
 
 The agent performs many rollouts of selecting actions, estimating the rewards, and updating visit counts and reward estimates along the particular sequence of actions. After a certain number of rollouts, the agent finally picks a particular action to perform by sampling from the empirical distribution of visit counts.
 See figure~\ref{fig:mcts} for a visual depiction of the MCTS process.
@@ -203,11 +201,6 @@ The two processes of self-play and training are done simultaneously, with multip
 %     \label{fig:az-parallel}
 % \end{figure}
 % TODO do this if I have time!!!
-
-% TODO justification, some problems associated with it
-% eg training on MCTS just reinforces how it's already searching
-% if there are intial biases in branches it explores, then
-% training will reinforce that (somewhat fixed with noisy priors)
 
 \subsection{Neural Network Architecture}
 
