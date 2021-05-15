@@ -131,17 +131,34 @@ The AlphaZero algorithm was originally designed to play board games, where the t
 
 
 
-% TODO talk about errors here...
-% TODO talk about phase transients, how I model them,
-% TODO and talk about resonance offsets too...
 
+\section{Robustness Evaluation}
 
+Although it is straightforward to simulate spin systems under ideal conditions without any experimental imperfections, this never happens in reality. Therefore, it is important to consider how the pulse sequences perform in the presence of errors and determine their robustness.
+The errors considered below include pulse rotation errors, phase transient errors, and resonant offset errors.
+% TODO include delay time too???
 
-Rotation errors, either under- or over-rotating the spins, are common in NMR systems due to limited precision in both the rf-field strength and the pulse width $t_p$.
+Pulse rotation errors, either under- or over-rotating the spins, are common in NMR systems due to limited precision in both the rf-field strength and the pulse width $t_p$. If the pulse strength or duration is too high (or too low), then the toggling frame will be rotated greater (or less) than $\pi/2$ and the average Hamiltonian will not necessarily match the target Hamiltonian. See figure~\ref{fig:rotation-error} for a visual depiction of rotation errors for a single spin.
 
+\begin{figure}[H]
+    \centering
+    \input{tikz/rotation-error.tex}
+    \caption{Pulse rotation errors for a single spin.}
+    \label{fig:rotation-error}
+\end{figure}
 
+Phase transient errors are another pulse-related error that are present in experimental systems. When applying a pulse, the non-zero impedance in the circuit will induce small additional pulses in quadrature to the intended pulse when the rf field rises and falls. For example, applying an $X$ pulse will also apply slight rotations about the $y$ axis when the $B_X$ field rises and falls. See figure~\ref{fig:phase_transients} for an ideal pulse compared to a pulse with phase transients. To simulate phase transient errors, each of the $X, Y, \overline{X}$, and $\overline{Y}$ actions were modified to include slight rotations along $y, -x, -y$, and $x$ immediately before and after the pulse. The rotation angle was parameterized as a fraction of $\pi/2$.
 
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=.7\textwidth]{phase_transients_viz.png}
+    \caption{
+    An ideal pulse (a) compared to a pulse with phase transients (b). Illustration from \cite{1976ii}.
+    }
+    \label{fig:phase_transients}
+\end{figure}
 
+Finally, resonance offset errors occur when the rf field is not matched to the Larmor frequency of the spins. The rotating frame therefore does not rotate \emph{precisely} with the spins, but at an offset frequency.
 
 The highest-fidelity pulse sequences from the $12\tau, 24\tau$, and $48\tau$ searches\footnote{
 See the appendix for an explicit presentation of these pulse sequences.
@@ -243,7 +260,7 @@ Despite the improved robustness by including errors in training, the resulting p
 
 
 
-\section{Experimental Validation}
+\section{Experimental Validation}\label{sec:experimental}
 
 % TODO
 % explain which sequence is tested

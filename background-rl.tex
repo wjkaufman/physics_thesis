@@ -1,6 +1,6 @@
 %!TEX root=thesis.tex
 
-\section{Reinforcement Learning}
+\chapter{Reinforcement Learning}
 
 
 % TODO explain episode, timesteps
@@ -36,45 +36,16 @@ or the total discounted rewards until the end of the episode at time step $T$. T
 \begin{equation}\label{eq:state_value}
     v_\pi(s) \defeq \E[G_t | S_t = s]
 \end{equation}
-Finally, the \emph{action-value function} is the expected return from taking an action $a$ in state $s$, then after following policy $\pi$
-\begin{equation}\label{eq:action_value}
-    q_\pi(s, a) \defeq \E[G_t | S_t = s, A_t = a]
-\end{equation}
+% Finally, the \emph{action-value function} is the expected return from taking an action $a$ in state $s$, then after following policy $\pi$
+% \begin{equation}\label{eq:action_value}
+%     q_\pi(s, a) \defeq \E[G_t | S_t = s, A_t = a]
+% \end{equation}
 
-\subsection{Action Space}
 
-The action space can generally be discrete (there are finitely many actions that can be performed) or continuous  (infinitely many actions). The size of the action space determines the type of RL algorithm that can be used. In discrete action spaces, the policy can be stochastic and learn a probability distribution over every action. In continuous action spaces, where it's impractical to learn an arbitrary probability distribution over all actions, the policy can either be stochastic and learn parameters of a general probability distribution (such as a multivariate Gaussian) or deterministic and return the action.
 
-For Hamiltonian engineering, the size of the action space depends on the number of allowed control Hamiltonians. As an example, in many pulse sequences developed using average Hamiltonian theory, the control Hamiltonians are restricted to $\pi/2$-pulses at consistent time intervals, which is better suited to a discrete action space. In contrast, techniques such as GRAPE
-\cite{Khaneja-2005}
-allow the control Hamiltonian amplitudes to vary continuously.
 
-Both discrete and continuous action spaces were tested, and the results of each are shared below in the sections for each corresponding RL algorithm.
 
-\subsection{Reward Function}
 
-The goal of Hamiltonian engineering is to control the system so that its time-evolution appears to be under some effective Hamiltonian. The reward signal should then be larger when the actual evolution is ``close'' to the target evolution. One measure of ``closeness'' is the fidelity function for two unitary operators
-\begin{equation} % TODO make sure this is right
-    F(U_\text{actual}, U_\text{target}) = \left| \frac{\Tr{
-        U_\text{actual}^\dagger U_\text{target}
-    }}{\Tr{\identity}} \right|
-\end{equation}
-The fidelity approaches 1 as the unitaries get closer, and approaches 0 as the unitaries get further apart. However, a tenfold improvement in performance doesn't correspond to a tenfold increase in fidelity (take for instance a fidelity of 0.9 compared to 0.99). A suitable reward function is then calculated by
-\begin{equation}
-    R = -\log(1-F(U_\text{actual}, U_\text{target}) + \epsilon)
-\end{equation}
-where $\epsilon>0$ ensures the reward isn't infinite.
-
-There is also the decision of \emph{when} to give rewards to the agent. A reward can be given at every time step during the episode (``dense rewards'') or only at certain time steps such as the end of the episode (``sparse rewards'').
-Dense rewards make sense when the fidelity matters at every time step, such as implementing a target unitary in the shortest amount of time possible.
-% TODO does ^ make sense? May need to explain more...
-Sparse rewards make sense when the fidelity only matters at certain points in time, such as in stroboscopic measurements and pulse sequences.
-
-\subsection{State Space and State Representation}
-
-The state space is the set of all possible states of the system. A possible approach would be to encode the state as the density matrix or propagator at the current time step. However, the density matrix and propagator grow exponentially as the system size increases, and the complete characterization of the quantum system is unrealistic for any experimental application.
-
-An alternative state representation is the sequence of past actions applied to the system.  This representation generally requires less memory and computation, and may also be better suited to more robust control.
 
 \subsection{Algorithm Examples}
 
@@ -117,13 +88,6 @@ If the state and action spaces are small, then it's feasible for all the $Q$-val
 % % \end{equation}
 % .
 
-\subsubsection{AlphaZero}
-
-
-AlphaZero is a model-based, off-policy, actor-critic algorithm that was originally developed to play Chess, shogi, and Go \cite{Silver1140}. There are two major components to the algorithm: self-play and neural network training. Because AlphaZero is a model-based algorithm, the agent is able to consider the state space without necessarily interacting with the environment. The agent plays many episodes against itself, using a neural network to estimate a policy $\pi(s)$ and a value function $v_\pi(s)$. During self-play, the agent rolls out many possible state-action trajectories, chooses an action that maximizes the expected reward, and collects data on the state, which actions it considered, and the final reward at the end of the episode. The collected data in turn is used to train the policy and value neural networks $\{ \pi, v_\pi \}$.
-
-% TODO more here, also include diagram?
-
 \subsubsection{PPO}
 
 Proximal-policy optimization (PPO) is a model-free, on-policy actor-critic algorithm that tried to improve data efficiency and robustness compared to existing algorithms (such as DQN or other policy gradient methods).
@@ -145,3 +109,9 @@ PPO has been applied successfully to both continuous and discrete action spaces%
 \subsubsection{ERL}
 
 Evolutionary reinforcement learning (ERL) is a model-free, off-policy hybrid algorithm that uses both actor-critic policy gradient and evolutionary algorithm methods \cite{khadka2018evolutionguided}. ERL addresses problems found in many  gradient-based RL algorithms, including temporal credit assignment (associating actions to rewards that may be separated by many time steps), exploration of the state and action spaces, and policy convergence sensitivity to hyperparameters. To do so, ERL maintains a population of actors with individual policies that interact with the environment. The population's experiences are recorded in a shared replay buffer, and a separate actor/critic pair learn from the replay buffer using policy gradient (such as DDPG or DQN). Periodically, the policy gradient-based actor is copied into the population, and evolutionary algorithms are used to iterate a new ``generation'' of actors (by preferentially selecting high-performing actors). By using both gradient-based and gradient-free methods, ERL attempts to achieve both efficiency and policy diversity, making it a candidate for a variety of RL problems.
+
+Pulse sequence design for Hamiltonian engineering has also been approached using the ERL algorithm \cite{peng2021deep}, and achieved similar results to this RL implementation.
+
+\subsubsection{AlphaZero}
+
+AlphaZero is a model-based, off-policy, actor-critic algorithm that was originally developed to play Chess, shogi, and Go \cite{Silver1140}. There are two major components to the algorithm: self-play and neural network training. Because AlphaZero is a model-based algorithm, the agent is able to consider the state space without necessarily interacting with the environment. The agent plays many episodes against itself, using a neural network to estimate a policy $\pi(s)$ and a value function $v_\pi(s)$. During self-play, the agent rolls out many possible state-action trajectories, chooses an action that maximizes the expected reward, and collects data on the state, which actions it considered, and the final reward at the end of the episode. The collected data in turn is used to train the policy and value neural networks $\{ \pi, v_\pi \}$.

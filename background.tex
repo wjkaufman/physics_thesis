@@ -1,65 +1,17 @@
 %!TEX root=thesis.tex
 \chapter{Background}
 
-\section{Motivation}
+% \section{Motivation}
 
-Some physicists believe that quantum physics is on the cusp of a ``second quantum revolution''.\cite{quantum-rev} The ability to probe quantum systems with finer precision and control them to a greater extent, as opposed to passively observing emergent phenomena that arise, has potential to radically transform many different areas, from sensing to simulation quantum computing.
+Some physicists believe that quantum physics is on the cusp of a ``second quantum revolution''.\cite{quantum-rev} The ability to probe quantum systems with finer precision and control them to a greater extent, as opposed to passively observing emergent phenomena that arise, has the potential to radically transform many different areas, from sensing to simulation to quantum computation.
 
-Two specific examples where quantum control can be readily applied include NMR spectroscopy and bath engineering. In NMR spectroscopy, the collective magnetization of spin-1/2 protons in a sample can be measured, and the resulting signal informs the particular chemical environments the spins are in. However, for solid-state samples, magnetic dipolar interactions between spins lead to state decoherence
-% TODO is ^ correct?
+Hamiltonian engineering is an important problem in the effort to more finely control quantum systems.
+Every system has a Hamiltonian that characterizes its dynamics, and as the name suggests, Hamiltonian engineering seeks to ``engineer'' a different Hamiltonian so that the system's dynamics are altered. Hamiltonian engineering has been applied to NMR spectroscopy by engineering Hamiltonians without certain interactions that cause noisier measurements. Engineering Hamiltonians can also be used for sensing (where certain interactions are sensitive to external fields while being robust to decoherence) and for quantum simulation (where novel Hamiltonians must be implemented in existing systems).
+
+Two specific examples where Hamiltonian engineering can be readily applied include NMR spectroscopy and bath engineering. In NMR spectroscopy, the collective magnetization of spin-1/2 protons in a sample can be measured, and the resulting signal informs the particular chemical environments the spins are in. However, for solid-state samples, magnetic dipolar interactions between spins lead to state decoherence
 and overwhelm the signal and inhibit our ability to learn about the chemical environments. However, various methods have been developed to effectively \emph{decouple} the magnetic dipolar interactions between spins, improving the signal drastically.
 
 Magnetic dipole interactions between a central spin and many surrounding bath spins (such as an NV center surrounded by many P1 centers) also leads to unwanted effects, in this case a decay of the central spin coherence time. Long coherence times for the system of interest are desirable, and finding ways to decouple interactions between the central spin and bath spins would help that endeavor.
-
-\section{Important Quantum Mechanics Concepts}
-
-This section is meant to present some fundamental ideas that will be used throughout, but for a more thorough description of quantum mechanics see
-\cite{mcintyre2012quantum, sakurai2017modern}.
-.
-In all equations that follow, $\hbar = 1$ is assumed.
-
-% state of system <-> density operator
-Given a quantum system, a general state can be represented by a density operator $\rho(t)$. The density operator encapsulates all known information about the quantum system, specifically the expectation values associated with well-defined observable. For an observable $A$, the expectation is given by
-\begin{equation}\label{eq:measure}
-    \langle A \rangle = \Tr{\rho A}
-\end{equation}
-
-The time evolution of the density operator is given by
-\begin{equation}\label{eq:density-time}
-    \rho(t) = U(t) \rho(0) U(t)^\dagger
-\end{equation}
-where the unitary operator $U$ is the ``propagator'' defined by
-\begin{equation}\label{eq:propagator-de}
-    i \ddt{U(t)} = H(t) U(t), U(0) = \identity
-\end{equation}
-% The two equations above can be combined to yield the Liouville-Von Neumann equation, which explicitly shows the density operator's time evolution from the system Hamiltonian.
-% \begin{equation}
-%     i \ddt{\rho(t)} = [H(t), \rho(t)]
-% \end{equation}
-
-When the Hamiltonian is time-independent or if the Hamiltonian commutes with itself at different points in time (i.e. $[H(t_1), H(t_2)] = 0$), equation~\ref{eq:propagator-de} can be solved to obtain the propagator
-\begin{equation}\label{eq:propagator-ti}
-    U(t) = \text{exp}\left[ {-i \int_0^t H(t') dt'} \right]
-\end{equation}
-However, if the Hamiltonian is time-dependent and doesn't commute with itself at different times, then the above equation is not valid. This difficulty with time-dependent Hamiltonians and methods with dealing with them are further discussed in~\ref{sec:AHT}.
-
-In many cases it can be helpful to consider the \emph{interaction frame} of a particular interaction. If the Hamiltonian is expressed as the sum of two terms
-\[
-H(t) = H_A(t) + H_B(t)
-\]
-then there is a unitary operator $U_A(t)$ given by
-\begin{equation}\label{eq:interaction-propagator}
-    \frac{d}{dt} U_A(t) = -i H_A(t) U_A(t), \, U_A(0) = \identity
-\end{equation}
-that maps from the interaction frame to the lab frame.
-The dynamics in the interaction frame are described by the interaction frame Hamiltonian $\widetilde{H}(t) = {U_A(t)}^{\dagger} H_B(t)U_A(t)$
-\[
-\frac{d}{dt}\widetilde{U}(t) = -i \widetilde{H}(t)\widetilde{U}(t),\, \widetilde{U}(0) = \identity
-\]
-The propagator in the lab frame $U(t)$ is related to $\widetilde{U}(t)$ by first time evolution in the interaction frame, then mapping from the interaction frame to the lab frame
-\[
-U(t) = U_A(t)\widetilde{U}(t).
-\]
 
 \section{Spin-1/2 Systems and Nuclear Magnetic Resonance}
 
@@ -71,8 +23,17 @@ I_z^{(j)} = \identity \otimes \identity \otimes \dots \otimes I_z \otimes \dots 
 Similarly, the term $I_z^{(j)}I_z^{(k)}$ is shorthand for a product of identity operators except for the $j$th and $k$th operators.
 
 Nuclear magnetic resonance (NMR) encompasses the study of nuclear spins and the various interactions they have with external fields and with each other.
-The key interactions considered in this work are given below, but a complete description of the interactions present in NMR can be found in \cite{1976ii}.%
+The key interactions considered in this work are given below in equations~\ref{eq:nmr-ham} through~\ref{eq:nmr-ham-rf}, but a complete description of the interactions present in NMR can be found in \cite{1976ii}.%
 \footnote{The quadrupolar interaction and J coupling are not considered here, but it's good to remember they're still there in general.}
+Figure~\ref{fig:spin-system} graphically depicts a spin system and the dipolar interactions between spins.
+
+\begin{figure}[H]
+    \centering
+    \input{tikz/Spin-System.tex}
+    \caption{A system of spins in a cubic lattice. Each spin may have a different local magnetic field due to its surrounding electronic structure, which causes the chemical shifts $\delta_i$ away from the Larmor frequency $\omega_0$. Dipolar interactions between pairs of spins are shown in red arrows, and only shown for a few pairs of spins. The main $B_0$ field is present everywhere in the lattice.}
+    \label{fig:spin-system}
+\end{figure}
+
 \begin{align}\label{eq:nmr-ham}
     H(t) &= H_Z + H_\text{CS} + H_D + H_\text{rf}(t) \\
     H_Z &= \omega_0 \sum_j I_z^{(j)} \\
@@ -141,10 +102,11 @@ then this field can be thought of as two counter-rotating magnetic fields whose 
 % TODO TWO control amplitudes for X and Y
 %
 In a frame rotating about the z-axis with frequency $\omega_0$, it looks like there a fixed magnetic field from one of the rotating fields and a counter-rotating field with frequency $2\omega_0$. If we ignore the high-frequency field (i.e. the rotating wave approximation), the spins in the rotating frame see a fixed magnetic field at an azimuthal angle $\phi$ in the xy-plane, and begin to precess about the new field.
-% In the rotating frame, the rf Hamiltonian effectively becomes
-% \[
-% \widetilde{H_\text{rf}}(t) = u_1(t) \omega_1 \sum_j I_x^{(j)} + u_2(t) \omega_1 \sum_j I_y^{(j)}
-% \]
+In the rotating frame, the rf Hamiltonian effectively becomes
+\begin{equation}\label{eq:nmr-ham-rf-rotating}
+    \widetilde{H}_\text{rf}(t) = u_1(t) \omega_1 \sum_j I_x^{(j)} + u_2(t) \omega_1 \sum_j I_y^{(j)}
+\end{equation}
+This rf field in the rotating frame can therefore rotate the spins about the $x$ or the $y$ axis by controlling $u_1$ and $u_2$ respectively.
 By applying this transverse $B_1$ field for a specific duration with phase $\phi$, the system in the rotating frame is transformed according to the unitary operator
 \[
 U = e^{-i \omega_1 t (\cos(\phi) I_x + \sin(\phi) I_y)}
@@ -157,9 +119,17 @@ In NMR experiments, the procedure generally goes as follows
 \begin{enumerate}
     \item Place the sample in the main magnetic field and wait for the sample to reach thermal equilibrium.
     \item Apply a $\pi/2$-pulse to rotate the spins into the xy-plane.
+    \item Apply a pulse sequence repeatedly so the system evolves under an engineered Hamiltonian.
     \item Measure the oscillating induced emf due to the precessing spins. This signal is called the free induction decay (FID).
 \end{enumerate}
-The Fourier transform of the FID gives a spectrum of the sample, including chemical shift frequencies $\delta_i$ of different spin species. There are many, \emph{many} other variations on NMR experiments, but that is the basic methodology.
+The Fourier transform of the FID gives a spectrum of the sample, including chemical shift frequencies $\delta_i$ of different spin species. There are many, \emph{many} other variations on NMR experiments, but that is the basic methodology. See figure~\ref{fig:NMR-Pulse-Train} for a diagram showing a typical NMR experiment, including the ``pulse train'' that is applied to the system.
+
+\begin{figure}[H]
+    \centering
+    \input{tikz/NMR-Pulse-Train.tex}
+    \caption{A typical NMR experiment, including initializing the state, a $\pi/2$-pulse to measure magnetization in the xy-plane, and many repetitions of a pulse sequence and magnetization measurements. After each pulse sequence (between the brackets), the dynamics appear to have evolved due to an engineered Hamiltonian.}
+    \label{fig:NMR-Pulse-Train}
+\end{figure}
 
 % TODO put in diagram(s) showing FID, spectrum
 % TODO do this if I have time...
@@ -186,27 +156,32 @@ In contrast, solid-state NMR does not have the advantage of motional averaging. 
     \label{fig:NMR-averaging}
 \end{figure}
 
-\section{Quantum Control}
 
-Quantum control theory encompasses many different problems, but they each involve driving quantum phenomena in a desired way using a set of control parameters. Quantum control problems include transforming an initial state $\rho(0)$ to a final state $\rho(T)$, creating a specified unitary transformation $U(T)$, or engineering interactions between a subsystem and its environment.\cite{Dong_2010}\footnote{In this work, only closed quantum systems are considered, so bath engineering is not considered.} Systems can be controlled by manipulating parameters in the Hamiltonian, such as the strength or orientation of an external magnetic field (as in NMR).
 
-The Hamiltonian in the context of quantum control can be expressed as
-\begin{equation}
-    H(t) = H_{\text{sys}} + H_{\text{ctrl}}(t)
-\end{equation}
-where $H_{\text{sys}}$ includes interactions in the system that we cannot control, and $H_{\text{ctrl}}(t)$ includes all interactions that we \emph{can} control. In many situations the control Hamiltonian can be expressed as
-\[
-H_{\text{ctrl}}(t) = \sum_k u_k(t) H_k
-\]
-where $\{H_k\}$ is a set of time-independent Hermitian operators and $\{u_k(t)\}$ are real-valued control parameters. In equation~\ref{eq:nmr-ham}, $H_{\text{int}} = H_{\text{sys}}$  and $H_{\text{rf}}(t) = H_{\text{ctrl}}(t)$.
+% \section{Quantum Control}
+%
+% Quantum control theory encompasses many different problems, but they each involve driving quantum phenomena in a desired way using a set of control parameters. Quantum control problems include transforming an initial state $\rho(0)$ to a final state $\rho(T)$, creating a specified unitary transformation $U(T)$, or engineering interactions between a subsystem and its environment.\cite{Dong_2010}\footnote{In this work, only closed quantum systems are considered, so bath engineering is not considered.} Systems can be controlled by manipulating parameters in the Hamiltonian, such as the strength or orientation of an external magnetic field (as in NMR).
+%
+% The Hamiltonian in the context of quantum control can be expressed as
+% \begin{equation}
+%     H(t) = H_{\text{sys}} + H_{\text{ctrl}}(t)
+% \end{equation}
+% where $H_{\text{sys}}$ includes interactions in the system that we cannot control, and $H_{\text{ctrl}}(t)$ includes all interactions that we \emph{can} control. In many situations the control Hamiltonian can be expressed as
+% \[
+% H_{\text{ctrl}}(t) = \sum_k u_k(t) H_k
+% \]
+% where $\{H_k\}$ is a set of time-independent Hermitian operators and $\{u_k(t)\}$ are real-valued control parameters. In equation~\ref{eq:nmr-ham}, $H_{\text{int}} = H_{\text{sys}}$  and $H_{\text{rf}}(t) = H_{\text{ctrl}}(t)$.
 
-\subsection{Hamiltonian Engineering}
 
-Closely related to creating a desired unitary transformation $U(T)$, Hamiltonian engineering is an important problem within quantum control. The goal of Hamiltonian engineering is to choose control parameters $\{u_k(t)\}$ so that, when measured stroboscopically\footnote{Stroboscopically means measured at regular intervals $0, T, 2T, \dots$.}, the system appears to evolve under a target effective Hamiltonian $H_{\text{eff}}$ instead of the system Hamiltonian $H_{\text{sys}}$. In most cases the target Hamiltonian is time-independent.
+
+\section{Hamiltonian Engineering}
+
+% Closely related to creating a desired unitary transformation $U(T)$,
+Hamiltonian engineering is an important problem within the broader field of quantum control. The goal of Hamiltonian engineering is to choose control parameters $\{u_k(t)\}$ so that, when measured stroboscopically\footnote{Stroboscopically means measured at regular intervals $0, T, 2T, \dots$.}, the system appears to evolve under a target effective Hamiltonian $H_{\text{eff}}$ instead of the system Hamiltonian $H_{\text{sys}}$. In most cases the target Hamiltonian is time-independent.
 
 If we are able to engineer an effective Hamiltonian, then we have also created a unitary transformation $U(T) = \exp{-i H_{\text{eff}} T}$. And conversely, if we have implemented a unitary transformation $U(T)$, then there exists an effective time-independent Hamiltonian that characterizes the dynamics over time $T$ (note that this Hamiltonian isn't unique).
 
-\section{Average Hamiltonian Theory}\label{sec:AHT}
+\subsection{Average Hamiltonian Theory}\label{sec:AHT}
 
 Average Hamiltonian theory (AHT) provides a framework with which the Hamiltonian engineering problem can be approached. The following presentation of AHT is inspired from \cite{brinkmann_2016, gerstein-dybowski, 1976ii}.
 
@@ -286,13 +261,22 @@ The AHT framework permits continuous control via the rf field, but we will focus
 where $t_p$ is the time taken to apply the rf field to perform the pulse. Pulses along the $y$-axis swap the $I_x$ operator with $I_y$, and reverse rotations negate the $\pi/2$ term. In the delta-pulse limit (i.e. $t_p = 0$), an $X$ pulse corresponds to the unitary operator $U_X = e^{-i \pi/2 \sum_j I_y^{(j)}}$ and a $Y$ pulse similarly corresponds to $U_Y = e^{-i \pi/2 \sum_j I_y^{(j)}}$.
 % note that I_x is the spin operator, so I_x = hbar/2 * sigma_x
 
-\subsection{Examples}\label{subsec:examples}
+\subsection{WAHUHA-4 Pulse Seuqnce}\label{subsec:WHH-4}
 
 One of the first pulse sequences developed for NMR was the WAHUHA-4 pulse sequence (WHH-4).\cite{PhysRevLett.20.180} The pulse sequence is defined as
 \begin{equation}
     \tau, X, \tau, \overline{Y}, \tau, \tau, Y, \tau, \overline{X}, \tau
 \end{equation}
-where the sequence should be read from left to right (an $X$ pulse is applied first). The propagator for a single cycle of the WHH-4 sequence is
+where the sequence should be read from left to right (an $X$ pulse is applied first). The pulse sequence is also shown in figure~\ref{fig:WHH-4}.
+
+\begin{figure}[H]
+    \centering
+    \input{tikz/WHH-4.tex}
+    \caption{The WHH-4 sequence repeated $n$ times in a pulse train. If the magnetization of the sample is measured after each WHH-4 sequence, the dynamics will appear to evolve according to the average Hamiltonian given below.}
+    \label{fig:WHH-4}
+\end{figure}
+
+The propagator for a single cycle of the WHH-4 sequence is
 \[
 U_{\text{WHH-4}} =
     e^{-i H_{\text{int}} \tau} U_{\overline{X}}
@@ -340,28 +324,39 @@ We see that WHH-4 is cyclic because $U_{\text{rf}}(6\tau) = \identity$. To deter
         1/3 \sum_j \delta_j \left(I_z^{(j)} + I_y^{(j)} + I_x^{(j)} \right) +
         \sum_{jk} d_{jk} \left(I_z^{(j)}I_z^{(k)} + I_y^{(j)}I_y^{(k)} + I_x^{(j)}I_x^{(k)} - \mathbf{I^{(j)}} \cdot \mathbf{I^{(k)}} \right)
     \right] \\
-    &= \boxed{1/3 \sum_j \delta_j \left(I_z^{(j)} + I_y^{(j)} + I_x^{(j)} \right)}
+    &= 1/3 \sum_j \delta_j \left(I_z^{(j)} + I_y^{(j)} + I_x^{(j)} \right)
 \end{align*}
 The WHH-4 sequence, to lowest order, refocuses (or ``cancels out'') the dipolar interaction between spins while retaining the chemical shift term. Instead of the principal axis being along z, however, the spin operator acts along the diagonal axis $(1,1,1)$.
 
-% TODO ideal6 sequence, or some other short time suspension sequence?
+\subsection{CORY-48 Pulse Seuqnce}\label{subsec:CORY48}
 
-% TODO
-% TODO
-% TODO
-% TODO
-% TODO
-% TODO put in CORY48 sequence
-% TODO
-% TODO
-% TODO
-% TODO
+AHT can be taken even further than the WHH-4 sequence by considering higher-order terms in the Magnus Expansion. The CORY48 sequence is a 72$\tau$, 48-pulse sequence that was designed to decouple all interactions so that $H_{\text{eff}} = 0$ \cite{CORY1990205}. Furthermore, the CORY48 sequence decouples the dipolar interactions to \emph{second order}, and is robust to errors including pulse rotation errors and resonance offset errors. The full sequence is presented in equation~\ref{eq:CORY48}.
+
+\begin{align}\label{eq:CORY48}
+    X, \tau, Y, 2\tau, \overline{X}, \tau, Y, 2\tau, \\
+    X, \tau, Y, 2\tau, X, \tau, Y, 2\tau, \\
+    X, \tau, \overline{Y}, 2\tau, X, \tau, Y, 2\tau, \\
+    \overline{Y}, \tau, \overline{X}, 2\tau, Y, \tau, \overline{X}, 2\tau, \\
+    \overline{Y}, \tau, \overline{X}, 2\tau, \overline{Y}, \tau, \overline{X}, 2\tau, \\
+    \overline{Y}, \tau, X, 2\tau, \overline{Y}, \tau, \overline{X}, 2\tau, \\
+    \overline{X}, \tau, Y, 2\tau, \overline{X}, \tau, \overline{Y}, 2\tau, \\
+    \overline{X}, \tau, Y, 2\tau, X, \tau, \overline{Y}, 2\tau, \\
+    \overline{X}, \tau, \overline{Y}, 2\tau, X, \tau, \overline{Y}, 2\tau, \\
+    Y, \tau, \overline{X}, 2\tau, Y, \tau, X, 2\tau, \\
+    Y, \tau, \overline{X}, 2\tau, \overline{Y}, \tau, X, 2\tau, \\
+    Y, \tau, X, 2\tau, \overline{Y}, \tau, X, 2\tau \\
+\end{align}
+
+The full AHT analysis is not presented here, but one can imagine evaluating the three lowest-order terms from equations~\ref{eq:AHT-term-0} to~\ref{eq:AHT-term-2} using each of the $48$ time intervals. The lowest-order term is not difficult to calculate, but the higher-order terms quickly become intractable as the integrals include more and more nested commutators.
+
+By comparing the average correlation (explained in greater depth in section~\ref{sec:experimental}) for an FID, the WHH-4 sequence, and the CORY48 sequence in an adamantane, it is clear that the longer CORY48 sequence outperforms the shorter WHH-4 sequence in decoupling interactions and extending the coherence time (see figure~\ref{fig:decay_plot_AHT}).
 
 
+\begin{figure}[H]
+    \centering
+    \includegraphics{decay_plot.pdf}
+    \caption{The average correlation for a free induction decay (FID), the WHH-4 sequence, and the CORY48 sequence in an adamantane sample. Both the WHH-4 and the CORY48 extend the coherence times of the sample, but CORY48 achieves nearly two orders of magnitude greater improvement. The $T_1$ time for adamantane is shown at $t=1$s.}
+    \label{fig:decay_plot_AHT}
+\end{figure}
 
-% TODO include figure of average correlation for FID, WHH, CORY
-
-% \subsection{GRAPE Shaped Pulses}
-% % TODO include?
-
-\input{bg-rl}
+However, AHT may not be a suitable framework with which to develop pulse sequences that improve upon CORY48. The computational resources required to decouple interactions to higher orders would be significant.

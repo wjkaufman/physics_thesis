@@ -9,9 +9,10 @@
 %
 %
 Hamiltonian engineering encompasses a variety of important problems in quantum physics and quantum control. For spin systems in particular, the ability to engineer an effective Hamiltonian to decouple dipolar interactions is desirable for improving spectroscopy and increasing spin coherence times.
-Average Hamiltonian theory (AHT) has been used effectively to design pulse sequences for Hamiltonian engineering, but has inherent limitations in the computational complexity of calculating higher-order terms.
+Average Hamiltonian theory (AHT) has been used to design pulse sequences for Hamiltonian engineering, but the computational complexity of calculating higher-order terms inherently limits its performance.
 % my project
-This work explores reinforcement learning as an alternative approach to designing pulse sequences for Hamiltonian engineering. The AlphaZero algorithm was trained to construct pulse sequences of varying lengths to decouple all interactions in spin systems. High-fidelity pulse sequences were identified after introducing additional constraints to the algorithm's tree search, and were trained to be robust to multiple sources of error by including those errors in training. The RL-based pulse sequences have lower fidelity than the CORY48 pulse sequence both in computational simulations and experiment, indicating that the current RL implementation does not outperform existing approaches using AHT.
+This work explores reinforcement learning as an alternative approach to designing pulse sequences for Hamiltonian engineering. The AlphaZero algorithm was trained to construct pulse sequences of varying lengths to decouple all interactions in spin systems. High-fidelity pulse sequences were identified after introducing additional constraints to the algorithm's tree search, and were trained to be robust to multiple sources of error by including those errors in training.
+The RL-based pulse sequences have lower fidelity than the CORY48 pulse sequence (a state-of-the-art AHT-based pulse sequence) both in computational simulations and experiment, indicating that the current RL implementation does not outperform existing approaches using AHT.
 % scope of project
 % ???
 % who cares?

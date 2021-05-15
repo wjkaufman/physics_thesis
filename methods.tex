@@ -34,6 +34,18 @@ Because the (random) choice of chemical shift and dipolar coupling strengths aff
 Each spin system used different random chemical shift and dipolar coupling strengths drawn from the same distributions (i.e. the dipolar strength parameter $D$ was the same for all systems). If experimental imperfections were also included, then each system also used different random error magnitudes.
 The reinforcement learning algorithm used $50$ spin systems and evaluation used $100$ spin systems.
 
+To assess the performance of a pulse sequence for a Hamiltonian engineering problem, the pulse sequence propagator is compared to the target propagator given by
+\[
+U_{\text{target}} = \exp\left\{ -i H_{\text{eff}} T \right\}
+\]
+Under ideal conditions, the two propagators should be ``close'' in some way. One measure of ``closeness'' is the following fidelity function for two unitary operators
+\begin{equation}
+    \text{fidelity}(U, U_\text{target}) = \left| \frac{\Tr{
+        U^\dagger U_\text{target}
+    }}{\Tr{\identity}} \right|
+\end{equation}
+The fidelity approaches $1$ as the unitaries get ``closer'' and the average Hamiltonian approaches the target Hamiltonian, and approaches $0$ as the unitaries get further apart.
+
 \section{Reinforcement Learning Implementation}
 
 The reinforcement learning methodology is sufficiently general to be applied to a wide range of problems, and in a variety of different ways.  The following sections describe how the Hamiltonian engineering problem is approached with RL.
@@ -44,11 +56,11 @@ In an NMR spectrometer, the actions we can perform, or the ``knobs'' we can turn
 % TODO change this reference to something in the rotating frame
 % with two control amplitudes, makes much more sense
 The spectrometer's electronics limit the strength and the granularity of the rf field,
-but this still allows for a staggeringly large action space. Instead of allowing for complete continuous control of the rf field%
+but this still allows for a staggeringly large \emph{continuous} action space. Instead of allowing for complete continuous control of the rf field%
 \footnote{
-Which is done in the GRAPE algorithm \cite{Khaneja-2005}.
+Which is precisely the action space used in gradient ascent pulse engineering (GRAPE) algorithms \cite{Khaneja-2005}, although it does not use RL.
 }
-, we will only consider a finite set of pulses (as we did in the introduction to AHT), each with an interval of free evolution after the pulse. The set of pulses we use is the set of $\pi/2$ rotations about the x- or y-axis along with a ``null pulse'' or delay. The action set is represented as $\{ D, X, \overline{X}, Y, \overline{Y} \}$.
+, we only consider a finite set of pulses (as we did in the introduction to AHT), each with an interval of free evolution after the pulse. The set of pulses we use is the set of $\pi/2$ rotations about the x- or y-axis along with a ``null pulse'' or delay. The action set is represented as $\{ D, X, \overline{X}, Y, \overline{Y} \}$.
 
 
 
@@ -82,25 +94,24 @@ The unitary operator fidelity generally improves as the time interval decreases,
 
 \subsection{State Space and Representation}
 
-The ``state'' can refer to the physics notion of state (e.g. the density operator $\rho$ of a quantum system) or the RL notion of state (a particular context in which the agent must choose an action). They are closely related but not the same.
+The ``state'' can refer to the physics notion of state--such as the the density operator $\rho$ of a quantum system--or the RL notion of state--a particular context in which the agent must choose an action. They are closely related but not the same.
 The ``physical'' state space is comprised of every reachable state $\rho(t)$ of the spin system given an initial thermalized state, the free evolution dynamics from $H_{\text{int}}$, and the control Hamiltonian given by the rf field $H_{\text{rf}}$.
 In an RL context, however, the agent does not observe the complete state of the system at each point in time. Instead, the agent only knows the sequence of actions that have been performed on the system and any measurements that have been made on the system.
 Therefore, a more realistic state space for the RL problem is all possible sequences of actions performed on the system.%
 \footnote{
-Making measurements on the system could also be considered an action (measurement affects the physical state), and the resulting measurement outcome could be included in the state. This possibility, however, is not explored here.
-% TODO cite Riccardo Porotti maybe? Measurement-based control
-% https://arxiv.org/abs/1901.06603
+Making measurements on the system could also be considered an action (measurement affects the physical state), and the resulting measurement outcome could be included in the state \cite{porotti2019coherent}. This possibility, however, is not explored here.
 }
 This is more ``realistic'' in the sense that the agent only knows what the experimenter would know, without getting any additional information ``for free.''
 
 \subsection{Reward Function}
 
-% TODO revise below
-%The agent tries to learn an optimal policy $\pi^*$ that maximizes a reward signal. In the Hamiltonian engineering problem, we want to push the dynamics as close as we can toward the target Hamiltonian, which we can quantify with the average gate fidelity % TODO cite this
-% \begin{equation}
-%     % TODO find out what this is...
-% \end{equation}
-
+% The fidelity approaches $1$ as the unitaries get ``closer'' and the average Hamiltonian approaches the target Hamiltonian, and approaches $0$ as the unitaries get further apart.
+As mentioned above, the fidelity function takes on values between $0$ and $1$, where values close to $1$ are desirable.
+However, a tenfold improvement in performance doesn't correspond to a tenfold increase in fidelity (take for instance a fidelity of 0.9 compared to 0.99). A suitable reward function is then calculated by
+\begin{equation}
+    R = -\log(1-F(U_\text{actual}, U_\text{target}) + \epsilon)
+\end{equation}
+where $\epsilon>0$ ensures the reward isn't infinite.
 
 \subsection{AlphaZero Algorithm}
 
@@ -156,9 +167,9 @@ Randomly sample an action $a_k$ from the distribution $\{ p_k \}$ \;
     \centering
     % \includegraphics[width=.7\textwidth]{MCTS.jpeg}
     % \scalebox{.8}{
-    \input{tikz/MCTS/MCTS-5.txt}
+    \input{tikz/MCTS/MCTS-Visual.tex}
     % }
-    \caption{Monte Carlo Tree Search (MCTS) visual.}
+    \caption{An example Monte Carlo Tree Search (MCTS) starting with root state $s = (X)$. The first rollout explores the action branch $D$, creating each of the child nodes for $D$. The next rollout instead explores $\overline{Y}$ starting from $(X)$. The final two rollouts depicted choose $(\overline{Y}, D)$ and $(\overline{Y}, D, Y)$ from $(X)$. The rollouts continue for a set number of rollouts, and the next action selected from $(X)$ is sampled proportionally according to visit counts of each of the children nodes.}
     \label{fig:mcts}
 \end{figure}
 
@@ -235,7 +246,7 @@ Because actions are explored and selected via tree search, additional constraint
 
 When the target effective Hamiltonian is $H_\text{eff} = 0$, all interactions must be decoupled. If the toggling frame is defined so that $\widetilde{I_z}(t) = I_z$ and $\widetilde{I_z}(t) = -I_z$ for equal durations, then the lowest-order average $\overline{I_z}^{(0)} = 1/2(I_z - I_z) = 0$. In general, any term containing $I_z$ will average to zero to lowest order when $\widetilde{I_z}$ is toggled for equal time along opposite axes (i.e. equal time on $+x$ and $-x$, $+y$ and $-y$, and $+z$ and $-z$-axes).
 
-We saw in section~\ref{subsec:examples} that the dipolar interaction term is decoupled when $I_z^{(j)}I_z^{(k)}$ is toggled to $I_z^{(j)}I_z^{(k)}, I_y^{(j)}I_y^{(k)}$, and $I_x^{(j)}I_x^{(k)}$ for equal times. Note that if $\widetilde{I_z} = -I_z$, then $\widetilde{I_z^{(j)}}\widetilde{I_z^{(k)}} = I_z^{(j)}I_z^{(k)}$.
+We saw in section~\ref{subsec:WHH-4} that the dipolar interaction term is decoupled when $I_z^{(j)}I_z^{(k)}$ is toggled to $I_z^{(j)}I_z^{(k)}, I_y^{(j)}I_y^{(k)}$, and $I_x^{(j)}I_x^{(k)}$ for equal times. Note that if $\widetilde{I_z} = -I_z$, then $\widetilde{I_z^{(j)}}\widetilde{I_z^{(k)}} = I_z^{(j)}I_z^{(k)}$.
 Therefore the dipolar interaction is decoupled to lowest order when $I_z^{(j)}I_z^{(k)}$ is toggled for equal time along the $x, y$, and $z$-axes.
 
 To decouple all interactions, both constraints above must be satisfied, which is achieved when $I_z$ is toggled along each of the six axes for equal time ($\pm x, \pm y, \pm z$). By keeping track of the toggled operator $\widetilde{I_z}$ while constructing the pulse sequence, it is possible to prune branches of the tree that would violate this constraint%

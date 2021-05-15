@@ -1,6 +1,55 @@
 %!TEX root=thesis.tex
 \chapter{Appendix}
 
-\section{Pulse sequence definitions}
+\section{Important Quantum Mechanics Concepts}
+
+This section is meant to present a few fundamental ideas that are used throughout this work, but for a more thorough description of quantum mechanics see
+\cite{mcintyre2012quantum, sakurai2017modern}.
+In all equations that follow, $\hbar = 1$ is assumed.
+
+% state of system <-> density operator
+Given a quantum system, a general state can be represented by a density operator $\rho(t)$. The density operator encapsulates all known information about the quantum system, specifically the expectation values associated with well-defined observable. For an observable $A$, the expectation is given by
+\begin{equation}\label{eq:measure}
+    \langle A \rangle = \Tr{\rho A}
+\end{equation}
+
+The time evolution of the density operator is given by
+\begin{equation}\label{eq:density-time}
+    \rho(t) = U(t) \rho(0) U(t)^\dagger
+\end{equation}
+where the unitary operator $U$ is the ``propagator'' defined by
+\begin{equation}\label{eq:propagator-de}
+    i \ddt{U(t)} = H(t) U(t), U(0) = \identity
+\end{equation}
+% The two equations above can be combined to yield the Liouville-Von Neumann equation, which explicitly shows the density operator's time evolution from the system Hamiltonian.
+% \begin{equation}
+%     i \ddt{\rho(t)} = [H(t), \rho(t)]
+% \end{equation}
+
+When the Hamiltonian is time-independent or if the Hamiltonian commutes with itself at different points in time (i.e. $[H(t_1), H(t_2)] = 0$), equation~\ref{eq:propagator-de} can be solved to obtain the propagator
+\begin{equation}\label{eq:propagator-ti}
+    U(t) = \text{exp}\left[ {-i \int_0^t H(t') dt'} \right]
+\end{equation}
+However, if the Hamiltonian is time-dependent and doesn't commute with itself at different times, then the above equation is not valid. This difficulty with time-dependent Hamiltonians and methods with dealing with them are further discussed in~\ref{sec:AHT}.
+
+In many cases it can be helpful to consider the \emph{interaction frame} of a particular interaction. If the Hamiltonian is expressed as the sum of two terms
+\[
+H(t) = H_A(t) + H_B(t)
+\]
+then there is a unitary operator $U_A(t)$ given by
+\begin{equation}\label{eq:interaction-propagator}
+    \frac{d}{dt} U_A(t) = -i H_A(t) U_A(t), \, U_A(0) = \identity
+\end{equation}
+that maps from the interaction frame to the lab frame.
+The dynamics in the interaction frame are described by the interaction frame Hamiltonian $\widetilde{H}(t) = {U_A(t)}^{\dagger} H_B(t)U_A(t)$
+\[
+\frac{d}{dt}\widetilde{U}(t) = -i \widetilde{H}(t)\widetilde{U}(t),\, \widetilde{U}(0) = \identity
+\]
+The propagator in the lab frame $U(t)$ is related to $\widetilde{U}(t)$ by first time evolution in the interaction frame, then mapping from the interaction frame to the lab frame
+\[
+U(t) = U_A(t)\widetilde{U}(t).
+\]
+
+\section{Pulse Sequence Definitions}
 
 % TODO put in no error, AHT0, 6tau, 12/24/48 sequences
