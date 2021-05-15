@@ -11,28 +11,29 @@ This section describes the simulation methods and RL algorithm used in this work
 
 \section{Simulated Spin Systems}
 
-Spin systems composed of a small number of spins can be easily simulated on a classical computer. Because the Hilbert space grows exponentially as the spins increase ($2^N$ basis states for $N$ spins and $2^{2N}$ matrix elements for associated operators), it rapidly becomes impractical to simulate large numbers of spins. In this work, $N=3$ spin-1/2 systems were used in the reinforcement learning algorithm, and $N=4$ spin-1/2 systems were used to evaluate pulse sequences. The QuTiP Python package was used for all simulations \cite{Johansson_2013}.
+Isolated spin systems composed of a small number of spins can be easily simulated on a classical computer. Because the Hilbert space grows exponentially as the spins increase ($2^N$ basis states for $N$ spins and $2^{2N}$ matrix elements for operators), it quickly becomes impractical to simulate large numbers of spins. To balance the need to capture dipole interactions and to decrease simulation time, $N=3$ spin-1/2 systems were used in the reinforcement learning algorithm, and $N=4$ spin-1/2 systems were used to evaluate pulse sequences. The QuTiP Python package was used for all simulations \cite{Johansson_2013}.
 
 In any real physical system, system-environment interactions are present and the spin system must be treated as open, but for simulation purposes the system is assumed to be isolated.
-Consequently, the dynamics are given by unitary time-evolution operators. In principle, though, simulations of open quantum systems could be used with reinforcement learning algorithms, and may lead to better control by accounting for non-unitary system dynamics.
+Consequently, the dynamics are given by unitary time-evolution operators. In principle, though, simulations of open quantum systems could be used with reinforcement learning algorithms, and may in fact lead to better control by accounting for non-unitary system dynamics.
 
-In each simulated $N$-spin system, the chemical shift strengths $\{\delta_j\}_j$ and the dipolar coupling strengths $\{d_{jk}\}_{j,k}$ are both drawn from normal distributions
+For each simulated $N$-spin system, the chemical shift strengths $\{\delta_j\}_j$ and the dipolar coupling strengths $\{d_{jk}\}_{j,k}$ are drawn from normal distributions
 \begin{align*}
     \delta_j &\sim \mathcal{N}(\mu=0, \sigma=1) \\
     d_{jk} &\sim \mathcal{N}(\mu=0, \sigma=D)
 \end{align*}
-so that the energy scale of the system is defined by the standard deviation of the chemical shifts. The parameter $D$ controls the regime of the spin system, where $D \gg 1$ is a ``strongly coupled'' spin system and $D \ll 1$ is ``weakly coupled.'' We focus on strongly coupled spin systems in this work, and set $D = 100$ unless otherwise specified. With the chemical shift and dipolar coupling strengths, the internal Hamiltonian $H_{\text{int}}$ can be calculated (see equation~\ref{eq:nmr-ham}).
+so that the energy scale of the system is defined by the standard deviation of the chemical shifts. The parameter $D$ controls the regime of the spin system, where $D \gg 1$ is a ``strongly coupled'' spin system and $D \ll 1$ is ``weakly coupled.'' We focus on strongly coupled spin systems, and set $D = 100$ unless otherwise specified. With the chemical shift and dipolar coupling strengths, the internal Hamiltonian $H_{\text{int}}$ can be calculated (see equation~\ref{eq:nmr-ham}).
 
-As an example, in a $3$-spin system, there will be three chemical shift terms, six dipolar coupling terms, and $H_{\text{int}}$ will be an $8
-\times 8$ Hermitian matrix.
+% As an example, in a $3$-spin system, there will be three chemical shift terms, six dipolar coupling terms, and $H_{\text{int}}$ will be an $8
+% \times 8$ Hermitian matrix.
 
-Once $H_{\text{int}}$ has been calculated, the free evolution propagator $U(t)$ can be calculated via matrix exponentiation (see equation~\ref{eq:propagator-ti})
+Once $H_{\text{int}}$ has been calculated, the free evolution propagator $U(\tau) \defeq U_\tau$ can be calculated via matrix exponentiation (see equation~\ref{eq:propagator-ti})
 and
 the pulse operators $\{ U_X, U_{\overline{X}}, U_Y, U_{\overline{Y}} \}$ can be calculated using equation~\ref{eq:X-pulse}.
 
-Because the (random) choice of chemical shift and dipolar coupling strengths affects the behavior of the spin system, an ensemble of spin systems was used both in the reinforcement learning algorithm and in subsequent evaluation of pulse sequences.
-Each spin system used different random chemical shift and dipolar coupling strengths drawn from the same distributions (i.e. the dipolar strength parameter $D$ was the same for all systems). If experimental imperfections were also included, then each system also used different random error magnitudes.
-The reinforcement learning algorithm used $50$ spin systems and evaluation used $100$ spin systems.
+Because the (random) choices of chemical shift and dipolar coupling strengths affect the dynamics of the spin system, an ensemble of spin systems was used both in the reinforcement learning algorithm and in evaluation of pulse sequences.
+Each spin system used different random chemical shift and dipolar coupling strengths drawn from the same distributions (i.e. the dipolar strength parameter $D$ was the same for all systems). If experimental imperfections were also included, then each system also used different random errors.
+It was found that using ensembles of 50 spin systems reduced the variance in fidelity enough while keeping runtimes relatively short, so
+the reinforcement learning algorithm used $50$ spin systems and evaluation used $100$ spin systems.
 
 To assess the performance of a pulse sequence for a Hamiltonian engineering problem, the pulse sequence propagator is compared to the target propagator given by
 \[
@@ -48,7 +49,8 @@ The fidelity approaches $1$ as the unitaries get ``closer'' and the average Hami
 
 \section{Reinforcement Learning Implementation}\label{sec:methods-RL}
 
-The reinforcement learning methodology is sufficiently general to be applied to a wide range of problems, and in a variety of different ways.  The following sections describe how the Hamiltonian engineering problem is approached with RL.
+As explained previously,
+the reinforcement learning methodology is sufficiently general to be applied to a wide range of problems in a variety of different ways.  The specific application of RL to the Hamiltonian engineering problem is described below.
 
 \subsection{Action Space and Representation}
 
@@ -56,26 +58,26 @@ In an NMR spectrometer, the actions we can perform, or the ``knobs'' we can turn
 % TODO change this reference to something in the rotating frame
 % with two control amplitudes, makes much more sense
 The spectrometer's electronics limit the strength and the granularity of the rf field,
-but this still allows for a staggeringly large \emph{continuous} action space. Instead of allowing for complete continuous control of the rf field%
+but this still allows for a staggeringly large \emph{continuous} action space. Instead of allowing for continuous control of the rf field%
 \footnote{
 Which is precisely the action space used in gradient ascent pulse engineering (GRAPE) algorithms \cite{Khaneja-2005}, although it does not use RL.
-}
-, we only consider a finite set of pulses (as we did in the introduction to AHT), each with an interval of free evolution after the pulse. The set of pulses we use is the set of $\pi/2$ rotations about the x- or y-axis along with a ``null pulse'' or delay. The action set is represented as $\{ D, X, \overline{X}, Y, \overline{Y} \}$.
+}%
+, we only consider a finite set of pulses, each with an interval of free evolution after the pulse. The set of pulses we use is the set of $\pi/2$ rotations about the x- or y-axis along with a ``null pulse'' or delay. The action set is represented as $\{ D, X, \overline{X}, Y, \overline{Y} \}$.
 
 
 
 In the physical system, the actions correspond to unitary operators that determine the overall propagator. If the free evolution interval has length $\tau$, then the $D$ action corresponds to propagator
 \[
-U_{\tau} = \exp\{ -i H_{\text{int}} \tau \}
+D \longrightarrow U_{\tau} = \exp\{ -i H_{\text{int}} \tau \}
 \]
 And the other pulse actions have corresponding propagators
 \begin{align*}
-    X &\implies U_{\tau} U_X \\
-    \overline{X} &\implies U_{\tau} U_{\overline{X}} \\
-    Y & \implies U_{\tau} U_Y \\
-    \overline{Y} &\implies U_{\tau} U_{\overline{Y}}
+    X &\longrightarrow U_{\tau} U_X \\
+    \overline{X} &\longrightarrow U_{\tau} U_{\overline{X}} \\
+    Y & \longrightarrow U_{\tau} U_Y \\
+    \overline{Y} &\longrightarrow U_{\tau} U_{\overline{Y}}
 \end{align*}
-Where $U_X$ is defined in equation~\ref{eq:X-pulse}). In the simulations done, the $\tau$ delay is set to $10^{-4}$ and the pulse width $t_p$ is set to $10^{-5}$ unless otherwise specified.
+Where $U_X$ is defined in equation~\ref{eq:X-pulse}. In the simulations, $\tau = 10^{-4}$ and the pulse width $t_p = 10^{-5}$ unless otherwise specified.
 % TODO give any more justification to this?
 % TODO mention Clifford gates/group?
 See figure~\ref{fig:actions} for the relationship between rf field amplitudes, unitary operators, and the actions.
@@ -89,7 +91,7 @@ See figure~\ref{fig:actions} for the relationship between rf field amplitudes, u
     \label{fig:actions}
 \end{figure}
 
-In principle, the actions could also be defined as pulses without a $\tau$ delay of free evolution. However, in practice this leads to poor performance: for episodes with a fixed number of timesteps, the actions taken influence how much time elapses in the simulation. As a result, the ``optimal'' performance is found to minimze the elapsed time by applying alternating pulses (e.g. $X, \overline{X}, X, \overline{X}, \dots$).
+In principle, the actions could also be defined as pulses without a $\tau$ delay of free evolution and a delay action. However, in practice this leads to worse performance: for episodes with a fixed number of timesteps, the actions taken influence how much time elapses in the pulse sequence. As a result, the ``optimal'' performance is found to minimze the elapsed time by applying alternating pulses (e.g. $X, \overline{X}, X, \overline{X}, \dots$).
 The unitary operator fidelity generally improves as the time interval decreases, so this is an unhelpful solution when we ideally want high fidelity at longer time intervals.
 
 \subsection{State Space and Representation}
@@ -97,11 +99,13 @@ The unitary operator fidelity generally improves as the time interval decreases,
 The ``state'' can refer to the physics notion of state--such as the the density operator $\rho$ of a quantum system--or the RL notion of state--a particular context in which the agent must choose an action. They are closely related but not the same.
 The ``physical'' state space is comprised of every reachable state $\rho(t)$ of the spin system given an initial thermalized state, the free evolution dynamics from $H_{\text{int}}$, and the control Hamiltonian given by the rf field $H_{\text{rf}}$.
 In an RL context, however, the agent does not observe the complete state of the system at each point in time. Instead, the agent only knows the sequence of actions that have been performed on the system and any measurements that have been made on the system.
-Therefore, a more realistic state space for the RL problem is all possible sequences of actions performed on the system.%
+Therefore, a more representative state space for the RL problem is all possible sequences of actions performed on the system.%
 \footnote{
 Making measurements on the system could also be considered an action (measurement affects the physical state), and the resulting measurement outcome could be included in the state \cite{porotti2019coherent}. This possibility, however, is not explored here.
 }
 This is more ``realistic'' in the sense that the agent only knows what the experimenter would know, without getting any additional information ``for free.''
+%This also simplifies the state representation with ensembles of spin systems.
+% TODO what did I mean by this^???
 
 \subsection{Reward Function}
 
@@ -117,12 +121,23 @@ where $\epsilon>0$ ensures the reward isn't infinite.
 
 As mentioned in the introduction, the AlphaZero algorithm has two main components: self-play and neural network training. The original publication and its supplementary materials has a complete description of the algorithm \cite{Silver1140}, but pseudocode is presented below as well.
 
-During self-play, the agent iteratively constructs a pulse sequence by performing Monte Carlo Tree Search (MCTS) from the current state. From state $s_i$ (which is represented by the sequence of actions performed so far, $(a_0, \dots, a_i)$), the agent stochastically samples actions based on the prior probability from the policy $\pi$, the number of times the agent has already ``visited'' that action, and the average estimated reward (or value) of that branch of the tree. The agent is more likely to select actions that have a higher prior probability, a lower visit count, and a higher average reward. The exact formula for selection is given in algorithm~\ref{al:mcts},
+During self-play, the agent iteratively constructs a pulse sequence by performing Monte Carlo Tree Search (MCTS) from the current state. From state $s_i$ (which is represented by the sequence of actions performed so far, $s_i = (a_0, \dots, a_i)$), the agent stochastically samples actions based on the prior probability from the policy $\pi$, the number of times the agent has already ``visited'' that action, and the average estimated reward (or value) of that branch of the tree. The agent is more likely to select actions that have a higher prior probability, a lower visit count, and a higher average reward. The exact formula for selection is given in algorithm~\ref{al:mcts},
 and is a variant of the PUCT algorithm from \cite{Rosin:2011uu}.
 
 The agent performs many rollouts of selecting actions, estimating the rewards, and updating visit counts and reward estimates along the particular sequence of actions. After a certain number of rollouts, the agent finally picks a particular action to perform by sampling from the empirical distribution of visit counts.
 See figure~\ref{fig:mcts} for a visual depiction of the MCTS process.
 
+
+% TODO continue here...
+% TODO continue here...
+% TODO continue here...
+% TODO continue here...
+% TODO continue here...
+% TODO continue here...
+% TODO continue here...
+% TODO continue here...
+% TODO continue here...
+% TODO continue here...
 % TODO redo formatting for state/action/probability, want s^{(i)} instead?
 % TODO
 % TODO
