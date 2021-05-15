@@ -1,13 +1,13 @@
 %!TEX root=thesis.tex
 \chapter{Results}
 
-To analyze the performance of the AlphaZero algorithm for constructing pulse sequences, different sets of algorithm hyperparameters and system parameters were tested. AlphaZero was first run with no additional constraints to the tree search (i.e. the state space was all possible sequences of pulses), and the simulated spin systems were idealized (i.e. delta-pulses, no errors in offset frequency, pulse rotations, or phase transients). Additional constraints were then added to the tree search while keeping idealized spin system simulations. Finally, experimental imperfections were introduced to the simulations.
+To analyze the performance of the AlphaZero algorithm for constructing pulse sequences, different sets of algorithm hyperparameters and system parameters were tested. AlphaZero was first run with no additional constraints to the tree search (i.e. the state space was all possible sequences of pulses), and the simulated spin systems were idealized (i.e. delta-pulses and no experimental errors). Additional constraints were then added to the tree search while keeping idealized spin system simulations. Finally, experimental imperfections were introduced to the simulations.
 
 
 
-As a preliminary consistency check, the AlphaZero algorithm was run with identical settings $10$ times, and the resulting distribution of rewards during training was recorded. In figure~\ref{fig:az-consistency}, it is evident that most of the runs perform similarly, but a few significantly outperform the rest, achieving over an order of magnitude improvement in fidelity. Furthermore, most of the runs plateau after about $5000$ training steps, indicating the policy network converged to a particular policy. The inconsistent performance could be improved by further tuning the algorithm hyperparameters, such as the amount of noise added to the policy, increasing the exploration rate in the MCTS, or adjusting the relative rate of training to data collection.
+As a preliminary consistency check, the AlphaZero algorithm was run with identical settings $10$ times, and the resulting distribution of rewards during training was recorded. In figure~\ref{fig:az-consistency}, it is evident that most of the runs perform similarly, but a few significantly outperform the rest, achieving over an order of magnitude improvement in fidelity. Furthermore, most of the runs plateau after about $5000$ training steps, indicating the policy network converged to a particular policy. The inconsistent performance across identical runs could be improved by further tuning the algorithm hyperparameters, such as the amount of noise added to the policy, increasing the exploration rate in the MCTS, or adjusting the relative rate of training to data collection.
 
-\begin{figure}
+\begin{figure}[H]
     \centering
     \includegraphics[width=.7\textwidth]{az-consistency.pdf}
     \caption{The mean reward ($-\log(1-\text{fidelity})$) seen during training for $10$ identical runs of the AlphaZero algorithm searching for $24\tau$ sequences. Most runs converge to similar mean fidelities, but a few runs have orders of magnitude better performance.}
@@ -50,19 +50,22 @@ The worsening performance as the pulse sequence length increases is understandab
 This can be seen by counting how many subsequences of length $k$ there are ($a^k$), and adding these for $k = 1, \dots, n$.
 }
 If $n=12$, then there are over $244$ million pulse sequences and over $300$ million states.
-But for $n=24$, then the number of pulse sequences jumps to $6 \times 10^{16}$, and for $n=48$ there are $3.6 \times 10^{33}$. Because AlphaZero begins training \emph{tabula rasa}, none of the states in the astronomically large state space are preferred, so it begins with a purely random search.
+But for $n=24$, then the number of pulse sequences jumps to $6 \times 10^{16}$, and for $n=48$ there are $3.6 \times 10^{33}$. Because AlphaZero begins training \emph{tabula rasa}, none of the states in the astronomically large state space are preferred by the agent, so it begins with a purely random search.
 Furthermore, rewards are only received once an \emph{entire pulse sequence} has been constructed. The sparse reward signal (which is the sole driver of learning in RL algorithms) therefore makes it difficult for the agent to associate actions with rewards and learn an effective policy.
-This is known as the ``credit assignment problem'' and is an active area of research.
-As an analogy, suppose you need to pass a test with $100$ questions, and can re-take the test as many times as you want. It would take many more tries to pass if the only feedback you received was your overall score on the test, as opposed to your score on each question.
+This is known as the ``credit assignment problem'' and is an active area of research both in theoretical and applied RL \cite{arumugam2021informationtheoretic}.
+
+For example, suppose you needed to pass a test with $100$ questions, and could re-take the test as many times as you want. It would take many more tries to pass if the only feedback you received was your overall score on the test, as opposed to your score on each question.
 
 There is not an immediately obvious way to provide additional rewards to the agent during training\footnote{
 From an experimental perspective, we only care about the fidelity of the pulse sequence overall, not at intermediate times.
 },
 but there are ways to constrain AlphaZero's tree search to only consider subsets of the state space.
-As described in section~\ref{sec:AHT-constraints}, the lowest-order term in the average Hamiltonian can be set to the desired Hamiltonian by keeping track of the toggling frame and the durations spent in each frame. To decouple all interactions, the toggling frame must spend equal time along each axis (i.e. $I_z$ must be toggled to $\pm I_x, \pm I_y, \pm I_z$ for equal times).
-By adding this constraint to the tree search, all pulse sequences at least have the correct average Hamiltonian to lowest order. This does not address the need for those pulse sequences to be cyclic (i.e. the toggling frame coincides with the lab frame at the end of the pulse sequence), the higher-order terms in the average Hamiltonian, nor experimental imperfections.
+As described in section~\ref{sec:AHT-constraints}, the lowest-order term in the average Hamiltonian can be set to the desired Hamiltonian by
+requiring that the toggling frame spend equal durations in different orientations.
+To decouple all interactions, the toggling frame must spend equal time along each axis (i.e. $I_z$ must be toggled to $\pm I_x, \pm I_y, \pm I_z$ for equal times).
+By adding this constraint to the tree search, all pulse sequences at least have the correct average Hamiltonian to lowest order. This does not address the cyclic requirement for those pulse sequences (i.e. the toggling frame coincide with the lab frame at the end of the pulse sequence), the higher-order terms in the average Hamiltonian, nor experimental imperfections.
 
-Figure~\ref{fig:reward_hist-no_errors-AHT0} shows the distributions of pulse sequence fidelities for the $12\tau, 24\tau$, and $48\tau$ sequences during training. Despite restricting the state space in a way that should guarantee higher fidelities, the fidelities are actually lower for the $12\tau$ and $24\tau$ sequences, and are comparable for the $48\tau$ sequence. These discrepancies are likely due to the stochastic nature of the algorithm, but more careful analysis is needed to understand the observed differences.
+Figure~\ref{fig:reward_hist-no_errors-AHT0} shows the distributions of pulse sequence fidelities for the $12\tau, 24\tau$, and $48\tau$ sequences during training. Despite restricting the state space in a way that should guarantee higher fidelities, the fidelities are actually lower for the $12\tau$ and $24\tau$ sequences, and are comparable for the $48\tau$ sequence. These discrepancies are likely due to the inherent randomness of the algorithm (as seen in figure~\ref{fig:consistency}), but more careful analysis is needed to understand the observed differences.
 
 \begin{figure}[H]
     \centering
@@ -90,7 +93,7 @@ Figure~\ref{fig:reward_hist-no_errors-AHT0} shows the distributions of pulse seq
 
 
 Because the lowest-order average Hamiltonian constraint didn't clearly improve performance, an even stronger constraint was added to the tree search to further restrict the state space: to decouple interactions to lowest order every $6\tau$, instead of decoupling interactions for the pulse sequence overall.
-There are $200$ sequences of length $6\tau$ that will decouple interactions to lowest order, significantly fewer than $5^6 = 15625$ possible sequences without any constraints. The resulting fidelities (figure~\ref{fig:reward_hist-no_errors-6tau}) significantly higher for the $24\tau$ and $48\tau$ sequences during training, achieving comparable fidelities to the shorter $12\tau$ sequence.
+There are $200$ sequences of length $6\tau$ that will decouple all interactions to lowest order, significantly fewer than $5^6 = 15625$ possible sequences without any constraints. The resulting fidelities (figure~\ref{fig:reward_hist-no_errors-6tau}) are significantly higher for the $24\tau$ and $48\tau$ sequences during training, comparable to the shorter $12\tau$ sequence.
 
 \begin{figure}[H]
     \centering
@@ -116,19 +119,13 @@ There are $200$ sequences of length $6\tau$ that will decouple interactions to l
     \label{fig:reward_hist-no_errors-6tau}
 \end{figure}
 
-The $6\tau$ refocusing constraint, while empirically beneficial for the AlphaZero tree search, raises some questions. By introducing this constraint, is the algorithm restricted to searching mediocre pulse sequences, where most sequences do not have low fidelity but none are extraordinarily high? The CORY48 pulse sequence does not refocus all interactions to lowest order until the end of the pulse sequence, and its fidelity is much higher than any pulse sequence found using AlphaZero.
+The $6\tau$ refocusing constraint, while empirically beneficial for the AlphaZero tree search, raises some questions. By introducing this constraint, is the algorithm excluding high-fidelity pulse sequences that do not follow this constraint? The CORY48 pulse sequence in fact does not refocus \emph{all} interactions to lowest order until the end of the pulse sequence, and its fidelity is much higher than any pulse sequence found using AlphaZero. Instead, it decouples dipolar interactions every $9\tau$, which is a more relaxed constraint.
 
 % TODO include figure showing refocusing interactions
 % TODO...
 
-The AlphaZero algorithm was originally designed to play board games, where the trained policy function defined on the entire state space is more important than the specific sequence of moves played in training games. In contrast, for designing pulse sequences, the final policy is less important than identifying a single pulse sequence with high fidelity and robustness to errors. The policy is only a tool for exploring the state space for high-fidelity pulse sequences. Therefore, pulse sequences with fidelity above a given threshold are recorded during training, and the highest-fidelity pulse sequence is used.
-
-% TODO talk about alternative pulse sequence construction using policy?
-% i.e. using policy and even longer MCTS to select a pulse sequence
-
-
-
-
+During training, pulse sequences with fidelity above a given threshold are recorded, and the highest-fidelity pulse sequence is chosen as a ``candidate'' for further evaluation (it would be impractical to evaluate each of the thousands of pulse sequences constructed by AlphaZero).
+The AlphaZero algorithm was originally designed to play board games, where the trained policy function defined on the entire state space is more important than the specific sequence of moves played in training games. In contrast, for designing pulse sequences, the final policy is less important than identifying a single pulse sequence with high fidelity and robustness to errors. The policy is only a tool for exploring the state space for high-fidelity pulse sequences.
 
 
 
@@ -162,7 +159,7 @@ Finally, resonance offset errors occur when the rf field is not matched to the L
 
 The highest-fidelity pulse sequences from the $12\tau, 24\tau$, and $48\tau$ searches\footnote{
 See the appendix for an explicit presentation of these pulse sequences.
-} were evaluated for robustness against several common experimental imperfections.
+} were evaluated for robustness against the experimental imperfections introduced above. To compare each of the different-length sequences on the same footing, each pulse sequence was repeated over a total duration of $288\tau$. That is, the $12\tau$ sequence was repeated $24$ times, the $24\tau$ sequence was repeated $12$ times, the $48\tau$ repeated $6$ times, and CORY48 (a $72\tau$ sequence) repeated $4$ times.
 % TODO actually put pulse sequences in appendix!!!
 % TODO explain evaluation, the whole 288tau thing...
 
@@ -184,14 +181,14 @@ This is not entirely unexpected however: the spin systems during training were i
 \end{figure}
 
 Similarly, the pulse sequences are much less robust to phase transient error (figure~\ref{fig:phase_transients-no_errors}), or
-resonance offset error (\ref{fig:offset_errors-no_errors}).
+resonance offset error (figure~\ref{fig:offset_errors-no_errors}). Interestingly, the $12\tau$ sequence seems to be highly robust to phaes transient error, but the fidelity is comparably worse overall.
 % or increasing th delay $\tau$ between pulses (\ref{fig:tau_delay-no_errors}).
 
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=.7\textwidth]{robustness/phase_transients-no_errors.pdf}
-    \caption{Robustness against phase transient errors, where the quadrature rotations are relative to a $\pi/2$-pulse. As with rotation errors, the AlphaZero-identified pulse sequence have very poor robustness compared to the CORY48 sequence.
+    \caption{Robustness against phase transient errors, where the quadrature rotations are relative to a $\pi/2$-pulse.
     }
     \label{fig:phase_transients-no_errors}
 \end{figure}
@@ -214,7 +211,7 @@ resonance offset error (\ref{fig:offset_errors-no_errors}).
 % \end{figure}
 
 
-To search for \emph{robust} pulse sequences, errors were intentionally introduced into the spin systems during training. First, only rotation errors were included by sampling a random rotation error $\epsilon_r \sim \mathcal{N}(\mu=0, \sigma=.01)$ for each spin system during training. Then instead of having perfect $\pi/2$-pulses, all pulses in a particular spin system rotate the spins by $\pi/2(1+\epsilon_r)$. The resulting pulse sequences were significantly more robust to rotation errors (figure~\ref{fig:rot_errors-rot_errors})
+To search for \emph{robust} pulse sequences, errors were intentionally introduced into the spin systems during training. First, only rotation errors were included by sampling a random rotation error $\epsilon_r \sim \mathcal{N}(\mu=0, \sigma=.01)$ for each spin system during training. Then instead of having perfect $\pi/2$-pulses, all pulses in a particular spin system rotate the spins by $\frac{\pi}{2}(1+\epsilon_r)$. The resulting pulse sequences were significantly more robust to rotation errors (figure~\ref{fig:rot_errors-rot_errors})
 compared to training without any errors (figure~\ref{fig:rot_errors-no_errors}).
 
 \begin{figure}[H]
@@ -226,7 +223,7 @@ compared to training without any errors (figure~\ref{fig:rot_errors-no_errors}).
 \end{figure}
 
 
-Finally, the AlphaZero algorithm was run with multiple experimental imperfections: rotation error $\epsilon_r \sim \mathcal{N}(0, .01)$, $.01\%$ phase transient error $\epsilon_{pt} \sim \mathcal{N}(0, 10^{-4})$, and resonance offset error $\epsilon_o \sim \mathcal{N}(0, 10^1)$.
+Finally, the AlphaZero algorithm was run with multiple experimental imperfections: rotation error $\epsilon_r \sim \mathcal{N}(0, .01)$, phase transient error $\epsilon_{pt} \sim \mathcal{N}(0, 10^{-4})$, and resonance offset error $\epsilon_o \sim \mathcal{N}(0, 10^1)$.
 The policy function was rewarded for high-fidelity pulse sequences in the presence of those errors, and consequently should identify pulse subsequences robust to multiple errors. For a range of rotation, phase transient, and resonance offset error (figures~\ref{fig:rot_errors-all_errors} to~\ref{fig:offset_errors-all_errors}), the pulse sequences from training \emph{with} simulated errors are more robust than those from training with no errors.
 
 \begin{figure}[H]
@@ -264,7 +261,7 @@ Despite the improved robustness by including errors in training, the resulting p
 
 % TODO
 % explain which sequence is tested
-In addition to computational simulations, the best-performing $48\tau$ pulse sequence was also tested against the CORY48 pulse sequence in a solid-state NMR spectrometer.
+In addition to computational simulations, the best-performing $48\tau$ pulse sequence was tested against the CORY48 pulse sequence in a solid-state NMR spectrometer.
 % TODO find out the magnet specs, bruker magnet _._T
 An adamantane sample was used.
 % TODO find out/look up sample specs, e.g. dipolar strength is ___, CS is ___
@@ -276,7 +273,8 @@ Instead, the fidelity is qualitatively approximated by the average correlation $
 \[
 C_\text{avg} = (C_{XX} C_{YY} C_{ZZ})^{1/3}
 \]
-where the correlation function $C_{XX}(t)$ is the expected signal from initializing the state along $X$ and measuring magnetization along $X$. $C_{YY}(t)$ and $C_{ZZ}(t)$ are defined similarly.
+where the correlation function $C_{XX}(t)$ is the expected signal from initializing the state along $X$ and measuring magnetization along $X$.
+% $C_{YY}(t)$ and $C_{ZZ}(t)$ are defined similarly.
 
 \begin{figure}[H]
     \centering

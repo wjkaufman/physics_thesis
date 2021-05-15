@@ -128,52 +128,40 @@ The agent performs many rollouts of selecting actions, estimating the rewards, a
 See figure~\ref{fig:mcts} for a visual depiction of the MCTS process.
 
 
-% TODO continue here...
-% TODO continue here...
-% TODO continue here...
-% TODO continue here...
-% TODO continue here...
-% TODO continue here...
-% TODO continue here...
-% TODO continue here...
-% TODO continue here...
-% TODO continue here...
-% TODO redo formatting for state/action/probability, want s^{(i)} instead?
-% TODO
-% TODO
-% TODO
 {\setstretch{1.0}
 \begin{algorithm}[H]
 \KwData{Current state $s = (a_0, \dots, a_{i-1})$, policy and value networks $(\pi, v)$, number of rollouts $n_\text{roll}$, Dirichlet noise parameter $\alpha$, noise weight $w \in [0,1]$, PUCT parameters $c_\text{base}, c_\text{init}$}
-\KwResult{Probabilities of selecting action $k$ ($\{p^{(k)}\}$) from state $s$, and randomly sampled action $a$}
+\KwResult{Probabilities $\{p_k\}_k$ of selecting action $a_k$ from state $s$, and randomly sampled action $a$}
 \BlankLine
 Initialize root node associated with current state $s$ \;
 Create child nodes of the root node corresponding to each action in the action space \;
-Initialize set of statistics $\{ N(s,a)=0, W(s,a)=0, Q(s,a)=0, P(s,a)= p_a \}$ for each child node, where $N$ is the visit count, $W$ is the total value, $Q$ is the mean value, and $P$ is the prior probability from $\pi$ \;
+Initialize set of statistics $\{ N(s,a_k)=0, W(s,a_k)=0, Q(s,a_k)=0, P(s,a_k)= \pi(s, a_k) \}_k$ for each child node $a_k$, where $N$ is the visit count, $W$ is the total value, $Q$ is the mean value, and $P$ is the prior probability from the policy network $\pi$ \;
 
-Sample Dirichlet noise from $\text{Dir}(\alpha)$ and add it to the priors $P(s, a)$ \;
+Sample multivariate Dirichlet noise from $\text{Dir}(\alpha)$ and add it to the priors $\{P(s, a_k)\}_k$ \;
 \For{$n_\text{roll}$ tree rollouts}{
 Set $s_0 \leftarrow s$, $i \leftarrow 0$ \;
 \While{$s_i$ is not a leaf node}{
-Select a child node $s_{i+1}$ of $s_i$ associated with action $a_i$ by maximizing $Q(s_i, a_i) + U(s_i, a_i)$ where
+Select a child node of $s_i$ associated with action $a_k$ by maximizing $Q(s_i, a_k) + U(s_i, a_k)$ where
 \[
 U(s, a) = C(s) P(s,a) \sqrt{N(s)}/(1+N(s,a))
 \]
 And $C(s) = \log((1+N(s) + c_\text{base})/c_\text{base}) + c_\text{init}$ \;
+Let $s_{i+1} \leftarrow s_i + (a_k)$ and $i \leftarrow i + 1$ \;
 }
 
 \If{
 the leaf node $s_L$ represents a pulse sequence with the desired length
 }{
-calculate the reward $r$ from fidelity of unitary operator \;
+Calculate the fidelity of the pulse sequence in spin system ensemble \;
+Calculate the reward $r$ from fidelity \;
 }
 \Else{
-evaluate the leaf node $s_L$ using $(\pi, v)$ to create child nodes for $s_L$ with initialized statistics $\{ N(s_L,a)=0, W(s_L,a)=0, Q(s_L,a)=0, P(s_L,a)= p_a \}$, and an estimated reward $r = v(s_L)$ \;
+Evaluate the leaf node $s_L$ using $(\pi, v)$ to create child nodes of $s_L$ with initialized statistics $\{ N(s_L,a_k)=0, W(s_L,a_k)=0, Q(s_L,a_k)=0, P(s_L,a_k)= \pi(s_L, a_k) \}_k$, and an estimated reward $r = v(s_L)$ \;
 }
 For each of the nodes $s_i$ visited from $s_0$ to $s_L$, update the visit counts $N(s_i, a_i) = N(s_i, a_i) + 1$ and the values $W(s_i, a_i) = W(s_i, a_i) + r, Q(s_i, a_i) = \frac{W(s_i, a_i)}{N(s_i, a_i)}$ \;
 }
 
-Calculate estimated probabilities $p_k \leftarrow N(s, a_k) / N(s)$ for all actions \;
+Calculate the estimated probability $p_k \leftarrow N(s, a_k) / N(s)$ for each action $a_k$ \;
 Randomly sample an action $a_k$ from the distribution $\{ p_k \}$ \;
 
 \caption{Monte Carlo Tree Search (MCTS) for selecting the next action. \label{al:mcts}}
@@ -190,7 +178,7 @@ Randomly sample an action $a_k$ from the distribution $\{ p_k \}$ \;
     \label{fig:mcts}
 \end{figure}
 
-The agent will repeat the process of MCTS and action sampling until it has constructed a pulse sequence with the desired length. The agent then records search statistics from each step of the pulse sequence construction: the state $s_i$, the empirical probability distribution of actions from MCTS, and the final reward $r$ of the pulse sequence. These statistics are then used to train the policy and value neural networks $(\pi, v)$.
+The agent will repeat the process of MCTS and action sampling until it has constructed a pulse sequence with the desired length. The agent records search statistics from each step of the pulse sequence construction: the state $s_i$, the empirical probability distribution of actions explored from MCTS, and the final reward $r$ of the pulse sequence from simulation. These statistics are then used to train the policy and value neural networks $(\pi, v)$.
 
 
 \begin{algorithm}[H]
@@ -201,21 +189,21 @@ Initialize empty search statistics $S \leftarrow \{\}$
 and initial state $s_0 \leftarrow ()$
 \;
 \While{Pulse sequence length is less than $T$}{
-Perform MCTS from state $s_i$ to get probabilities of selecting action $k$ ($\{p_i^{(k)}\}$) and randomly sample the next action $a_i$ \;
+Perform MCTS from state $s_i$ to get probabilities of selecting action $k$ ($\{p_k\}^{(i)}$) and randomly sample the next action $a_i$ \;
 
-Append $(s_i, \{p_i^{(k)}\})$ to the search statistics $S$ \;
+Append $(s_i, \{p_k\}^{(i)})$ to the search statistics $S$ \;
 Apply action $a_i$, get updated state $s_{i+1} \leftarrow (a_0, \dots, a_i)$ \;
 }
 Calculate the reward $r$ for the final pulse sequence \;
-Include the reward $r$ in each element in the search statistics $S$, so $S = \{ (s_i, \{p_i^{(k)}\}, r) \}$ \;
+Include the reward $r$ in each element in the search statistics $S$, so $S = \{ (s_i, \{p_k\}^{(i)}, r) \}$ \;
 \caption{Pulse sequence construction via self-play. \label{al:make_sequence}}
 \end{algorithm}
 
-As the agent continually generates search statistics from self-play, the policy and value neural networks $(\pi, v)$ can in turn be trained on the collected data. The loss function used to train the neural networks is
+As the agent continually generates search statistics from self-play, the policy and value neural networks $(\pi, v)$ in turn are trained on the collected data. The loss function to train the neural networks is
 \begin{equation}\label{eq:az_loss}
     L(\theta) = (r_i - v_\theta(s_i))^2 - \pi_\theta(s_i) \cdot \log \mathbf{p_i} + c ||\theta||^2
 \end{equation}
-Which is simply the squared error of the reward estimates, the cross-entropy loss of the policy estimates, and $L_2$ regularization of the neural network parameters. The constant $c$ controls the weight of $L_2$ regularization (in this work $c = 10^{-6}$).
+The first term is the squared error of the reward estimates, the second is the cross-entropy loss of the policy estimates, and the third is $L_2$ regularization of the neural network parameters. The constant $c$ controls the weight of $L_2$ regularization (in this work $c = 10^{-6}$).
 
 The two processes of self-play and training are done simultaneously, with multiple agent processes constructing pulse sequences and generating data that is then used to train the policy and value networks. In turn, the updated network parameters $\theta$ are shared with the agents.
 % The flow of information is shown in figure~\ref{fig:az-parallel}.
@@ -232,10 +220,14 @@ The two processes of self-play and training are done simultaneously, with multip
 
 \subsection{Neural Network Architecture}
 
-As in the original AlphaZero implementation, the policy and the value networks were combined into a single neural network $f_\theta(s) = (\pi(s), v(s))$. This adds an additional degree of regularization, because any shared parameters must minimize the loss for both the policy and the value estimates. The combined network includes a shared set of layers that transform the state to a hidden representation, and two separate sets of layers (called ``heads'') that return the policy and value estimates. See figure~\ref{fig:nn} for the complete neural network architecture.
+As in the original AlphaZero implementation, the policy and the value networks were combined into a single neural network that maps a state $s$ to \emph{both} a probability distribution over actions $\pi(s)$ and a value estimate $v(s)$. This is written as $f_\theta(s) = (\pi(s), v(s))$, where $\theta$ are the neural network parameters. This adds an additional degree of regularization, because any parameters that are used for both the policy and value estimates must minimize the loss for both the policy and the value estimates, preventing overfitting. The combined network includes a shared set of layers that transform the state to an intermediate representation, and two separate sets of layers (called ``heads'') that return the policy and value estimates. See figure~\ref{fig:nn} for the complete neural network architecture.
 
 The state is represented by the sequence of actions performed on the system and an additional \texttt{START} ``action.''
-Because the action space is discrete ($\{ D, X, \overline{X}, Y, \overline{Y} \}$), each action is represented by a one-hot vector. For example, the \texttt{START} action corresponds to the vector $[1,0,0,0,0]$, a delay $D$ corresponds to the vector $[0,1,0,0,0,0]$, and $\overline{Y}$ corresponds to $[0,0,0,0,0,1]$. The sequence of pulses $[\overline{X}, Y, D]$ is then represented by the 2D-array
+Because the action space is discrete ($\{ D, X, \overline{X}, Y, \overline{Y} \}$), each action is represented by a one-hot vector%
+\footnote{
+A one-hot vector has a single entry equal to one, and all other entries are zero.
+}%
+. For example, the \texttt{START} action corresponds to the vector $[1,0,0,0,0]$, a delay $D$ corresponds to the vector $[0,1,0,0,0,0]$, and $\overline{Y}$ corresponds to $[0,0,0,0,0,1]$. The sequence of pulses $[\overline{X}, Y, D]$ is then represented by the 2D-array
 \begin{align*}
     [&[1,0,0,0,0,0], \\
     &[0,0,0,1,0,0], \\
@@ -245,28 +237,26 @@ Because the action space is discrete ($\{ D, X, \overline{X}, Y, \overline{Y} \}
 Because the state is represented by a sequence of actions, the size of the state depends on the length of the pulse sequence.
 The policy head outputs a $1 \times 5$ vector of probabilities associated with each of the possible actions. The value head outputs a single scalar for the estimated reward of the pulse sequence so far.
 
-The nature of the state representation (i.e. as a sequence of actions) lends itself nicely to using a recurrent neural network architecture for the policy and value networks. A gated recurrent unit (GRU) was used, though a long-short term memory (LSTM) layer performed similarly \cite{cho2014learning, lstm}.
-Both GRUs and LSTMs are capable of mapping variable-length input to a fixed-length output space, which is precisely what we need to do when mapping the actions we have performed so far to the estimated policy and value of that state.
-
-\begin{figure}[H]
-    \centering
-    \input{tikz/neural_network}
-    % \includegraphics{example-image}
-    \caption{The policy and value network architecture.}
-    \label{fig:nn}
-\end{figure}
+The state representation--as a sequence of actions--lends itself to using a recurrent neural network architecture. A gated recurrent unit (GRU) was used, though a long-short term memory (LSTM) layer performed similarly \cite{cho2014learning, lstm}.
+Both GRUs and LSTMs are capable of mapping variable-length input to a fixed-length output space, which is precisely what is needed when mapping the actions we have performed so far to the estimated policy and value of that state.
 
 
 \section{AHT-Constrained Search}\label{sec:AHT-constraints}
 
-Because actions are explored and selected via tree search, additional constraints can be added to prune branches of the tree that are unlikely to yield high rewards. Thankfully, AHT gives us a straightforward constraint so that pulse sequences have the desired lowest-order average Hamiltonian $\overline{H}^{(0)}$.
+\smash{
+Because actions are explored and selected via tree search, additional constraints can be added to prune branches of the tree that are unlikely to yield high rewards.
+This is akin to adding ``rules of the game'' that determine which actions can or cannot be applied.
+Thankfully, AHT gives us a straightforward constraint so that pulse sequences have the desired lowest-order average Hamiltonian $\overline{H}^{(0)}$.
+}
 
-When the target effective Hamiltonian is $H_\text{eff} = 0$, all interactions must be decoupled. If the toggling frame is defined so that $\widetilde{I_z}(t) = I_z$ and $\widetilde{I_z}(t) = -I_z$ for equal durations, then the lowest-order average $\overline{I_z}^{(0)} = 1/2(I_z - I_z) = 0$. In general, any term containing $I_z$ will average to zero to lowest order when $\widetilde{I_z}$ is toggled for equal time along opposite axes (i.e. equal time on $+x$ and $-x$, $+y$ and $-y$, and $+z$ and $-z$-axes).
+When the target effective Hamiltonian $H_\text{eff} = 0$, all interactions must be decoupled. If the toggling frame is defined so that $\widetilde{I}_z(t) = I_z$ and $\widetilde{I}_z(t) = -I_z$ for equal durations, then the lowest-order average $\overline{I}_z^{(0)} = 1/2(I_z - I_z) = 0$. In general, any term containing $I_z$ will average to zero to lowest order when $\widetilde{I}_z$ is toggled for equal time along opposite axes (i.e. equal time on $+x$ and $-x$, $+y$ and $-y$, and $+z$ and $-z$-axes).
+Doing so would decouple the chemical shift term $H_\text{CS}$ to lowest order.
 
-We saw in section~\ref{subsec:WHH-4} that the dipolar interaction term is decoupled when $I_z^{(j)}I_z^{(k)}$ is toggled to $I_z^{(j)}I_z^{(k)}, I_y^{(j)}I_y^{(k)}$, and $I_x^{(j)}I_x^{(k)}$ for equal times. Note that if $\widetilde{I_z} = -I_z$, then $\widetilde{I_z^{(j)}}\widetilde{I_z^{(k)}} = I_z^{(j)}I_z^{(k)}$.
+We saw in section~\ref{subsec:WHH-4} that the dipolar interaction term is decoupled when $I_z^{(j)}I_z^{(k)}$ is toggled to $I_z^{(j)}I_z^{(k)}, I_y^{(j)}I_y^{(k)}$, and $I_x^{(j)}I_x^{(k)}$ for equal times.
+Note that if $\widetilde{I}_z = -I_z$, then $\widetilde{I}_z^{(j)}\widetilde{I}_z^{(k)} = (-I_z^{(j)})(-I_z^{(k)}) = I_z^{(j)}I_z^{(k)}$, so the overall term remains unchanged.
 Therefore the dipolar interaction is decoupled to lowest order when $I_z^{(j)}I_z^{(k)}$ is toggled for equal time along the $x, y$, and $z$-axes.
 
-To decouple all interactions, both constraints above must be satisfied, which is achieved when $I_z$ is toggled along each of the six axes for equal time ($\pm x, \pm y, \pm z$). By keeping track of the toggled operator $\widetilde{I_z}$ while constructing the pulse sequence, it is possible to prune branches of the tree that would violate this constraint%
+To decouple all interactions, both constraints above must be satisfied, which is achieved when $I_z$ is toggled along each of the six axes for equal time ($\pm x, \pm y, \pm z$). By keeping track of the toggled operator $\widetilde{I}_z$ while constructing the pulse sequence, it is possible to prune branches of the tree that would violate this constraint%
 % (see figure~\ref{fig:tree-prune})%
 .
 
