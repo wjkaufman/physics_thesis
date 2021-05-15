@@ -16,8 +16,9 @@ Hamiltonian engineering fits into the RL paradigm by considering discrete time s
 
 % \subsection{Important RL Concepts}
 
-In the language of RL, an \emph{agent} is responsible for performing \emph{actions} on the \emph{environment} to maximize a \emph{reward signal} (or reward). The agent can see the \emph{state} of the environment which informs what actions to take. See figure~\ref{fig:RL} for a diagram of the agent-environment interactions. In turn, the agent's actions may affect the environment state. The agent must then balance exploration of the environment by choosing a variety of actions and exploitation of its prior knowledge to maximize rewards.
+In the language of RL, an \emph{agent} is responsible for performing \emph{actions} on the \emph{environment} to maximize a \emph{reward signal} (or reward). The agent can see the \emph{state} of the environment which informs what actions to take. See figure~\ref{fig:RL} for a diagram of the agent-environment interactions. In turn, the agent's actions may affect the environment state. The agent must then balance exploration of the environment by choosing a variety of actions and exploitation of its prior knowledge to maximize rewards.\footnote{
 For a more detailed description of the RL framework, see \cite{sutton2018reinforcement}.
+}
 
 \begin{figure}[H]
     \centering
@@ -26,16 +27,19 @@ For a more detailed description of the RL framework, see \cite{sutton2018reinfor
     \label{fig:RL}
 \end{figure}
 
-The agent decides what actions to perform via a policy function $\pi$, which maps from a state $s \in S$ to either a probability distribution over the action space $\mathcal{P}(A)$ (a ``stochastic policy'') or simply a particular action $a \in A$ (a ``deterministic policy''). Policy functions are typically implemented as neural networks which are then usually optimized using gradient-based methods.
+The agent interacts with the environment in a series of \emph{timesteps}. Each timestep begins with a state $s_i$, the agent chooses an action $a_i$ based on the state, and optionally receives a reward $r_i$ for the particular state-action combination. An \emph{episode} is a collection of timesteps that begin in an initial state and end in a terminal state. For Hamiltonian engineering, an episode is the complete construction of a pulse sequence, where each timestep selects the next pulse depending on the sequence of previous pulses.
 
-There are a few other common functions used in RL. The \emph{return} at time step $t$ is defined as
+The agent decides what actions to perform at each timestep via a policy function $\pi$, which maps from a state $s \in S$ to either a probability distribution over the action space $\mathcal{P}(A)$ (a ``stochastic policy'') or simply a particular action $a \in A$ (a ``deterministic policy''). Policy functions are typically implemented as neural networks which are then usually optimized using gradient-based methods.
+
+The \emph{return} at timestep $t$ is defined as
 \begin{equation}\label{eq:return}
     G_t \defeq \sum_{k=t}^T \gamma^{k-t} R_k, \quad \gamma \in [0,1)
 \end{equation}
-or the total discounted rewards until the end of the episode at time step $T$. The \emph{state-value function} is the expected return from a particular state while following a policy $\pi$
+or the total discounted rewards until the end of the episode at timestep $T$. If the episode has finitely many timesteps the discount factor is often ignored. The \emph{state-value function} (or simply value function) is the expected return from a particular state while following a policy $\pi$
 \begin{equation}\label{eq:state_value}
     v_\pi(s) \defeq \E[G_t | S_t = s]
 \end{equation}
+If there is only a reward at the end of the episode (as is the case with pulse sequence design), then the value function gives the expected final reward at the end of the episode.
 % Finally, the \emph{action-value function} is the expected return from taking an action $a$ in state $s$, then after following policy $\pi$
 % \begin{equation}\label{eq:action_value}
 %     q_\pi(s, a) \defeq \E[G_t | S_t = s, A_t = a]
