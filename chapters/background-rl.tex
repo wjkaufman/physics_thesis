@@ -9,14 +9,17 @@
 \begin{quote}
     Reinforcement learning is learning what to do--how to map situations to actions--so as to maximize a numerical reward signal. \cite{sutton2018reinforcement}
 \end{quote}
-Reinforcement learning  (RL) has been applied to a variety of different problems, including interacting with physical environments such as balancing a pole \cite{lillicrap2015continuous} or playing games such as chess or Go \cite{Silver1140}. A significant attraction of RL is its generality: in most cases no prior knowledge of the problem is assumed. As a result, any problem that can be formulated as a Markov decision process (MDP) can be approached with RL.
-
+Reinforcement learning  (RL) has been applied to a variety of different problems, including interacting with physical environments such as robotic manipulation using visual input \cite{lillicrap2015continuous} or playing chess \cite{Silver1140}. A significant attraction of RL is its generality: any problem that can be formulated as a Markov decision process (MDP) can be approached with RL, and in most cases no prior knowledge of the problem is assumed.
 % potential application to Ham engineering
-Hamiltonian engineering fits into the RL paradigm by considering discrete time steps. The environment is the quantum system we are trying to control, the actions are control Hamiltonian parameters at a given time step, the state of the system is the propagator, and the reward is the fidelity of the propagator with the target propagator.  Each of these are developed in more detail below.
+Hamiltonian engineering
+fits into
+% TODO WC^
+the RL paradigm by considering discrete time steps at which the control Hamiltonian can be set.
+The environment is the quantum system we are trying to control, the actions are control Hamiltonian parameters at a given time step,
+% the state of the system is the propagator,
+and the reward is how ``close'' the dynamics are to the desired dynamics under the target Hamiltonian. Each of these are developed in more detail in section~\ref{sec:methods-RL}.
 
-% \subsection{Important RL Concepts}
-
-In the language of RL, an \emph{agent} is responsible for performing \emph{actions} on the \emph{environment} to maximize a \emph{reward signal} (or reward). The agent can see the \emph{state} of the environment which informs what actions to take. See figure~\ref{fig:RL} for a diagram of the agent-environment interactions. In turn, the agent's actions may affect the environment state. The agent must then balance exploration of the environment by choosing a variety of actions and exploitation of its prior knowledge to maximize rewards.\footnote{
+In the language of RL, an \emph{agent} is responsible for performing \emph{actions} on the \emph{environment} to maximize a \emph{reward signal} (or reward). The agent can see the \emph{state} of the environment which informs what actions to take. See figure~\ref{fig:RL} for a diagram of the agent-environment interactions. In turn, the agent's actions affect the environment's state. The agent must then balance exploration of the environment for learning about novel, possibly better policies, and exploitation of its prior knowledge to maximize rewards.\footnote{
 For a more detailed description of the RL framework, see \cite{sutton2018reinforcement}.
 }
 
@@ -29,7 +32,7 @@ For a more detailed description of the RL framework, see \cite{sutton2018reinfor
 
 The agent interacts with the environment in a series of \emph{timesteps}. Each timestep begins with a state $s_i$, the agent chooses an action $a_i$ based on the state, and optionally receives a reward $r_i$ for the particular state-action combination. An \emph{episode} is a collection of timesteps that begin in an initial state and end in a terminal state. For Hamiltonian engineering, an episode is the complete construction of a pulse sequence, where each timestep selects the next pulse depending on the sequence of previous pulses.
 
-The agent decides what actions to perform at each timestep via a policy function $\pi$, which maps from a state $s \in S$ to either a probability distribution over the action space $\mathcal{P}(A)$ (a ``stochastic policy'') or simply a particular action $a \in A$ (a ``deterministic policy''). Policy functions are typically implemented as neural networks which are then usually optimized using gradient-based methods.
+The agent decides what actions to perform at each timestep using a policy function $\pi$, which maps each state $s \in S$ to either a probability distribution over the action space $\mathcal{P}(A)$ (a ``stochastic policy'') or simply a particular action $a \in A$ (a ``deterministic policy''). Policy functions can be implemented as a dictionary of state-action pairs when the state space is small, or as neural networks which are optimized using gradient-based methods.
 
 The \emph{return} at timestep $t$ is defined as
 \begin{equation}\label{eq:return}
@@ -47,32 +50,30 @@ If there is only a reward at the end of the episode (as is the case with pulse s
 
 
 
-
-
-
-
 \subsection{Algorithm Examples}
 
-There are many RL algorithms that have been developed, tailored to different characteristics of the RL problem. The relevant characteristics include
+There are many RL algorithms that have been developed, tailored to different characteristics of the RL problem. The RL algorithms can be differentiated according to the following characteristics.
 \begin{description}
-    \item[Model] An agent in a \emph{model-free} RL algorithm learns a policy directly from observations of the environment. An agent in a \emph{model-based} RL algorithm instead uses observations to model the environment, then uses that model to learn a policy.
-    \item[Policy] An \emph{on-policy} algorithm improves the policy that is used to interact with the environment. An \emph{off-policy} algorithm has separate policies for improvement and environment interaction.
+    \item[Model] An agent in a \emph{model-free} RL algorithm learns a policy directly from observations of the environment. An agent in a \emph{model-based} RL algorithm instead uses observations to model the environment, then uses that model to learn a policy. For example, an agent that plays chess could use a model of the game to model possible future moves by their opponent.
+    \item[Policy] An \emph{on-policy} algorithm learns the policy that is used to interact with the environment. An \emph{off-policy} algorithm has separate policies for learning and environment interaction.
     \item[Action space] As mentioned before, an action space can be \emph{discrete} (finitely many actions) or \emph{continuous} (infinitely many actions).
+    \item[Learning method] There are general classes of RL algorithms that learn from the agent-environment interactions in different ways. Examples include temporal-difference (TD) learning and policy gradient methods.
+    % TODO describe this more...
 \end{description}
-In addition to the above characteristics, there are general classes of RL algorithms, such as temporal-difference learning policy gradient methods. More information on RL can be found in \cite{sutton2018reinforcement}.
+More information on RL can be found in \cite{sutton2018reinforcement}.
 
-The AlphaZero algorithm was used as the primary RL algorithm in this work, and a more complete description of the algorithm can be found in the Methods section. The other algorithms listed below were explored as potential options for Hamiltonian engineering, but ultimately were not as effective as AlphaZero.
+The RL algorithms listed below were each tested as potential options for Hamiltonian engineering. Ultimately, the AlphaZero algorithm was used as the primary RL algorithm in this work as it was the best-performing of those that were tested. A more complete description of the algorithm can be found in section~\ref{sec:methods-RL}.
 
 \subsubsection{Q-learning and DQN}
 
-Q-learning is a model-free, off-policy, TD control algorithm applicable to discrete action spaces \cite{watkins1989learning}. As the name suggests, the action-value function $Q(s,a)$ is learned from experiences with the environment according to the following update rule
+Q-learning is a model-free, off-policy, temporal-difference (TD) control algorithm applicable to discrete action spaces \cite{watkins1989learning}. As the name suggests, the action-value function $Q(s,a)$ is learned from experiences with the environment according to the following update rule
 \begin{equation}\label{eq:Q_learning_update}
     Q(S_t, A_t) \leftarrow Q(S_t, A_t) +
         \alpha \left[ R_{t+1} + \gamma \max_a Q(S_{t+1}, a) - Q(S_t, A_t) \right]
 \end{equation}
 To encourage exploration of the state and action spaces, the agent typically follows an $\epsilon$-greedy policy (with probability $1-\epsilon$ perform the action that maximizes $Q$, otherwise perform a random action), which makes this algorithm \emph{off-policy}.
 
-If the state and action spaces are small, then it's feasible for all the $Q$-values to be stored in memory. In general, though, the action-value function is approximated using a neural network, and the parameters are updated to minimize the loss given by \ref{eq:Q_learning_update}. This approach is called ``deep Q-network'' or DQN \cite{mnih2013playing}. DQN is suitable for large state spaces (as demonstrated through Atari games in \cite{mnih2013playing}), but still requires the action space to be discrete.
+If the state and action spaces are small, then it is feasible for all the $Q$-values to be stored in memory. In general, though, the action-value function is approximated using a neural network, and the parameters are updated to minimize the loss given by \ref{eq:Q_learning_update}. This approach is called ``deep Q-network'' or DQN \cite{mnih2013playing}. DQN is suitable for large state spaces (as demonstrated through Atari games in \cite{mnih2013playing}), but still requires the action space to be discrete.
 
 % TODO include DDPG??
 % \subsubsection{DDPG}
@@ -94,7 +95,7 @@ If the state and action spaces are small, then it's feasible for all the $Q$-val
 
 \subsubsection{PPO}
 
-Proximal-policy optimization (PPO) is a model-free, on-policy actor-critic algorithm that tried to improve data efficiency and robustness compared to existing algorithms (such as DQN or other policy gradient methods).
+Proximal-policy optimization (PPO) is a model-free, on-policy policy gradient algorithm that tried to improve data efficiency and robustness compared to existing algorithms (such as DQN or other policy gradient methods).
 \cite{schulman2017proximal}.
 In contrast with other policy gradient methods, the PPO objective function is clipped according to a hyperparameter $\epsilon$.
 \begin{equation}\label{eq:ppo_loss}
@@ -105,14 +106,18 @@ In contrast with other policy gradient methods, the PPO objective function is cl
     )\right]
 \end{equation}
 where
-$r_t(\theta) = \frac{\pi_\theta(a_t|s_t)}{\pi_{\theta'}(a_t|s_t)}$ is the probability ratio of actions under the new and old policies, and $\hat{A}_t$ is an estimator of the \emph{advantage function} at time $t$. By clipping the objective, the gradient updates are non-zero only for a region close to the previous policy, thus preventing policy changes that are too large.
+$r_t(\theta) = \frac{\pi_\theta(a_t|s_t)}{\pi_{\theta'}(a_t|s_t)}$ is the probability ratio of actions under the new and old policies, and $\hat{A}_t$ is an estimator of the \emph{advantage function} at time $t$, or the excess return above what was expected by the value function
+\[
+\hat{A}_t \defeq G_t - v_\pi(S_t)
+\]
+By clipping the objective, the gradient updates are non-zero only for a region close to the previous policy, thus preventing policy changes that move too far away from the old policy.
 PPO has been applied successfully to both continuous and discrete action spaces%
 % TODO check above, I think that's right but not sure...
 .
 
-\subsubsection{ERL}
+\subsubsection{Evolutionary Reinforcement Learning}
 
-Evolutionary reinforcement learning (ERL) is a model-free, off-policy hybrid algorithm that uses both actor-critic policy gradient and evolutionary algorithm methods \cite{khadka2018evolutionguided}. ERL addresses problems found in many  gradient-based RL algorithms, including temporal credit assignment (associating actions to rewards that may be separated by many time steps), exploration of the state and action spaces, and policy convergence sensitivity to hyperparameters. To do so, ERL maintains a population of actors with individual policies that interact with the environment. The population's experiences are recorded in a shared replay buffer, and a separate actor/critic pair learn from the replay buffer using policy gradient (such as DDPG or DQN). Periodically, the policy gradient-based actor is copied into the population, and evolutionary algorithms are used to iterate a new ``generation'' of actors (by preferentially selecting high-performing actors). By using both gradient-based and gradient-free methods, ERL attempts to achieve both efficiency and policy diversity, making it a candidate for a variety of RL problems.
+Evolutionary reinforcement learning (ERL) is a model-free, off-policy hybrid algorithm that uses both policy gradient and evolutionary algorithm methods \cite{khadka2018evolutionguided}. ERL addresses problems found in many  gradient-based RL algorithms, including temporal credit assignment (associating actions to rewards that may be separated by many time steps), exploration of the state and action spaces, and policy convergence sensitivity to hyperparameters. To do so, ERL maintains a population of actors with individual policies that interact with the environment. The population's experiences are recorded in a shared replay buffer, and a separate actor/critic pair learn from the replay buffer using policy gradient (such as DDPG or DQN). Periodically, the policy gradient-based actor is copied into the population, and evolutionary algorithms are used to iterate a new ``generation'' of actors (by preferentially selecting high-performing actors). By using both gradient-based and gradient-free methods, ERL attempts to achieve both efficiency and policy diversity, making it a candidate for a variety of RL problems.
 
 Pulse sequence design for Hamiltonian engineering has also been approached using the ERL algorithm \cite{peng2021deep}, and achieved similar results to this RL implementation.
 

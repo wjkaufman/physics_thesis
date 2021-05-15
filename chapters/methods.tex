@@ -7,11 +7,11 @@
 % physical constraints
 % parameters for sequences
 
-The code for this work can be found at \url{https://github.com/wjkaufman/rl_pulse}.
+This section describes the simulation methods and RL algorithm used in this work. The implementation of both can be found at \url{https://github.com/wjkaufman/rl_pulse}.
 
 \section{Simulated Spin Systems}
 
-Spin systems composed of a small number of spins can be easily simulated on a classical computer. Because the Hilbert Space grows exponentially as the spins increase ($2^N$ basis states for $N$ spins and $2^{2N}$ matrix elements for associated operators), it rapidly becomes impractical to simulate large numbers of spins. In this work, $N=3$ spin-1/2 systems were used in the reinforcement learning algorithm, and $N=4$ spin-1/2 systems were used to evaluate pulse sequences. The QuTiP Python package was used for all simulations \cite{Johansson_2013}.
+Spin systems composed of a small number of spins can be easily simulated on a classical computer. Because the Hilbert space grows exponentially as the spins increase ($2^N$ basis states for $N$ spins and $2^{2N}$ matrix elements for associated operators), it rapidly becomes impractical to simulate large numbers of spins. In this work, $N=3$ spin-1/2 systems were used in the reinforcement learning algorithm, and $N=4$ spin-1/2 systems were used to evaluate pulse sequences. The QuTiP Python package was used for all simulations \cite{Johansson_2013}.
 
 In any real physical system, system-environment interactions are present and the spin system must be treated as open, but for simulation purposes the system is assumed to be isolated.
 Consequently, the dynamics are given by unitary time-evolution operators. In principle, though, simulations of open quantum systems could be used with reinforcement learning algorithms, and may lead to better control by accounting for non-unitary system dynamics.
@@ -46,7 +46,7 @@ Under ideal conditions, the two propagators should be ``close'' in some way. One
 \end{equation}
 The fidelity approaches $1$ as the unitaries get ``closer'' and the average Hamiltonian approaches the target Hamiltonian, and approaches $0$ as the unitaries get further apart.
 
-\section{Reinforcement Learning Implementation}
+\section{Reinforcement Learning Implementation}\label{sec:methods-RL}
 
 The reinforcement learning methodology is sufficiently general to be applied to a wide range of problems, and in a variety of different ways.  The following sections describe how the Hamiltonian engineering problem is approached with RL.
 
