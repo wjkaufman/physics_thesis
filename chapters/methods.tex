@@ -109,7 +109,7 @@ This is more ``realistic'' in the sense that the agent only knows what the exper
 As mentioned above, the fidelity function takes on values between $0$ and $1$, where values close to $1$ are desirable.
 However, a tenfold improvement in performance doesn't correspond to a tenfold increase in fidelity (take for instance a fidelity of 0.9 compared to 0.99). A suitable reward function is then calculated by
 \begin{equation}
-    R = -\log(1-F(U_\text{actual}, U_\text{target}) + \epsilon)
+    r = -\log(1-\text{fidelity}(U_\text{actual}, U_\text{target}) + \epsilon)
 \end{equation}
 where $\epsilon>0$ ensures the reward isn't infinite.
 
@@ -127,6 +127,7 @@ See figure~\ref{fig:mcts} for a visual depiction of the MCTS process.
 % TODO
 % TODO
 % TODO
+{\setstretch{1.0}
 \begin{algorithm}[H]
 \KwData{Current state $s = (a_0, \dots, a_{i-1})$, policy and value networks $(\pi, v)$, number of rollouts $n_\text{roll}$, Dirichlet noise parameter $\alpha$, noise weight $w \in [0,1]$, PUCT parameters $c_\text{base}, c_\text{init}$}
 \KwResult{Probabilities of selecting action $k$ ($\{p^{(k)}\}$) from state $s$, and randomly sampled action $a$}
@@ -162,6 +163,7 @@ Randomly sample an action $a_k$ from the distribution $\{ p_k \}$ \;
 
 \caption{Monte Carlo Tree Search (MCTS) for selecting the next action. \label{al:mcts}}
 \end{algorithm}
+}
 
 \begin{figure}[H]
     \centering

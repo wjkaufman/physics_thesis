@@ -332,7 +332,7 @@ The WHH-4 sequence, to lowest order, refocuses (or ``cancels out'') the dipolar 
 
 AHT can be taken even further than the WHH-4 sequence by considering higher-order terms in the Magnus Expansion. The CORY48 sequence is a 72$\tau$, 48-pulse sequence that was designed to decouple all interactions so that $H_{\text{eff}} = 0$ \cite{CORY1990205}. Furthermore, the CORY48 sequence decouples the dipolar interactions to \emph{second order}, and is robust to errors including pulse rotation errors and resonance offset errors. The full sequence is presented in equation~\ref{eq:CORY48}.
 
-\begin{align}\label{eq:CORY48}
+\begin{align*}\label{eq:CORY48}
     X, \tau, Y, 2\tau, \overline{X}, \tau, Y, 2\tau, \\
     X, \tau, Y, 2\tau, X, \tau, Y, 2\tau, \\
     X, \tau, \overline{Y}, 2\tau, X, \tau, Y, 2\tau, \\
@@ -345,7 +345,7 @@ AHT can be taken even further than the WHH-4 sequence by considering higher-orde
     Y, \tau, \overline{X}, 2\tau, Y, \tau, X, 2\tau, \\
     Y, \tau, \overline{X}, 2\tau, \overline{Y}, \tau, X, 2\tau, \\
     Y, \tau, X, 2\tau, \overline{Y}, \tau, X, 2\tau \\
-\end{align}
+\end{align*}
 
 The full AHT analysis is not presented here, but one can imagine evaluating the three lowest-order terms from equations~\ref{eq:AHT-term-0} to~\ref{eq:AHT-term-2} using each of the $48$ time intervals. The lowest-order term is not difficult to calculate, but the higher-order terms quickly become intractable as the integrals include more and more nested commutators.
 
@@ -354,7 +354,7 @@ By comparing the average correlation (explained in greater depth in section~\ref
 
 \begin{figure}[H]
     \centering
-    \includegraphics{decay_plot.pdf}
+    \includegraphics[width=.7\textwidth]{decay_plot.pdf}
     \caption{The average correlation for a free induction decay (FID), the WHH-4 sequence, and the CORY48 sequence in an adamantane sample. Both the WHH-4 and the CORY48 extend the coherence times of the sample, but CORY48 achieves nearly two orders of magnitude greater improvement. The $T_1$ time for adamantane is shown at $t=1$s.}
     \label{fig:decay_plot_AHT}
 \end{figure}

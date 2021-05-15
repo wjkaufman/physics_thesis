@@ -1,0 +1,142 @@
+\documentclass[
+11pt,
+english,
+% singlespacing,
+% draft
+]{dcthesis}
+
+% \documentclass{agujournal2018}
+
+\usepackage{wjk}
+
+\usepackage{palatino}
+\usepackage{physics}
+% \usepackage{graphicx}
+\usepackage{natbib}
+% \usepackage{hyperref}
+% \usepackage{subcaption}
+% \usepackage{algorithm}
+% \usepackage{dsfont}
+% \usepackage[noend]{algpseudocode}
+% \usepackage{amsmath,amssymb,amsthm}
+\usepackage{indentfirst}
+\usepackage{booktabs}
+\usepackage{xcolor}
+\usepackage{pdfpages}
+% \usepackage{trackchanges}
+
+\graphicspath{{graphics/}}
+
+\raggedbottom
+
+%Formatting
+%  Change or add to as desired.
+%  These two commands make the first enumerations look like (a)
+%  And the second level like (i).
+% \renewcommand{\labelenumi}{(\roman{enumi})}
+\renewcommand{\labelenumii}{(\alph{enumii})}
+%  These commands make the section headings Boldface and not all
+%  caps. It also removes the chapter numbers
+\renewcommand{\chaptermark}[1]{\markboth{{\bf #1}}{{\bf #1}}}
+\renewcommand{\sectionmark}[1]{\markright{{\bf \thesection\ #1}}}
+%  These commands have lowercase headings with chapter numbers.
+%\renewcommand{\chaptermark}[1]{markboth{#1}{}}
+%\renewcommand{\sectionmark}[1]{\markright{\thesection\ #1}}
+% \newcommand{\citepGem}{\citep{zettergrensnively2015,zettergrenSemeter2012,ZettergrenSemeterDahlgren2015}}
+% \newcommand{\citetGem}{\citet{zettergrensnively2015,zettergrenSemeter2012,ZettergrenSemeterDahlgren2015}}
+
+\makeatletter
+\def\BState{\State\hskip-\ALG@thistlm}
+\makeatother
+
+
+%Theorem Declarations
+%  A basic set of theorem declarations.  Add or remove as desired.
+\newtheorem{prop}{Proposition}[chapter]
+\newtheorem{theorem}[prop]{Theorem}
+\newtheorem{lemma}[prop]{Lemma}
+\newtheorem{corr}[prop]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[prop]{Definition}
+\theoremstyle{remark}
+\newtheorem{remark}[prop]{Remark}
+\newtheorem{example}[prop]{Example}
+\newtheorem*{claim}{Claim}
+
+%Title Page Information
+%  Your personal info goes here!
+\title{Applying Reinforcement Learning to Hamiltonian Engineering}
+\author{Will Kaufman}
+\date{\today}
+\field{Physics}
+\degree{Bachelor of Arts}
+%As an optional argument to \committee you can specify the
+%dean of graduate studies
+\committee{Chandrasekhar Ramanathan}{Lorenza Viola}{Bo Zhu}
+
+\begin{document}
+
+\begin{center}
+%\includegraphics[width=0.6\textwidth]{figures/mps_}
+\vspace*{\fill}
+
+\huge
+Applying Reinforcement Learning to Hamiltonian Engineering
+
+\vspace*{\fill}
+%\includegraphics[width=0.6\textwidth]{figures/mps}
+\end{center}
+
+\normalsize
+\newpage\null\thispagestyle{empty}\newpage
+
+%Front end of thesis
+\frontmatter
+
+\maketitle
+
+% \singlespacing
+
+%Abstract
+%NOTE:  Must be less than 350 words.
+\chapter*{Abstract}
+%This is so the abstract appears in the ToC
+\addcontentsline{toc}{section}{Abstract}
+
+Hamiltonian engineering encompasses a variety of important problems in quantum physics and quantum control. For spin systems in particular, the ability to engineer an effective Hamiltonian to decouple dipolar interactions is desirable for improving spectroscopy and increasing spin coherence times.
+Average Hamiltonian theory (AHT) has been used to design pulse sequences for Hamiltonian engineering, but the computational complexity of calculating higher-order terms inherently limits its performance.
+% my project
+This work explores reinforcement learning as an alternative approach to designing pulse sequences for Hamiltonian engineering. The AlphaZero algorithm was trained to construct pulse sequences of varying lengths to decouple all interactions in spin systems. High-fidelity pulse sequences were identified after introducing additional constraints to the algorithm's tree search, and were trained to be robust to multiple sources of error by including those errors in training.
+The RL-based pulse sequences have lower fidelity than the CORY48 pulse sequence (a state-of-the-art AHT-based pulse sequence) both in computational simulations and experiment, indicating that the current RL implementation does not outperform existing approaches using AHT.
+
+% \singlespacing
+
+% \chapter*{Acknowledgements}
+% TODO add acknowledgements
+% \noindent Nunc id cursus metus aliquam eleifend. Massa sed elementum tempus egestas sed sed. Congue nisi vitae suscipit tellus mauris a. In iaculis nunc sed augue lacus. Leo vel orci porta non pulvinar neque.
+% \newline\newline
+% Ullamcorper a lacus vestibulum sed arcu non odio euismod lacinia. Euismod quis viverra nibh cras. Vulputate ut pharetra sit amet aliquam id. Mollis aliquam ut porttitor leo a diam sollicitudin tempor.
+% \newline\newline
+% Aenean sed adipiscing diam donec adipiscing tristique risus nec. Libero justo laoreet sit amet cursus sit amet. Fringilla urna porttitor rhoncus dolor.
+% \newline\newline
+% Porta lorem mollis aliquam ut porttitor leo a. Ut sem viverra aliquet eget. Lectus mauris ultrices eros in cursus turpis. Tellus rutrum tellus pellentesque eu. Elit pellentesque habitant morbi tristique.
+
+\addcontentsline{toc}{section}{Preface}
+
+%Table of Contents
+\tableofcontents
+
+\setcounter{tocdepth}{3}
+\mainmatter
+\include{chapters/background}
+\include{chapters/background-rl}
+\include{chapters/methods}
+\include{chapters/results}
+\include{chapters/conclusion}
+
+\backmatter
+\include{appendix}
+
+\bibliography{refs}
+\bibliographystyle{apa}
+\end{document}
