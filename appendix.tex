@@ -63,4 +63,129 @@ U(t) = U_A(t)\widetilde{U}(t).
 
 \section{Pulse Sequence Definitions}
 
-% TODO put in no error, AHT0, 6tau, 12/24/48 sequences
+\subsection{CORY48}
+
+
+\begin{equation*}
+\begin{aligned}
+    X, \tau, Y, 2\tau, \overline{X}, \tau, Y, 2\tau, X, \tau, Y, 2\tau,
+    X, \tau, Y, 2\tau, X, \tau, \overline{Y}, 2\tau, X, \tau, Y, 2\tau, \\
+    %
+    \overline{Y}, \tau, \overline{X}, 2\tau, Y, \tau, \overline{X}, 2\tau,
+    \overline{Y}, \tau, \overline{X}, 2\tau, \overline{Y}, \tau, \overline{X},
+    2\tau, \overline{Y}, \tau, X, 2\tau, \overline{Y}, \tau, \overline{X},
+    2\tau, \\
+    %
+    \overline{X}, \tau, Y, 2\tau, \overline{X}, \tau, \overline{Y}, 2\tau,
+    \overline{X}, \tau, Y, 2\tau, X, \tau, \overline{Y}, 2\tau, \overline{X},
+    \tau, \overline{Y}, 2\tau, X, \tau, \overline{Y}, 2\tau, \\
+    %
+    Y, \tau, \overline{X}, 2\tau, Y, \tau, X, 2\tau, Y, \tau, \overline{X}, 2\tau, \overline{Y}, \tau, X, 2\tau, Y, \tau, X, 2\tau, \overline{Y}, \tau, X, 2\tau
+\end{aligned}
+\end{equation*}
+
+\subsection{AlphaZero Pulse Sequences: No Errors}
+
+\noindent $12\tau$
+
+\begin{equation*}
+\begin{aligned}
+    X, \tau, \overline{Y}, \tau, \overline{Y}, \tau, X, \tau, \overline{Y}, \tau, \overline{Y}, \tau, \overline{Y}, \tau, X, \tau, X, \tau, \overline{Y}, \tau, X, \tau, X, \tau
+\end{aligned}
+\end{equation*}
+
+\noindent $24\tau$
+
+\begin{equation*}
+\begin{aligned}
+    \overline{Y}, \tau, \overline{Y}, \tau, \overline{X}, \tau, \overline{Y}, \tau, \overline{Y}, \tau, \overline{X}, \tau, \overline{Y}, \tau, \overline{Y}, \tau, X, \tau, X, \tau, \overline{Y}, \tau, X, \tau, \\
+    \overline{Y}, \tau, \overline{Y}, \tau, X, \tau, \overline{Y}, \tau, \overline{Y}, \tau, X, \tau, X, \tau, X, \tau, \overline{Y}, \tau, \overline{Y}, \tau, X, \tau, \overline{Y}, \tau
+\end{aligned}
+\end{equation*}
+
+\noindent $48\tau$
+
+\begin{equation*}
+\begin{aligned}
+    \overline{Y}, \tau, \overline{X}, \tau, \overline{Y}, \tau, \overline{X}, \tau, \overline{Y}, \tau, \overline{X}, \tau, Y, \tau, X, \tau, Y, \tau, X, \tau, X, \tau, Y, \tau, \\
+    Y, \tau, X, \tau, X, \tau, Y, \tau, X, \tau, X, 2\tau, \overline{X}, \tau, \overline{Y}, \tau, \overline{X}, \tau, \overline{X}, \tau, \overline{Y}, \tau, \overline{X}, \tau, \\
+    \overline{X}, \tau, \overline{Y}, \tau, \overline{X}, \tau, \overline{Y}, \tau, \overline{X}, \tau, \overline{Y}, \tau, \overline{Y}, \tau,
+    \overline{X}, \tau, \overline{X}, \tau, \overline{X}, \tau, \overline{Y}, 2\tau, \overline{Y}, \tau, \\
+    \overline{Y}, \tau, \overline{X}, \tau, \overline{Y}, \tau, \overline{Y}, \tau, X, \tau, Y, \tau, \overline{X}, \tau, Y, \tau, \overline{X}, \tau, Y, \tau
+\end{aligned}
+\end{equation*}
+
+
+\subsection{AlphaZero Pulse Sequences: Rotation Errors}
+
+\noindent $12\tau$
+
+\begin{equation*}
+\begin{aligned}
+    \tau, X, \tau, X, \tau, Y, \tau, X, \tau, X, 2\tau, \overline{X}, \tau, \overline{X}, \tau, \overline{Y}, \tau, \overline{X}, \tau, \overline{X}, \tau
+\end{aligned}
+\end{equation*}
+
+\noindent $24\tau$
+
+\begin{equation*}
+\begin{aligned}
+    \overline{Y}, \tau, X, \tau, Y, \tau, Y, \tau, X, \tau, Y, \tau, Y, \tau, \overline{X}, \tau, Y, \tau, Y, \tau, \overline{X}, \tau, Y, \tau, \\
+    Y, \tau, \overline{X}, \tau, \overline{Y}, \tau, \overline{Y}, \tau, \overline{X}, \tau, \overline{Y}, \tau, \overline{Y}, \tau, X, \tau, \overline{Y}, \tau, \overline{Y}, \tau, X, \tau, \overline{Y}, \tau
+\end{aligned}
+\end{equation*}
+
+\noindent $48\tau$
+
+\begin{equation*}
+\begin{aligned}
+    \overline{Y}, \tau, \overline{Y}, \tau, \overline{X}, \tau, \overline{X}, \tau, \overline{X}, \tau, \overline{Y}, \tau, \overline{X}, \tau, Y, \tau, \overline{X}, \tau, \overline{X}, \tau, Y, \tau, \overline{X}, \tau, \\
+    %
+    \overline{Y}, \tau, \overline{X}, \tau, \overline{Y}, \tau, \overline{X}, \tau, \overline{X}, \tau, \overline{Y}, \tau, Y, \tau, \overline{X}, \tau,
+    \overline{Y}, \tau, \overline{Y}, \tau, \overline{X}, \tau, \overline{Y}, \tau, \\
+    %
+    \overline{Y}, \tau, X, \tau, Y, \tau, Y, \tau, X, \tau, Y, \tau, Y, \tau, \overline{X}, \tau, \overline{X}, \tau, Y, \tau, \overline{X}, \tau, \overline{X}, \tau, \\
+    %
+    \overline{Y}, \tau, \overline{X}, \tau, \overline{X}, \tau, \overline{Y}, \tau, \overline{X}, \tau, \overline{X}, \tau, \overline{Y}, \tau,
+    \overline{X}, \tau, \overline{X}, \tau, \overline{Y}, \tau, \overline{X}, \tau, \overline{X}, \tau
+    %
+\end{aligned}
+\end{equation*}
+
+
+
+\subsection{AlphaZero Pulse Sequences: All Errors}
+
+\noindent $12\tau$
+
+\begin{equation*}
+\begin{aligned}
+    \overline{Y}, \tau, \overline{X}, \tau, Y, \tau, Y, \tau, \overline{X}, \tau, Y, \tau, Y, \tau, \overline{X}, \tau, \overline{Y}, \tau, \overline{Y}, \tau, \overline{X}, \tau, \overline{Y}, \tau
+\end{aligned}
+\end{equation*}
+
+\noindent $24\tau$
+
+\begin{equation*}
+\begin{aligned}
+    \overline{Y}, \tau, \overline{Y}, \tau, \overline{X}, \tau, \overline{Y}, \tau, \overline{Y}, \tau, \overline{X}, \tau, Y, \tau, \overline{X}, \tau, Y, \tau, Y, \tau, \overline{X}, \tau, Y, \tau, \\
+    %
+    X, \tau, Y, \tau, X, \tau, X, \tau, Y, \tau, X, \tau, \overline{Y}, \tau, \overline{Y}, \tau, X, \tau, \overline{Y}, \tau, \overline{Y}, \tau, X, \tau\\
+    %
+\end{aligned}
+\end{equation*}
+
+\noindent $48\tau$
+
+\begin{equation*}
+\begin{aligned}
+    X, \tau, X, \tau, \overline{Y}, \tau, X, \tau, X, \tau, \overline{Y}, \tau, \overline{X}, \tau, \overline{Y}, \tau, \overline{Y}, \tau, \overline{X}, \tau, \overline{Y}, \tau, \overline{Y}, \tau, \\
+    %
+    \overline{X}, \tau, \overline{Y}, \tau, \overline{Y}, \tau, \overline{X}, \tau, \overline{Y}, \tau, \overline{Y}, \tau, Y, \tau, Y, \tau, Y, \tau, \overline{X}, \tau, Y, \tau, Y, \tau,\\
+    %
+    \overline{X}, \tau, \overline{X}, \tau, Y, \tau, Y, \tau, \overline{X}, \tau, Y, \tau, Y, \tau, Y, \tau, \overline{X}, \tau, Y, \tau, Y, \tau, \overline{X}, \tau,\\
+    %
+    X, \tau, \overline{Y}, \tau, \overline{Y}, \tau, X, \tau, \overline{Y}, \tau, \overline{Y}, \tau, \overline{Y}, \tau, \overline{X}, \tau, \overline{X}, \tau, \overline{Y}, \tau, \overline{X}, \tau, \overline{X}, \tau\\
+    %
+\end{aligned}
+\end{equation*}
