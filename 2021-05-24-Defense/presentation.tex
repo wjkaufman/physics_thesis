@@ -2,6 +2,11 @@
 \documentclass{beamer}
 
 \usepackage[beamer]{../wjk}
+\usepackage[style=nature,
+% citestyle=authoryear,
+uniquename=init,
+backend=biber
+]{biblatex}
 \usepackage[font=footnotesize]{caption}
 
 % uncomment to only show notes in PDF
@@ -10,7 +15,7 @@
 \bibliography{../refs.bib}
 \graphicspath{{../graphics/}}
 
-\title[RL for Quantum Control in NMR]{Using Reinforcement Learning for Quantum Control in Magnetic Resonance}
+\title[RL for Hamiltonian Engineering]{Applying Reinforcement Learning to Hamiltonian Engineering}
 \author[Will Kaufman]{
 Will Kaufman\inst{1}
 % \and Benjamin Alford\inst{1}
@@ -53,13 +58,22 @@ Hanover, NH 03755, USA
 \section{Spin systems}
 
 
-\begin{frame}{NMR and spin systems}
+\begin{frame}{Spin-1/2 particles and spin systems}
 
 \begin{figure}
 \centering
-\scalebox{.7}{
-\input{../tikz/NMR-System.tex}
-}
+\begin{subfigure}{.49\textwidth}
+    \centering
+    \scalebox{.8}{
+    \input{../tikz/Single-Spin.tex}
+    }
+\end{subfigure}
+\begin{subfigure}{.49\textwidth}
+    \centering
+    \scalebox{.8}{
+    \input{../tikz/Spin-System.tex}
+    }
+\end{subfigure}
 \end{figure}
 
 % \begin{figure}
@@ -68,10 +82,9 @@ Hanover, NH 03755, USA
 % \end{figure}
 
 \[
-H_{\text{sys}} =\sum _{i}\textcolor[rgb]{0,0.69,0}{\delta_{i}} I^{i}_{z}
-    + \sum _{i,j}\textcolor[rgb]{0.82,0.01,0.11}{d_{ij}}\left( 3I^{i}_{z} I^{j}_{z} -\mathbf{I^{i}} \cdot \mathbf{I^{j}}\right)
-    = \textcolor[rgb]{0,0.69,0}{H_{\text{CS}}}
-    + \textcolor[rgb]{0.82,0.01,0.11}{H_{D}}
+H_{\text{sys}} =\sum _{i}\delta_{i} I^{i}_{z}
+    + \sum _{i,j}d_{ij}\left( 3I^{i}_{z} I^{j}_{z} -\mathbf{I^{i}} \cdot \mathbf{I^{j}}\right)
+    = H_{\text{CS}} + H_{D}
 \]
 
 
@@ -84,27 +97,73 @@ Only focusing on closed system dynamics with global control (spins are not addre
 
 \begin{frame}{Quantum control in spin systems}
 
+\begin{figure}
+\centering
+% \scalebox{.7}{
+\input{../tikz/Single-Spin-Control.tex}
+% }
+\end{figure}
+
+$B_x$ and $B_y$ are the ``knobs'' we can turn to interact with the spin system
+
 \[
     H_{\text{ctrl}}(t) = -B_x(t) \sum_i \gamma_n^i I_x^i -B_y(t) \sum_i \gamma_n^i I_y^i
 \]
 
-Can apply \textbf{$\pi/2$-pulses} that collectively rotate spins
+Can apply \textbf{$\pi/2$-pulses} that collectively rotate spins $90^\circ$
 
-\begin{figure}
-    \centering
-    \scalebox{.5}{
-    \input{../tikz/rotation-error.tex}
-    }
-    \hspace{1em}
-    \includegraphics[width=.49\textwidth]{phase_transients_viz.png}
-    % TODO make this side-by-side and larger
-\end{figure}
 
 
 \end{frame}
 
 
-\begin{frame}{Magnetic dipolar interactions}
+\section{Hamiltonian engineering}
+
+
+\begin{frame}{Hamiltonian engineering}
+
+% set up Hamiltonian engineering
+
+The system Hamiltonian is the \emph{generator} of time evolution: determines how system changes in time
+
+\[
+H(t) = H_{\text{sys}} + H_{\text{ctrl}}(t)
+\]
+
+Goal: engineer a Hamiltonian $H_{\text{target}}$ different from $H_{\text{sys}}$ using $H_{\text{ctrl}}(t)$
+
+\begin{figure}
+\centering
+\includegraphics[width=.5\textwidth]{quadcopter.jpg} \\
+From \cite{quadcopter}
+\end{figure}
+
+% \[
+% U(T) = Te^{-i \int_0^T H(t) dt } = e^{-i H_{\text{target}} T}
+% \]
+%
+% % TODO Bloch sphere example showing ideal6 or something for time suspension
+% \begin{figure}
+% $H_{\text{target}} = 0$ \\
+% \includegraphics[width=.5\textwidth]{hamiltonian_engineering.jpeg}
+% \end{figure}
+
+
+\note{
+Hamiltonian engineering used for:
+
+\begin{itemize}
+    \item Sensing (decoupling dipolar interactions while keeping chemical shift, e.g. $H_\text{eff} = \beta \textcolor[rgb]{0,0.69,0}{H_{\text{CS}}}$)
+    \item Quantum memory (decoupling all interactions, $H_\text{eff} = 0$)
+    \item Quantum simulation
+\end{itemize}
+}
+
+\end{frame}
+
+
+
+\begin{frame}{Hamiltonian engineering application: magnetic dipolar interactions}
 
 \begin{figure}
 \centering
@@ -133,60 +192,25 @@ Don't want dipolar interactions! Decoupling (removing) them would narrow spectra
 
 \end{frame}
 
-\section{Hamiltonian engineering}
-
-
-\begin{frame}{Hamiltonian engineering}
-
-% set up Hamiltonian engineering
-
-\[
-H(t) = H_{\text{sys}} + H_{\text{ctrl}}(t)
-\]
-
-Goal: ``engineer'' an effective Hamiltonian $H_{\text{eff}}$ using $H_{\text{ctrl}}(t)$
-
-\[
-U(T) = Te^{-i \int_0^T H(t) dt } = e^{-i H_{\text{eff}} T}
-\]
-
-% TODO Bloch sphere example showing ideal6 or something for time suspension
-\begin{figure}
-$H_{\text{eff}} = 0$ \\
-\includegraphics[width=.5\textwidth]{hamiltonian_engineering.jpeg}
-\end{figure}
-
-
-\note{
-Hamiltonian engineering used for:
-
-\begin{itemize}
-    \item Sensing (decoupling dipolar interactions while keeping chemical shift, e.g. $H_\text{eff} = \beta \textcolor[rgb]{0,0.69,0}{H_{\text{CS}}}$)
-    \item Quantum memory (decoupling all interactions, $H_\text{eff} = 0$)
-    \item Quantum simulation
-\end{itemize}
-}
-
-\end{frame}
-
-
 
 
 \begin{frame}{Average Hamiltonian theory (AHT)}
 
-The time-evolution operator (or propagator) characterizes time-evolution of states
-\[
-\ket{\psi(t)} = U(t)\ket{\psi(0)}, \rho(t) = U(t) \rho(0) U^\dagger(t)
-\]
-and follows the differential equation
-\[
-i \frac{d}{dt} U(t) = H(t)U(t)
-\]
-\[
-U(0) = \identity
-\]
+Given how we turn the ``knobs'' for $H_\text{ctrl}(t)$, we can calculate what Hamiltonian we engineered with AHT!
 
-The Magnus Expansion gives an exponential solution for $U(t)$
+% The time-evolution operator (or propagator) characterizes time-evolution of states
+% \[
+% \ket{\psi(t)} = U(t)\ket{\psi(0)}, \rho(t) = U(t) \rho(0) U^\dagger(t)
+% \]
+% and follows the differential equation
+% \[
+% i \frac{d}{dt} U(t) = H(t)U(t)
+% \]
+% \[
+% U(0) = \identity
+% \]
+
+The Magnus Expansion gives an exponential solution for propagator $U(t)$
 via an \emph{average Hamiltonian} $\overline{H}$ at time $t$ \cite{Blanes_2009,2010EJPh...31..907B}
 \[
 U(t) = e^{-i \overline{H} t}
@@ -203,56 +227,34 @@ The series converges rapidly when $t||H|| \ll 1$.
 
 \end{frame}
 
-\begin{frame}{AHT: interaction frame}
 
-What if $t||H||$ is large (strong pulses from $H_{\text{ctrl}}$)? Go into the interaction frame! \cite{brinkmann_2016}
+\begin{frame}{AHT: pulse sequences}
 
+If $H_{\text{ctrl}}$ is cyclic on the interval $[0,T]$ and periodic \cite{gerstein-dybowski}
 \begin{align*}
-    \frac{d}{dt} U_{\text{ctrl}}(t) &=
-        -i H_{\text{ctrl}}(t)U_{\text{ctrl}}(t) \\
-    U_{\text{ctrl}}(0) &= \identity
-\end{align*}
-
-So the Hamiltonian in the interaction frame becomes
-
-\[
-    \widetilde{H}(t) = \widetilde{H}_{\text{sys}}(t) = U_{\text{ctrl}}(t)^\dagger H_{\text{sys}} U_{\text{ctrl}}(t)
-\]
-
-\end{frame}
-
-\begin{frame}{AHT: Pulse sequences}
-
-If a pulse sequence is both cyclic and periodic \cite{gerstein-dybowski}
-\begin{align*}
-    U_{\text{ctrl}}(T) &= T\exp \left(
-        -i \int_0^{T} H_{\text{ctrl}}(t) dt \right) = \pm \identity
-         \, \text{(cyclic)} \\
+    U_{\text{ctrl}}(T) &= \pm \identity \, \text{(cyclic)} \\
+    % T\exp \left( -i \int_0^{T} H_{\text{ctrl}}(t) dt \right) =
     H_{\text{ctrl}}(t) &= H_{\text{ctrl}}(t + NT) \, \text{(periodic)}
 \end{align*}
-then the interaction frame and the lab frame coincide at multiples of
-the cycle time, and the propagator can be given by
-\[
-    U(T) = \exp\left( -i T (\overline{H}^{(0)} +
-        \overline{H}^{(1)} + \dots) \right)
-\]
+then the time evolution over $[NT, (N+1)T]$ is characterized by $\overline{H}$
 % Higher-order terms for average Hamiltonian become nasty\dots
+
+\begin{figure}[H]
+    \centering
+    \input{../tikz/WHH-4.tex}
+\end{figure}
 
 \end{frame}
 
 
-\begin{frame}{Average Hamiltonian theory (AHT)}
 
-% If\dots
-% \begin{itemize}
-%     \item Consider cyclic and periodic pulse sequences
-%     \[
-%     U_{\text{ctrl}}(T) = \identity, H_{\text{ctrl}}(t) = H_{\text{ctrl}}(t + NT)
-%     \]
-%     \item Observe system stroboscopically ($t = NT$)
-% \end{itemize}
-% \dots then system appears to evolve under an effective \emph{average} Hamiltonian.
-% TODO does this make sense in context of above?
+\begin{frame}{WAHUHA-4 pulse sequence}
+
+WAHUHA 4-pulse sequence decouples dipolar interaction to lowest-order while keeping chemical shifts \cite{PhysRevLett.20.180}
+
+\[
+H_{\text{CS}} + H_D \longrightarrow H_{\text{CS}}'
+\]
 
 \begin{figure}
 \centering
@@ -263,6 +265,8 @@ the cycle time, and the propagator can be given by
 % and include diagram showing difficulty with different time terms
 
 \note{
+WHH-4 designed with pen and paper using AHT
+
 Average Hamiltonian Theory (AHT) has been used extensively for Hamiltonian engineering. AHT lets you design pulse sequences that decouples (cancels) certain terms in the Hamiltonian.
 
 Axes in the figure show the orientation of the interaction frame, cyclic because first and last orientations are the same.
@@ -276,21 +280,46 @@ If you measure at $T$, then system will appear to evolve under $\overline{H}$.
 
 \end{frame}
 
+
+\begin{frame}{CORY48 pulse sequence}
+%
+
+CORY 48-pulse sequence (\cite{CORY1990205}) designed analytically using AHT to decouple \emph{all} interactions to second order, robust to experimental errors
+
+\[
+H_{\text{CS}} + H_D \longrightarrow 0
+\]
+
+\begin{equation*}\label{eq:CORY48}
+\begin{aligned}
+    X, \tau, Y, 2\tau, \overline{X}, \tau, Y, 2\tau, X, \tau, Y, 2\tau,
+    X, \tau, Y, 2\tau, X, \tau, \overline{Y}, 2\tau, X, \tau, Y, 2\tau \\
+    %
+    \overline{Y}, \tau, \overline{X}, 2\tau, Y, \tau, \overline{X}, 2\tau,
+    \overline{Y}, \tau, \overline{X}, 2\tau, \overline{Y}, \tau, \overline{X},
+    2\tau, \overline{Y}, \tau, X, 2\tau, \overline{Y}, \tau, \overline{X},
+    2\tau \\
+    %
+    \overline{X}, \tau, Y, 2\tau, \overline{X}, \tau, \overline{Y}, 2\tau,
+    \overline{X}, \tau, Y, 2\tau, X, \tau, \overline{Y}, 2\tau, \overline{X},
+    \tau, \overline{Y}, 2\tau, X, \tau, \overline{Y}, 2\tau \\
+    %
+    Y, \tau, \overline{X}, 2\tau, Y, \tau, X, 2\tau, Y, \tau, \overline{X}, 2\tau, \overline{Y}, \tau, X, 2\tau, Y, \tau, X, 2\tau, \overline{Y}, \tau, X, 2\tau
+\end{aligned}
+\end{equation*}
+
+\end{frame}
+
+
+
 \begin{frame}{Existing AHT approaches to Hamiltonian engineering}
-
-\begin{itemize}
-    \item WAHUHA 4-pulse sequence (\cite{PhysRevLett.20.180}), decouples dipolar interaction to lowest-order
-
-    \item CORY 48-pulse sequence (\cite{CORY1990205}) designed analytically using AHT to be robust to experimental imperfections, decouples \emph{all} interactions to second order
-\end{itemize}
 
 \begin{figure}
 \centering
-\includegraphics[width=.7\textwidth]{decay_plot.pdf}
+\includegraphics[width=.9\textwidth]{decay_plot.pdf}
 \end{figure}
 
 \note{
-WHH-4 designed with pen and paper
 
 Plot of average correlation of adamantane sample for FID, and using two pulse sequences. See how coherence time improves with dipolar decoupling! But there's still room to improve before we reach T1 limit.
 
@@ -315,16 +344,20 @@ Plot of average correlation of adamantane sample for FID, and using two pulse se
     & \hspace{13em} + \left.
     \left[\left[\widetilde{H}_{\text{sys}}(t_1), \widetilde{H}_{\text{sys}}(t_2)\right], \widetilde{H}_{\text{sys}}(t_3)\right]
     \right\}
+    %
+    % TODO fill in more if I have time...
 \end{align*}
 }
-\vspace{-1em}
-\begin{figure}
-\centering
-\includegraphics[width=0.3\textwidth]{AHT-HO-diagram.pdf}
 
-{\scriptsize From \cite{brinkmann_2016}.}
-\end{figure}
-% TODO make sure I can see this figure ^
+And higher-order terms get even worse\dots
+
+% \vspace{-1em}
+% \begin{figure}
+% \centering
+% \includegraphics[width=0.3\textwidth]{AHT-HO-diagram.pdf}
+%
+% {\scriptsize From \cite{brinkmann_2016}.}
+% \end{figure}
 
 \note{
 
@@ -340,8 +373,19 @@ Are there better approaches to Hamiltonian engineering using RL?
 
 \begin{frame}{AHT limitations}
 
+Pulse sequence design with AHT has been effective, but may be approaching its limitations
+
+~\\
+
+\pause
 
 \emph{Is there a better way?}
+
+~\\
+
+\pause
+
+Perhaps with reinforcement learning\dots
 
 \end{frame}
 
@@ -353,56 +397,73 @@ Are there better approaches to Hamiltonian engineering using RL?
 
 \begin{figure}
 \centering
-\includegraphics[width=.8\textwidth]{rl.png}
-
-From \cite{sutton2018reinforcement}.
+\begin{subfigure}{.59\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{rl.png} \\
+    From \cite{sutton2018reinforcement}
+\end{subfigure}
+\begin{subfigure}{.39\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{tetris.png}
+\end{subfigure}
 \end{figure}
+
+
+\end{frame}
+
+
+\begin{frame}{Applications of RL}
+%
+
 
 \begin{figure}
 \centering
-\includegraphics[width=.4\textwidth]{tetris.png}
+\begin{subfigure}{.54\textwidth}
+    \centering
+    \includegraphics[width=.9\textwidth]{chess.jpg}
+    % https://en.wikipedia.org/wiki/Chess#/media/File:ChessSet.jpg
+\end{subfigure}
+\begin{subfigure}{.44\textwidth}
+    \centering
+    \includegraphics[width=.9\textwidth]{space-invaders.jpg}
+    % https://upload.wikimedia.org/wikipedia/en/2/20/SpaceInvaders-Gameplay.gif
+\end{subfigure}
+\begin{subfigure}{.49\textwidth}
+    \centering
+    \includegraphics[width=.9\textwidth]{robot.png} \\
+    From \cite{gu2016deep}
+\end{subfigure}
+
 \end{figure}
 
 \end{frame}
 
 
+\begin{frame}{Policy and value functions}
+
+The policy function $\pi(s)$ tells the agent what to do in state $s$
+
+The value function $v_\pi(s)$ tells the agent what rewards it expects following state $s$
+
+\end{frame}
+
+
+
 \begin{frame}{RL for Hamiltonian engineering}
 %
 
-
-
-
-
-
-
-
-
-
-% TODO continue...
-
-
-
-
-
 \begin{itemize}
-    \item State $\to$ sequence of pulses
-    \item Action $\to$ control pulse ($\{ D, X, \overline{X}, Y, \overline{Y} \}$)
-    \item Reward $\to$ propagator fidelity
+    \item Action $\to$ delay time $\tau$ or apply $\pi/2$-pulse ($\{ D, X, \overline{X}, Y, \overline{Y} \}$)
+    \item State $\to$ sequence of pulses applied via $H_{\text{ctrl}}$
 \end{itemize}
 
-\[
-\text{fidelity} = \left(\Re{
-    \frac{\Tr{U_\text{target}^\dagger U(t)}}{\Tr{\identity}}
-}\right)
-\]
-% TODO double check if I'm using this or average gate fidelity
+\begin{figure}
+    \centering
+    \scalebox{.6}{
+    \input{../tikz/Pulse-Action.tex}
+    }
+\end{figure}
 
-Actually use log transformation of fidelity
-\[
-r = -\log(1 - \text{fidelity})
-\]
-
-% TODO add visual
 
 \note{
 With RL, potential for tailored pulse sequences for particular systems (e.g. strongly coupled vs weakly coupled), learned robustness to errors.
@@ -412,14 +473,51 @@ With RL, potential for tailored pulse sequences for particular systems (e.g. str
 \end{frame}
 
 
+\begin{frame}{Hamiltonian engineering reward function}
+%
+
+The agent is doing a good job when the propagator $U$ is close to the target propagator $U_\text{target}$
+
+\[
+\text{F}(U, U_\text{target}) = \left| \frac{\Tr{
+    U^\dagger U_\text{target}
+}}{\Tr{\identity}} \right|
+\]
+% TODO double check if I'm using this or average gate fidelity
+
+Because fidelity is between $0$ and $1$, use log transformation for reward function
+\[
+r = -\log(1 - \text{F})
+\]
+
+An order of magnitude improvement\dots
+\[
+F=0.99 \to F=0.999, \quad r=2 \to r=3
+\]
+
+\end{frame}
+
+
+
+
 \begin{frame}{AlphaZero Algorithm}
 
-Tried \emph{many} different RL algorithms for pulse sequence design, AlphaZero algorithm (\cite{Silver1140}, originally for Chess, Shogi, and Go) performed the best.
+Tried \emph{many} different RL algorithms for pulse sequence design, ultimately used AlphaZero algorithm \cite{Silver1140}
+
+Originally designed to play Chess, Shogi, and Go
+
+% \begin{figure}
+%     \centering
+%     \includegraphics[width=.3\textwidth]{lee-sedol.jpg} \\
+%     From \cite{lee-sedol}
+% \end{figure}
+
 
 \begin{figure}
 \centering
-\includegraphics[width=.8\textwidth]{az-parallel.jpeg}
-% TODO update this diagram
+\scalebox{.7}{
+\input{../tikz/AZ-Parallel.tex}
+}
 \end{figure}
 
 \note{
@@ -449,36 +547,43 @@ With tree structure, can optionally add AHT constraints to search.
 
 \begin{figure}
 \centering
-\scalebox{.6}{
-\input{../tikz/MCTS/MCTS-1.txt}
+\scalebox{.8}{
+\input{../tikz/MCTS/MCTS-1.tex}
 }
 \end{figure}
 
 \begin{figure}
 \centering
-\scalebox{.6}{
-\input{../tikz/MCTS/MCTS-2.txt}
+\scalebox{.8}{
+\input{../tikz/MCTS/MCTS-2.tex}
 }
 \end{figure}
 
 \begin{figure}
 \centering
-\scalebox{.6}{
-\input{../tikz/MCTS/MCTS-3.txt}
+\scalebox{.8}{
+\input{../tikz/MCTS/MCTS-3.tex}
 }
 \end{figure}
 
 \begin{figure}
 \centering
-\scalebox{.6}{
-\input{../tikz/MCTS/MCTS-4.txt}
+\scalebox{.8}{
+\input{../tikz/MCTS/MCTS-4.tex}
 }
 \end{figure}
 
 \begin{figure}
 \centering
-\scalebox{.6}{
-\input{../tikz/MCTS/MCTS-5.txt}
+\scalebox{.8}{
+\input{../tikz/MCTS/MCTS-5.tex}
+}
+\end{figure}
+
+\begin{figure}
+\centering
+\scalebox{.8}{
+\input{../tikz/MCTS/MCTS-6.tex}
 }
 \end{figure}
 
@@ -490,22 +595,13 @@ With tree structure, can optionally add AHT constraints to search.
 
 \begin{frame}{AlphaZero: network training}
 
-Pulse sequence data comes in from MCTS\dots
-
-    \begin{figure}
-    \centering
-    \scalebox{.6}{
-    \input{../tikz/neural_network.tex}
-    }
-    \end{figure}
-
-Network parameters $\theta$ trained with loss function
+Data collected from tree search used to train network parameters $\theta$ with loss function
 
 \[
     L(\theta) = (r_i - v_\theta(s_i))^2 - \pi_\theta(s_i) \cdot \log \mathbf{p_i} + c ||\theta||^2
 \]
 
-And updated parameters $\theta'$ are used in MCTS\dots
+And updated parameters $\theta'$ are used in tree search\dots
 
 \end{frame}
 
@@ -516,15 +612,16 @@ And updated parameters $\theta'$ are used in MCTS\dots
 % TODO Sekhar: "You don't have a lot of sequences, I'd consider explicitly listing them here"
 % TODO change here... Just list all jobs I ran/have results for
 
-Goal: decouple all interactions ($H_{\text{eff}} = 0$) in strongly coupled spin systems.
+Goal: decouple all interactions ($H_{\text{target}} = 0$) in strongly coupled spin systems.
 
 \begin{itemize}
     \item Consistency checks: $10$ identical runs using same parameters
-    \item Unconstrained tree search (\emph{``tabula rasa''}, no AHT knowledge), no errors
-    \item Constrained tree search with AHT, no errors
-    \item Constrained tree search with AHT \textbf{and} $6\tau$ refocusing, no errors
-    \item Constrained tree search, simulated errors
+    \item Unconstrained tree search (\emph{``tabula rasa''}, no AHT knowledge)
+    \item Constrained tree search with AHT
+    \item Add errors to simulations during training
 \end{itemize}
+
+Each job runs for 12 hours using 16 CPUs
 
 \note{
 
@@ -543,6 +640,10 @@ Goal: decouple all interactions ($H_{\text{eff}} = 0$) in strongly coupled spin 
 
 \note{
 $24\tau$ sequence, no errors, AHT0 and 6tau constraints.
+
+Algorithm is inherently random, leads to different performance.
+
+Lines are different lengths because jobs run for equal times, but if policies converge faster then tree search is faster.
 }
 
 \end{frame}
@@ -550,27 +651,30 @@ $24\tau$ sequence, no errors, AHT0 and 6tau constraints.
 
 \begin{frame}{Unconstrained tree search}
 %
+
 \begin{figure}[H]
     \centering
     \begin{subfigure}{.49\textwidth}
         \centering
-        \includegraphics[width=\textwidth]{hists/reward_hist-no_errors-no_constraints-12.pdf}
+        \includegraphics[width=.8\textwidth]{hists/reward_hist-no_errors-no_constraints-12.pdf}
         \caption{$12\tau$ sequence}
         \label{fig:reward_hist-no_errors-no_constraints-12}
     \end{subfigure}
     \begin{subfigure}{.49\textwidth}
         \centering
-        \includegraphics[width=\textwidth]{hists/reward_hist-no_errors-no_constraints-24.pdf}
+        \includegraphics[width=.8\textwidth]{hists/reward_hist-no_errors-no_constraints-24.pdf}
         \caption{$24\tau$ sequence}
         \label{fig:reward_hist-no_errors-no_constraints-24}
     \end{subfigure}
     \begin{subfigure}{.49\textwidth}
         \centering
-        \includegraphics[width=\textwidth]{hists/reward_hist-no_errors-no_constraints-48.pdf}
+        \includegraphics[width=.8\textwidth]{hists/reward_hist-no_errors-no_constraints-48.pdf}
         \caption{$48\tau$ sequence}
         \label{fig:reward_hist-no_errors-no_constraints-48}
     \end{subfigure}
 \end{figure}
+
+Want dark bands to move down and to the right
 
 \note{
 Distribution of ``rewards'' ($-\log(1 - \text{fidelity})$) during AlphaZero training. No constraints were applied to the tree search, and the simulated spin systems were idealized.
@@ -586,23 +690,25 @@ Distribution of ``rewards'' ($-\log(1 - \text{fidelity})$) during AlphaZero trai
     \centering
     \begin{subfigure}{.49\textwidth}
         \centering
-        \includegraphics[width=\textwidth]{hists/reward_hist-no_errors-AHT0-12.pdf}
+        \includegraphics[width=.8\textwidth]{hists/reward_hist-no_errors-AHT0-12.pdf}
         \caption{$12\tau$ sequence}
         \label{fig:reward_hist-no_errors-AHT0-12}
     \end{subfigure}
     \begin{subfigure}{.49\textwidth}
         \centering
-        \includegraphics[width=\textwidth]{hists/reward_hist-no_errors-AHT0-24.pdf}
+        \includegraphics[width=.8\textwidth]{hists/reward_hist-no_errors-AHT0-24.pdf}
         \caption{$24\tau$ sequence}
         \label{fig:reward_hist-no_errors-AHT0-24}
     \end{subfigure}
     \begin{subfigure}{.49\textwidth}
         \centering
-        \includegraphics[width=\textwidth]{hists/reward_hist-no_errors-AHT0-48.pdf}
+        \includegraphics[width=.8\textwidth]{hists/reward_hist-no_errors-AHT0-48.pdf}
         \caption{$48\tau$ sequence}
         \label{fig:reward_hist-no_errors-AHT0-48}
     \end{subfigure}
 \end{figure}
+
+Want dark bands to move down and to the right
 
 \note{
 Distribution of ``rewards'' ($-\log(1 - \text{fidelity})$) during AlphaZero training. Lowest-order AHT constraints were applied to the tree search, and the simulated spin systems were idealized.
@@ -611,30 +717,31 @@ Distribution of ``rewards'' ($-\log(1 - \text{fidelity})$) during AlphaZero trai
 \end{frame}
 
 
-
 \begin{frame}{Constrained tree search with AHT and $6\tau$ refocusing}
 %
 \begin{figure}[H]
     \centering
     \begin{subfigure}{.49\textwidth}
         \centering
-        \includegraphics[width=\textwidth]{hists/reward_hist-no_errors-6tau-12.pdf}
+        \includegraphics[width=.8\textwidth]{hists/reward_hist-no_errors-6tau-12.pdf}
         \caption{$12\tau$ sequence}
         \label{fig:reward_hist-no_errors-6tau-12}
     \end{subfigure}
     \begin{subfigure}{.49\textwidth}
         \centering
-        \includegraphics[width=\textwidth]{hists/reward_hist-no_errors-6tau-24.pdf}
+        \includegraphics[width=.8\textwidth]{hists/reward_hist-no_errors-6tau-24.pdf}
         \caption{$24\tau$ sequence}
         \label{fig:reward_hist-no_errors-6tau-24}
     \end{subfigure}
     \begin{subfigure}{.49\textwidth}
         \centering
-        \includegraphics[width=\textwidth]{hists/reward_hist-no_errors-6tau-48.pdf}
+        \includegraphics[width=.8\textwidth]{hists/reward_hist-no_errors-6tau-48.pdf}
         \caption{$48\tau$ sequence}
         \label{fig:reward_hist-no_errors-6tau-48}
     \end{subfigure}
 \end{figure}
+
+Want dark bands to move down and to the right
 
 \note{
 Distribution of ``rewards'' ($-\log(1 - \text{fidelity})$) during AlphaZero training. Lowest-order AHT constraints and refocusing all interactions every $6\tau$ were applied to the tree search, and the simulated spin systems were idealized.
@@ -642,6 +749,64 @@ Distribution of ``rewards'' ($-\log(1 - \text{fidelity})$) during AlphaZero trai
 
 \end{frame}
 
+
+\begin{frame}{Candidate pulse sequences from training}
+%
+
+\noindent $12\tau$
+\begin{equation*}
+\begin{aligned}
+    X, \tau, \overline{Y}, \tau, \overline{Y}, \tau, X, \tau, \overline{Y}, \tau, \overline{Y}, \tau, \overline{Y}, \tau, X, \tau, X, \tau, \overline{Y}, \tau, X, \tau, X, \tau
+\end{aligned}
+\end{equation*}
+
+\noindent $24\tau$
+\begin{equation*}
+\begin{aligned}
+    \overline{Y}, \tau, \overline{Y}, \tau, \overline{X}, \tau, \overline{Y}, \tau, \overline{Y}, \tau, \overline{X}, \tau, \overline{Y}, \tau, \overline{Y}, \tau, X, \tau, X, \tau, \overline{Y}, \tau, X, \tau, \\
+    \overline{Y}, \tau, \overline{Y}, \tau, X, \tau, \overline{Y}, \tau, \overline{Y}, \tau, X, \tau, X, \tau, X, \tau, \overline{Y}, \tau, \overline{Y}, \tau, X, \tau, \overline{Y}, \tau
+\end{aligned}
+\end{equation*}
+
+\noindent $48\tau$
+\begin{equation*}
+\begin{aligned}
+    \overline{Y}, \tau, \overline{X}, \tau, \overline{Y}, \tau, \overline{X}, \tau, \overline{Y}, \tau, \overline{X}, \tau, Y, \tau, X, \tau, Y, \tau, X, \tau, X, \tau, Y, \tau, \\
+    Y, \tau, X, \tau, X, \tau, Y, \tau, X, \tau, X, 2\tau, \overline{X}, \tau, \overline{Y}, \tau, \overline{X}, \tau, \overline{X}, \tau, \overline{Y}, \tau, \overline{X}, \tau, \\
+    \overline{X}, \tau, \overline{Y}, \tau, \overline{X}, \tau, \overline{Y}, \tau, \overline{X}, \tau, \overline{Y}, \tau, \overline{Y}, \tau,
+    \overline{X}, \tau, \overline{X}, \tau, \overline{X}, \tau, \overline{Y}, 2\tau, \overline{Y}, \tau, \\
+    \overline{Y}, \tau, \overline{X}, \tau, \overline{Y}, \tau, \overline{Y}, \tau, X, \tau, Y, \tau, \overline{X}, \tau, Y, \tau, \overline{X}, \tau, Y, \tau
+\end{aligned}
+\end{equation*}
+
+\end{frame}
+
+
+\begin{frame}{Experimental errors}
+
+In reality, there are imperfections\dots
+
+Rotation errors
+
+\begin{figure}
+    \centering
+    \scalebox{.6}{
+    \input{../tikz/rotation-error.tex}
+    }
+    % TODO make this side-by-side and larger
+\end{figure}
+
+Phase transients
+
+\begin{figure}
+    \centering
+    \includegraphics[width=.6\textwidth]{phase_transients_viz.png} \\
+    (a) is ideal pulse, (b) is actual pulse with phase transients
+\end{figure}
+
+
+
+\end{frame}
 
 
 \begin{frame}
@@ -685,7 +850,7 @@ Robust to resonance offset errors (trained with chemical shifts of similar magni
 
 \begin{figure}
     \centering
-    \includegraphics[width=.9\textwidth]{example-image}
+    \includegraphics[width=.9\textwidth]{robustness/rot_errors-all_errors.pdf}
 \end{figure}
 
 \end{frame}
@@ -694,7 +859,7 @@ Robust to resonance offset errors (trained with chemical shifts of similar magni
 
 \begin{figure}
     \centering
-    \includegraphics[width=.9\textwidth]{example-image}
+    \includegraphics[width=.9\textwidth]{robustness/phase_transients-all_errors.pdf}
 \end{figure}
 
 \end{frame}
@@ -703,7 +868,7 @@ Robust to resonance offset errors (trained with chemical shifts of similar magni
 
 \begin{figure}
     \centering
-    \includegraphics[width=.9\textwidth]{example-image}
+    \includegraphics[width=.9\textwidth]{robustness/offset_errors-all_errors.pdf}
 \end{figure}
 
 \end{frame}
@@ -712,7 +877,7 @@ Robust to resonance offset errors (trained with chemical shifts of similar magni
 
 \begin{figure}
 \centering
-\includegraphics[width=.9\textwidth]{decay_plot_1.pdf}
+\includegraphics[width=.9\textwidth]{decay_plot_2.pdf}
 \end{figure}
 
 \end{frame}
@@ -722,12 +887,12 @@ Robust to resonance offset errors (trained with chemical shifts of similar magni
 \begin{frame}{Summary}
 
 \begin{itemize}
-    \item Hamiltonian engineering is important class of problems in quantum physics/engineering
+    \item Hamiltonian engineering is important problem in quantum physics/engineering
     \item Decoupling dipolar interactions is important for narrowing linewidths, increasing coherence times
     \item RL is promising new tool to design new pulse sequences
     \begin{itemize}
         \item Tailored control for specific system characteristics and errors
-        \item Best-performing approach likely is a mix of RL and knowledge from AHT
+        \item Best-performing approach combination of RL and AHT
     \end{itemize}
 \end{itemize}
 
@@ -735,8 +900,9 @@ Robust to resonance offset errors (trained with chemical shifts of similar magni
 
 Next steps:
 \begin{itemize}
-    \item Further tune algorithm hyperparameters for consistency, better performance
-    \item Add additional constraints on tree search for higher-order terms in average Hamiltonian
+    \item Further tune RL algorithm hyperparameters
+    \item Improve constraints on tree search for higher-order terms in average Hamiltonian
+    \item Curriculum learning, spin simulation parameters, other target Hamiltonians
 \end{itemize}
 
 \pause
@@ -771,9 +937,36 @@ Next steps:
 
 
 
+
+
+
+
+
+
+
+
+
 \section{Appendix}
 
 
+
+\begin{frame}{AHT: interaction frame}
+
+What if $t||H||$ is large (strong pulses from $H_{\text{ctrl}}$)? Go into the interaction frame! \cite{brinkmann_2016}
+
+\begin{align*}
+    \frac{d}{dt} U_{\text{ctrl}}(t) &=
+        -i H_{\text{ctrl}}(t)U_{\text{ctrl}}(t) \\
+    U_{\text{ctrl}}(0) &= \identity
+\end{align*}
+
+So the Hamiltonian in the interaction frame becomes
+
+\[
+    \widetilde{H}(t) = \widetilde{H}_{\text{sys}}(t) = U_{\text{ctrl}}(t)^\dagger H_{\text{sys}} U_{\text{ctrl}}(t)
+\]
+
+\end{frame}
 
 \begin{frame}{AHT: Special Cases}
 
@@ -826,6 +1019,17 @@ r = 4 \iff \text{fidelity} = 0.\underline{9999}
 % \note{Can apply RL to discrete control problem (pulse sequences)
 % or continuous control (shaped pulses, continuously-varying control
 % Hamiltonians)}
+
+\end{frame}
+
+\begin{frame}{AlphaZero: neural network structure}
+
+\begin{figure}
+\centering
+\scalebox{.6}{
+\input{../tikz/neural_network.tex}
+}
+\end{figure}
 
 \end{frame}
 
