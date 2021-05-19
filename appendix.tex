@@ -8,7 +8,9 @@ This section is meant to present a few fundamental ideas that are used throughou
 In all equations that follow, $\hbar = 1$ is assumed.
 
 % state of system <-> density operator
-Given a quantum system, a general state can be represented by a density operator $\rho(t)$. The density operator encapsulates all known information about the quantum system, specifically the expectation values associated with well-defined observable. For an observable $A$, the expectation is given by
+Given a quantum system, a general state can be represented by a density operator $\rho(t)$. The density operator encapsulates all known information about the quantum system, specifically the expectation values associated with well-defined observable.
+The density operator is Hermitian ($\rho^\dagger = \rho$) and $\Tr(\rho) = 1$.
+For an observable $\hat{A}$, there is a corresponding Hermitian operator $A$, with the expectation is given by
 \begin{equation}\label{eq:measure}
     \langle A \rangle = \Tr{\rho A}
 \end{equation}

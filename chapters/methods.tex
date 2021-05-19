@@ -33,7 +33,7 @@ the pulse operators $\{ U_X, U_{\overline{X}}, U_Y, U_{\overline{Y}} \}$ can be 
 Because the (random) choices of chemical shift and dipolar coupling strengths affect the dynamics of the spin system, an ensemble of spin systems was used both in the reinforcement learning algorithm and in evaluation of pulse sequences.
 Each spin system used different random chemical shift and dipolar coupling strengths drawn from the same distributions (i.e. the dipolar strength parameter $D$ was the same for all systems). If experimental imperfections were also included, then each system also used different random errors.
 It was found that using ensembles of 50 spin systems reduced the variance in fidelity enough while keeping runtimes relatively short, so
-the reinforcement learning algorithm used $50$ spin systems and evaluation used $100$ spin systems.
+the reinforcement learning algorithm used 50 spin systems and evaluation used 100 spin systems.
 
 To assess the performance of a pulse sequence for a Hamiltonian engineering problem, the pulse sequence propagator is compared to the target propagator given by
 \[
