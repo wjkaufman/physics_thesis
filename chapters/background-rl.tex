@@ -38,7 +38,7 @@ The \emph{return} at timestep $t$ is defined as
 \begin{equation}\label{eq:return}
     G_t \defeq \sum_{k=t}^T \gamma^{k-t} R_k, \quad \gamma \in [0,1)
 \end{equation}
-or the total discounted rewards until the end of the episode at timestep $T$. If the episode has finitely many timesteps the discount factor is often ignored. The \emph{state-value function} (or simply value function) is the expected return from a particular state while following a policy $\pi$
+or the total discounted rewards until the end of the episode at timestep $T$. If the episode has a finite number of timesteps the discount factor is often ignored. The \emph{state-value function} (or simply value function) is the expected return from a particular state while following a policy $\pi$
 \begin{equation}\label{eq:state_value}
     v_\pi(s) \defeq \E[G_t | S_t = s]
 \end{equation}
@@ -123,4 +123,4 @@ Pulse sequence design for Hamiltonian engineering has also been approached using
 
 \subsubsection{AlphaZero}
 
-AlphaZero is a model-based, off-policy, actor-critic algorithm that was originally developed to play Chess, shogi, and Go \cite{Silver1140}. There are two major components to the algorithm: self-play and neural network training. Because AlphaZero is a model-based algorithm, the agent is able to consider the state space without necessarily interacting with the environment. The agent plays many episodes against itself, using a neural network to estimate a policy $\pi(s)$ and a value function $v_\pi(s)$. During self-play, the agent rolls out many possible state-action trajectories, chooses an action that maximizes the expected reward, and collects data on the state, which actions it considered, and the final reward at the end of the episode. The collected data in turn is used to train the policy and value neural networks $\{ \pi, v_\pi \}$.
+AlphaZero is a model-based, off-policy, actor-critic algorithm that was originally developed to play chess, shogi, and Go \cite{Silver1140}. There are two major components to the algorithm: self-play and neural network training. Because AlphaZero is a model-based algorithm, the agent is able to consider the state space without necessarily interacting with the environment. The agent plays many episodes against itself, using a neural network to estimate a policy $\pi(s)$ and a value function $v_\pi(s)$. During self-play, the agent rolls out many possible state-action trajectories, chooses an action that maximizes the expected reward, and collects data on the state, which actions it considered, and the final reward at the end of the episode. The collected data in turn is used to train the policy and value neural networks $\{ \pi, v_\pi \}$.

@@ -91,8 +91,8 @@ See figure~\ref{fig:actions} for the relationship between rf field amplitudes, u
     \label{fig:actions}
 \end{figure}
 
-In principle, the actions could also be defined as pulses without a $\tau$ delay of free evolution and a delay action. However, in practice this leads to worse performance: for episodes with a fixed number of timesteps, the actions taken influence how much time elapses in the pulse sequence. As a result, the ``optimal'' performance is found to minimze the elapsed time by applying alternating pulses (e.g. $X, \overline{X}, X, \overline{X}, \dots$).
-The unitary operator fidelity generally improves as the time interval decreases, so this is an unhelpful solution when we ideally want high fidelity at longer time intervals.
+In principle, the actions could also be defined as pulses without a $\tau$ delay of free evolution and a delay action. However, in practice this leads to worse performance: for episodes with a fixed number of timesteps, the actions taken influence how much time elapses in the pulse sequence. As a result, the ``optimal'' performance is found to minimize the elapsed time by applying alternating pulses (e.g. $X, \overline{X}, X, \overline{X}, \dots$).
+The unitary operator fidelity generally improves as the time interval decreases, so this is an unhelpful solution when pursuing high fidelity at longer time intervals.
 
 \subsection{State Space and Representation}
 
@@ -179,6 +179,7 @@ Randomly sample an action $a_k$ from the distribution $\{ p_k \}$ \;
 \end{figure}
 
 The agent will repeat the process of MCTS and action sampling until it has constructed a pulse sequence with the desired length. The agent records search statistics from each step of the pulse sequence construction: the state $s_i$, the empirical probability distribution of actions explored from MCTS, and the final reward $r$ of the pulse sequence from simulation. These statistics are then used to train the policy and value neural networks $(\pi, v)$.
+% TODO make sure this doesn't drop off on new page...
 
 
 \begin{algorithm}[H]
@@ -243,11 +244,11 @@ Both GRUs and LSTMs are capable of mapping variable-length input to a fixed-leng
 
 \section{AHT-Constrained Search}\label{sec:AHT-constraints}
 
-\smash{
+% \smash{
 Because actions are explored and selected via tree search, additional constraints can be added to prune branches of the tree that are unlikely to yield high rewards.
 This is akin to adding ``rules of the game'' that determine which actions can or cannot be applied.
 Thankfully, AHT gives us a straightforward constraint so that pulse sequences have the desired lowest-order average Hamiltonian $\overline{H}^{(0)}$.
-}
+% }
 
 When the target effective Hamiltonian $H_\text{eff} = 0$, all interactions must be decoupled. If the toggling frame is defined so that $\widetilde{I}_z(t) = I_z$ and $\widetilde{I}_z(t) = -I_z$ for equal durations, then the lowest-order average $\overline{I}_z^{(0)} = 1/2(I_z - I_z) = 0$. In general, any term containing $I_z$ will average to zero to lowest order when $\widetilde{I}_z$ is toggled for equal time along opposite axes (i.e. equal time on $+x$ and $-x$, $+y$ and $-y$, and $+z$ and $-z$-axes).
 Doing so would decouple the chemical shift term $H_\text{CS}$ to lowest order.

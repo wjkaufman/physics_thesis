@@ -1,16 +1,16 @@
 %!TEX root=thesis.tex
 \chapter{Results}
 
-To analyze the performance of the AlphaZero algorithm for constructing pulse sequences, different sets of algorithm hyperparameters and system parameters were tested. AlphaZero was first run with no additional constraints to the tree search (i.e. the state space was all possible sequences of pulses), and the simulated spin systems were idealized (i.e. delta-pulses and no experimental errors). Additional constraints were then added to the tree search while keeping idealized spin system simulations. Finally, experimental imperfections were introduced to the simulations.
+To analyze the performance of the AlphaZero algorithm for constructing pulse sequences, different sets of algorithm hyperparameters and system parameters were tested. AlphaZero was first run with no additional constraints to the tree search (i.e. the state space contains all possible sequences of pulses), and the simulated spin systems were idealized (i.e. delta-pulses and no experimental errors). Additional constraints were then added to the tree search while keeping idealized spin system simulations. Finally, experimental imperfections were introduced to the simulations.
 
 
 
-As a preliminary consistency check, the AlphaZero algorithm was run with identical settings $10$ times, and the resulting distribution of rewards during training was recorded. In figure~\ref{fig:az-consistency}, it is evident that most of the runs perform similarly, but a few significantly outperform the rest, achieving over an order of magnitude improvement in fidelity. Furthermore, most of the runs plateau after about $5000$ training steps, indicating the policy network converged to a particular policy. The inconsistent performance across identical runs could be improved by further tuning the algorithm hyperparameters, such as the amount of noise added to the policy, increasing the exploration rate in the MCTS, or adjusting the relative rate of training to data collection.
+As a preliminary consistency check, the AlphaZero algorithm was run with identical settings 10 times, and the resulting distribution of rewards during training was recorded. In figure~\ref{fig:az-consistency}, it is evident that most of the runs perform similarly, but a few significantly outperform the rest, achieving over an order of magnitude improvement in fidelity. Furthermore, most of the runs plateau after about 5000 training steps, indicating the policy network converged to a particular policy. The inconsistent performance across identical runs could be improved by further tuning the algorithm hyperparameters, such as the amount of noise added to the policy, increasing the exploration rate in the MCTS, or adjusting the relative rate of training to data collection.
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=.7\textwidth]{az-consistency.pdf}
-    \caption{The mean reward ($-\log(1-\text{fidelity})$) seen during training for $10$ identical runs of the AlphaZero algorithm searching for $24\tau$ sequences. Most runs converge to similar mean fidelities, but a few runs have orders of magnitude better performance.}
+    \caption{The mean reward ($-\log(1-\text{fidelity})$) seen during training for 10 identical runs of the AlphaZero algorithm searching for $24\tau$ sequences. Most runs converge to similar mean fidelities, but a few runs have orders of magnitude better performance.}
     \label{fig:az-consistency}
 \end{figure}
 
@@ -48,11 +48,11 @@ And for the 48-pulse sequence (figure~\ref{fig:reward_hist-no_errors-no_constrai
 The worsening performance as the pulse sequence length increases is understandable. For an $n$-pulse sequence with $a$ possible actions, there are $a^n$ possible pulse sequences, and $\frac{a^{n+1} - 1}{a-1}$ possible states%
 \footnote{
 This can be seen by counting how many subsequences of length $k$ there are ($a^k$), and adding these for $k = 1, \dots, n$.
-}
-If $n=12$, then there are over $244$ million pulse sequences and over $300$ million states.
+}.
+If $n=12$, then there are over 244 million pulse sequences and over 300 million states.
 But for $n=24$, then the number of pulse sequences jumps to $6 \times 10^{16}$, and for $n=48$ there are $3.6 \times 10^{33}$. Because AlphaZero begins training \emph{tabula rasa}, none of the states in the astronomically large state space are preferred by the agent, so it begins with a purely random search.
 Furthermore, rewards are only received once an \emph{entire pulse sequence} has been constructed. The sparse reward signal (which is the sole driver of learning in RL algorithms) therefore makes it difficult for the agent to associate actions with rewards and learn an effective policy.
-This is known as the ``credit assignment problem'' and is an active area of research both in theoretical and applied RL \cite{arumugam2021informationtheoretic}.
+This is known as the ``credit assignment problem'' and is an active area of research both in theoretical and applied RL (\cite{arumugam2021informationtheoretic}).
 
 For example, suppose you needed to pass a test with $100$ questions, and could re-take the test as many times as you want. It would take many more tries to pass if the only feedback you received was your overall score on the test, as opposed to your score on each question.
 
@@ -181,7 +181,7 @@ This is not entirely unexpected however: the spin systems during training were i
 \end{figure}
 
 Similarly, the pulse sequences are much less robust to phase transient error (figure~\ref{fig:phase_transients-no_errors}), or
-resonance offset error (figure~\ref{fig:offset_errors-no_errors}). Interestingly, the $12\tau$ sequence seems to be highly robust to phaes transient error, but the fidelity is comparably worse overall.
+resonance offset error (figure~\ref{fig:offset_errors-no_errors}). Interestingly, the $12\tau$ sequence seems to be highly robust to phase transient error, but the fidelity is comparably worse overall.
 % or increasing th delay $\tau$ between pulses (\ref{fig:tau_delay-no_errors}).
 
 

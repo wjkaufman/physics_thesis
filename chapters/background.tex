@@ -8,10 +8,10 @@ Some physicists believe that quantum physics is on the cusp of a ``second quantu
 Hamiltonian engineering is an important problem in the effort to more finely control quantum systems.
 Every system has a Hamiltonian that characterizes its dynamics, and as the name suggests, Hamiltonian engineering seeks to ``engineer'' a different Hamiltonian so that the system's dynamics are altered. Hamiltonian engineering has been applied to NMR spectroscopy by engineering Hamiltonians without certain interactions that cause noisier measurements. Engineering Hamiltonians can also be used for sensing (where certain interactions are sensitive to external fields while being robust to decoherence) and for quantum simulation (where novel Hamiltonians must be implemented in existing systems).
 
-Two specific examples where Hamiltonian engineering can be readily applied include NMR spectroscopy and bath engineering. In NMR spectroscopy, the collective magnetization of spin-1/2 protons in a sample can be measured, and the resulting signal informs the particular chemical environments the spins are in. However, for solid-state samples, magnetic dipolar interactions between spins lead to state decoherence
+Two specific examples where Hamiltonian engineering can be readily applied include NMR spectroscopy and bath engineering. In NMR spectroscopy, the collective magnetization of spin-1/2 protons in a sample can be measured, and the resulting signal informs the particular chemical environments in which the spins exist. However, for solid-state samples, magnetic dipolar interactions between spins lead to state decoherence
 and overwhelm the signal and inhibit our ability to learn about the chemical environments. However, various methods have been developed to effectively \emph{decouple} the magnetic dipolar interactions between spins, improving the signal drastically.
 
-Magnetic dipole interactions between a central spin and many surrounding bath spins (such as an NV center surrounded by many P1 centers) also leads to unwanted effects, in this case a decay of the central spin coherence time. Long coherence times for the system of interest are desirable, and finding ways to decouple interactions between the central spin and bath spins would help that endeavor.
+Magnetic dipole interactions between a central spin and many surrounding bath spins (such as an NV center surrounded by many P1 centers) also lead to unwanted effects, in this case a decay of the central spin coherence time. Long coherence times for the system of interest are desirable, and finding ways to decouple interactions between the central spin and bath spins would help that endeavor.
 
 \section{Spin-1/2 Systems and Nuclear Magnetic Resonance}
 
@@ -103,7 +103,7 @@ then this field can be thought of as two counter-rotating magnetic fields whose 
 % TODO and also get an equation I can reference that talks about
 % TODO TWO control amplitudes for X and Y
 %
-In a frame rotating about the z-axis with frequency $\omega_0$, it looks like there a fixed magnetic field from one of the rotating fields and a counter-rotating field with frequency $2\omega_0$. If we ignore the high-frequency field (i.e. the rotating wave approximation), the spins in the rotating frame see a fixed magnetic field at an azimuthal angle $\phi$ in the xy-plane, and begin to precess about the new field.
+In a frame rotating about the z-axis with frequency $\omega_0$, it looks like there is a fixed magnetic field from one of the rotating fields and a counter-rotating field with frequency $2\omega_0$. If we ignore the high-frequency field (i.e. the rotating wave approximation), the spins in the rotating frame see a fixed magnetic field at an azimuthal angle $\phi$ in the xy-plane, and begin to precess about the new field.
 In the rotating frame, the rf Hamiltonian effectively becomes
 \begin{equation}\label{eq:nmr-ham-rf-rotating}
     \widetilde{H}_\text{rf}(t) = u_1(t) \omega_1 \sum_j I_x^{(j)} + u_2(t) \omega_1 \sum_j I_y^{(j)}
@@ -117,7 +117,7 @@ In particular, if $t = \frac{\pi}{2 \omega_1}$, the spins can be rotated from th
 From this point forward, we will work in the rotating frame unless otherwise specified.
 % TODO mention the pulse frequency to rotate about z?
 
-In NMR experiments, the procedure generally goes as follows
+In NMR experiments, the general procedure is the following:
 \begin{enumerate}
     \item Place the sample in the main magnetic field and wait for the sample to reach thermal equilibrium.
     \item Apply a $\pi/2$-pulse to rotate the spins into the xy-plane.
@@ -184,7 +184,7 @@ In contrast, motional averaging does not occur in solid-state NMR. Because the s
 % Closely related to creating a desired unitary transformation $U(T)$,
 Hamiltonian engineering is an important problem within the broader field of quantum control. The goal of Hamiltonian engineering is to choose control parameters $\{u_k(t)\}$ so that, when measured stroboscopically\footnote{Stroboscopically means measured at regular intervals $0, T, 2T, \dots$.}, the system appears to evolve under a target effective Hamiltonian $H_{\text{eff}}$ instead of the system Hamiltonian $H_{\text{sys}}$. In most cases the target Hamiltonian is time-independent.
 
-If we are able to engineer an effective Hamiltonian, then we have also created a unitary transformation $U(T) = \exp{-i H_{\text{eff}} T}$. And conversely, if we have implemented a unitary transformation $U(T)$, then there exists an effective time-independent Hamiltonian that characterizes the dynamics over time $T$ (note that this Hamiltonian isn't unique).
+If we are able to engineer an effective Hamiltonian, then we have also created a unitary transformation $U(T) = \exp{-i H_{\text{eff}} T}$. And conversely, if we have implemented a unitary transformation $U(T)$, then there exists an effective time-independent Hamiltonian that characterizes the dynamics over time $T$ (note that this Hamiltonian is not unique).
 
 \subsection{Average Hamiltonian Theory}\label{sec:AHT}
 
@@ -198,7 +198,7 @@ As the name suggests, average Hamiltonian theory lets us express the propagator 
 \[
 U(t) = \exp\left\{-i \overline{H}(t) t \right\}
 \]
-You might look at the above equation and say ``$\overline{H}(t)$ isn't time-independent--it is explicitly dependent on time!'' It is true that $\overline{H}(t)$ itself isn't time-independent, but \emph{given} a time $T$, we can find $\overline{H}(T)$ so that the propagator $U(T)$ can be expressed \emph{as though} the Hamiltonian were $\overline{H}(T)$ for the time interval $t \in [0, T]$.
+The above equation seems to suggest that $\overline{H}(t)$ is not time-independent--it is explicitly dependent on time! It is true that $\overline{H}(t)$ itself is not time-independent, but \emph{given} a time $T$, we can find $\overline{H}(T)$ so that the propagator $U(T)$ can be expressed \emph{as though} the Hamiltonian were $\overline{H}(T)$ for the time interval $t \in [0, T]$.
 
 How then do we determine the average Hamiltonian? One approach is to use the Magnus Expansion \cite{Blanes_2009,2010EJPh...31..907B}. Given the propagator differential equation (equation~\ref{eq:propagator-de}), the Magnus Expansion begins with the ansatz that an exponential solution exists
 \[
@@ -237,7 +237,7 @@ This then gives us a series expansion for the average Hamiltonian $\overline{H}(
     \left[\left[H(t_1), H(t_2)\right], H(t_3)\right]
     \right\}
 \end{align}
-Although there appears to be a simple pattern to the terms, this is not the case. Higher-order terms can be determined through a recursive relationship or through particularly nasty explicit forms.
+Although there appears to be a simple pattern to the terms, this is not the case. Higher-order terms can be determined through a recursive relationship or through particularly complicated explicit forms.
 
 The Magnus Expansion converges when
 \begin{equation}\label{eq:AHT-convergence}
@@ -251,7 +251,7 @@ H(t) = H_{\text{int}} + H_{\text{rf}}(t) \implies \widetilde{H}(t) = \widetilde{
 \]
 In the toggling frame, the Magnus Expansion can again be used to determine the average Hamiltonian $\overline{\widetilde{H}}(t)$, but using $\widetilde{H}_{\text{int}}(t)$ in place of $H(t)$ in equation~\ref{eq:AHT-term-0}. The upshot is that by going into the toggling frame, the smaller-norm average Hamiltonian converges for longer time values.
 
-At this point, the identification of an ``average Hamiltonian'' does not give us that much: $\overline{H}(t)$ might be different at different times, and it may be the average Hamiltonian in the \emph{toggling} frame instead of the lab frame. To address these concerns, we can require that $H_\text{rf}(t)$ be ``cyclic'' and ``periodic.'' For a fixed time $T>0$,
+At this point, the identification of an ``average Hamiltonian'' is of little benefit: $\overline{H}(t)$ might be different at different times, and it may be the average Hamiltonian in the \emph{toggling} frame instead of the lab frame. To address these concerns, we can require that $H_\text{rf}(t)$ be ``cyclic'' and ``periodic.'' For a fixed time $T>0$,
 \begin{align}\label{eq:AHT-constraints}
     U_{\text{rf}}(T) &= \identity & \quad \text{(cyclic)} \\
     H_{\text{rf}}(t + NT) &= H_{\text{rf}}(t), N \in \Z & \quad \text{(periodic)}
@@ -296,7 +296,7 @@ U_{\text{WHH-4}} =
     \exp\{-i H_{\text{int}} \tau\}
 \]
 
-Now comes the fun bit. Using AHT, we will express $U_{\text{WHH-4}} = \exp\{-i \overline{H}_{\text{WHH-4}} 6\tau\}$ and find an approximation for the average Hamiltonian $\overline{H}_{\text{WHH-4}}$. The toggling frame propagator as well as the toggled $I_z^{(j)}$ and $I_z^{(j)}I_z^{(k)}$ terms are determined by the four pulses in the sequence. For $t \in [0, \tau]$, the toggling frame corresponds to the lab frame.
+Now, using AHT, we express $U_{\text{WHH-4}} = \exp\{-i \overline{H}_{\text{WHH-4}} 6\tau\}$ and find an approximation for the average Hamiltonian $\overline{H}_{\text{WHH-4}}$. The toggling frame propagator as well as the toggled $I_z^{(j)}$ and $I_z^{(j)}I_z^{(k)}$ terms are determined by the four pulses in the sequence. For $t \in [0, \tau]$, the toggling frame corresponds to the lab frame.
 But after the $X$ pulse, the toggling frame propagator is now $U_X$, so the toggled spin terms are $\widetilde{I_z}^{(j)} = U_X^\dagger I_z^{(j)} U_X = I_y^{(j)}$
 \footnote{
 This can be seen by noting that $\exp\{-i \theta I_x\} = \exp\{-i \theta/2 \sigma_x\} = \cos(\theta/2) \identity - i\sin(\theta/2) \sigma_x$, then using the commutation relations for Pauli matrices to simplify. As a rule of thumb, $U_X$ rotates the lab frame's y-axis into the z-axis so that $\widetilde{I}_z = I_y$, and $U_Y$ rotates z into y.
