@@ -14,7 +14,7 @@ This section describes the simulation methods and RL algorithm used in this work
 Isolated spin systems composed of a small number of spins can be easily simulated on a classical computer. Because the Hilbert space grows exponentially as the spins increase ($2^N$ basis states for $N$ spins and $2^{2N}$ matrix elements for operators), it quickly becomes impractical to simulate large numbers of spins. To balance the need to capture dipole interactions and to decrease simulation time, $N=3$ spin-1/2 systems were used in the reinforcement learning algorithm, and $N=4$ spin-1/2 systems were used to evaluate pulse sequences. The QuTiP Python package was used for all simulations \cite{Johansson_2013}.
 
 In any real physical system, system-environment interactions are present and the spin system must be treated as open, but for simulation purposes the system is assumed to be isolated.
-Consequently, the dynamics are given by unitary time-evolution operators. In principle, though, simulations of open quantum systems could be used with reinforcement learning algorithms, and may in fact lead to better control by accounting for non-unitary system dynamics.
+Consequently, the dynamics are given by unitary time-evolution operators. In principle, simulations of open quantum systems could be used with reinforcement learning algorithms, and may in fact lead to better control by accounting for non-unitary system dynamics.
 
 For each simulated $N$-spin system, the chemical shift strengths $\{\delta_j\}_j$ and the dipolar coupling strengths $\{d_{jk}\}_{j,k}$ are drawn from normal distributions
 \begin{align*}
@@ -96,7 +96,7 @@ The unitary operator fidelity generally improves as the time interval decreases,
 
 \subsection{State Space and Representation}
 
-The ``state'' can refer to the physics notion of state--such as the the density operator $\rho$ of a quantum system--or the RL notion of state--a particular context in which the agent must choose an action. They are closely related but not the same.
+The ``state'' can refer to the physics notion of state--such as the density operator $\rho$ of a quantum system--or the RL notion of state--a particular context in which the agent must choose an action. They are closely related but not the same.
 The ``physical'' state space is comprised of every reachable state $\rho(t)$ of the spin system given an initial thermalized state, the free evolution dynamics from $H_{\text{int}}$, and the control Hamiltonian given by the rf field $H_{\text{rf}}$.
 In an RL context, however, the agent does not observe the complete state of the system at each point in time. Instead, the agent only knows the sequence of actions that have been performed on the system and any measurements that have been made on the system.
 Therefore, a more representative state space for the RL problem is all possible sequences of actions performed on the system.%
@@ -111,7 +111,7 @@ This is more ``realistic'' in the sense that the agent only knows what the exper
 
 % The fidelity approaches $1$ as the unitaries get ``closer'' and the average Hamiltonian approaches the target Hamiltonian, and approaches $0$ as the unitaries get further apart.
 As mentioned above, the fidelity function takes on values between $0$ and $1$, where values close to $1$ are desirable.
-However, a tenfold improvement in performance doesn't correspond to a tenfold increase in fidelity (take for instance a fidelity of 0.9 compared to 0.99). A suitable reward function is then calculated by
+However, a tenfold improvement in performance doesn't correspond to a tenfold increase in fidelity (for instance a fidelity of 0.9 compared to 0.99). A suitable reward function is then calculated by
 \begin{equation}
     r = -\log(1-\text{fidelity}(U_\text{actual}, U_\text{target}) + \epsilon)
 \end{equation}
@@ -119,7 +119,7 @@ where $\epsilon>0$ ensures the reward isn't infinite.
 
 \subsection{AlphaZero Algorithm}
 
-As mentioned in the introduction, the AlphaZero algorithm has two main components: self-play and neural network training. The original publication and its supplementary materials has a complete description of the algorithm \cite{Silver1140}, but pseudocode is presented below as well.
+As mentioned in the introduction, the AlphaZero algorithm has two main components: self-play and neural network training. The original publication and its supplementary materials have a complete description of the algorithm \cite{Silver1140}, but pseudocode is presented below as well.
 
 During self-play, the agent iteratively constructs a pulse sequence by performing Monte Carlo Tree Search (MCTS) from the current state. From state $s_i$ (which is represented by the sequence of actions performed so far, $s_i = (a_0, \dots, a_i)$), the agent stochastically samples actions based on the prior probability from the policy $\pi$, the number of times the agent has already ``visited'' that action, and the average estimated reward (or value) of that branch of the tree. The agent is more likely to select actions that have a higher prior probability, a lower visit count, and a higher average reward. The exact formula for selection is given in algorithm~\ref{al:mcts},
 and is a variant of the PUCT algorithm from \cite{Rosin:2011uu}.

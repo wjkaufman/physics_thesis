@@ -9,7 +9,7 @@ Hamiltonian engineering is an important problem in the effort to more finely con
 Every system has a Hamiltonian that characterizes its dynamics, and as the name suggests, Hamiltonian engineering seeks to ``engineer'' a different Hamiltonian so that the system's dynamics are altered. Hamiltonian engineering has been applied to NMR spectroscopy by engineering Hamiltonians without certain interactions that cause noisier measurements. Engineering Hamiltonians can also be used for sensing (where certain interactions are sensitive to external fields while being robust to decoherence) and for quantum simulation (where novel Hamiltonians must be implemented in existing systems).
 
 Two specific examples where Hamiltonian engineering can be readily applied include NMR spectroscopy and bath engineering. In NMR spectroscopy, the collective magnetization of spin-1/2 protons in a sample can be measured, and the resulting signal informs the particular chemical environments in which the spins exist. However, for solid-state samples, magnetic dipolar interactions between spins lead to state decoherence
-and overwhelm the signal and inhibit our ability to learn about the chemical environments. However, various methods have been developed to effectively \emph{decouple} the magnetic dipolar interactions between spins, improving the signal drastically.
+and overwhelm the signal, inhibiting our ability to learn about the chemical environments. However, various methods have been developed to effectively \emph{decouple} the magnetic dipolar interactions between spins, improving the signal drastically.
 
 Magnetic dipole interactions between a central spin and many surrounding bath spins (such as an NV center surrounded by many P1 centers) also lead to unwanted effects, in this case a decay of the central spin coherence time. Long coherence times for the system of interest are desirable, and finding ways to decouple interactions between the central spin and bath spins would help that endeavor.
 
@@ -48,7 +48,7 @@ The Zeeman interaction $H_Z$ captures the coupling of spins to the main external
 \footnote{The external magnetic field $B_0$ varies slightly from spin to spin due to experimental imperfections, but those field inhomogeneities are ignored.}
 The chemical shift interaction $H_{\text{CS}}$ captures the local magnetic field differences for each spin due to the electronic structure surrounding the spin. The dipolar interaction between spins is represented by $H_D$. Finally, $H_\text{rf}(t)$ is the interaction between the spins and a time-varying transverse magnetic field along the x-axis.%
 \footnote{The reason it is labeled as $H_\text{rf}$ is because the field's oscillation frequency is matched to the Larmor frequency $\omega_0$ which is in the radiofrequency range.}
-The time-independent terms in the Hamiltonian ($H_Z + H_{\text{CS}} + H_D$) are collectively referred to as the internal Hamiltonian or $H_{\text{int}}$.
+The time-independent terms in the Hamiltonian ($H_Z + H_{\text{CS}} + H_D$) are collectively referred to as the internal Hamiltonian $H_{\text{int}}$.
 
 % % TODO include this if I have time?
 % \begin{figure}[H]
@@ -124,7 +124,7 @@ In NMR experiments, the general procedure is the following:
     \item Apply a pulse sequence repeatedly so the system evolves under an engineered Hamiltonian.
     \item Measure the oscillating induced emf due to the precessing spins. This signal is called the free induction decay (FID).
 \end{enumerate}
-The Fourier transform of the FID gives a spectrum of the sample, including chemical shift frequencies $\delta_i$ of different spin species. There are many, \emph{many} other variations on NMR experiments, but that is the basic methodology. See figure~\ref{fig:NMR-Pulse-Train} for a diagram showing a typical NMR experiment, including the ``pulse train'' that is applied to the system.
+The Fourier transform of the FID gives a spectrum of the sample, including chemical shift frequencies $\delta_i$ of different spin species. There are \emph{many} other variations on NMR experiments, but that is the basic methodology. See figure~\ref{fig:NMR-Pulse-Train} for a diagram showing a typical NMR experiment, including the ``pulse train'' that is applied to the system.
 
 \begin{figure}[H]
     \centering
@@ -184,7 +184,7 @@ In contrast, motional averaging does not occur in solid-state NMR. Because the s
 % Closely related to creating a desired unitary transformation $U(T)$,
 Hamiltonian engineering is an important problem within the broader field of quantum control. The goal of Hamiltonian engineering is to choose control parameters $\{u_k(t)\}$ so that, when measured stroboscopically\footnote{Stroboscopically means measured at regular intervals $0, T, 2T, \dots$.}, the system appears to evolve under a target effective Hamiltonian $H_{\text{eff}}$ instead of the system Hamiltonian $H_{\text{sys}}$. In most cases the target Hamiltonian is time-independent.
 
-If we are able to engineer an effective Hamiltonian, then we have also created a unitary transformation $U(T) = \exp{-i H_{\text{eff}} T}$. And conversely, if we have implemented a unitary transformation $U(T)$, then there exists an effective time-independent Hamiltonian that characterizes the dynamics over time $T$ (note that this Hamiltonian is not unique).
+If we are able to engineer an effective Hamiltonian, then we have also created a unitary transformation $U(T) = \exp{-i H_{\text{eff}} T}$. Conversely, if we have implemented a unitary transformation $U(T)$, then there exists an effective time-independent Hamiltonian that characterizes the dynamics over time $T$ (note that this Hamiltonian is not unique).
 
 \subsection{Average Hamiltonian Theory}\label{sec:AHT}
 
@@ -214,7 +214,7 @@ The first few terms are presented below
     \Omega_2(t) &= -\frac{1}{2} \int_0^t dt_1 \int_0^{t_1} dt_2 [H(t_1), H(t_2)] \\
     \vdots
 \end{align*}
-Derivations of the the Magnus Expansion can be found in
+Derivations of the Magnus Expansion can be found in
 \cite{gerstein-dybowski,Blanes_2009,2010EJPh...31..907B}.
 
 From $\Omega(t)$, an expression for the average Hamiltonian can be derived by making the comparison
@@ -243,7 +243,7 @@ The Magnus Expansion converges when
 \begin{equation}\label{eq:AHT-convergence}
     \int_0^t dt_1 ||H(t)||_2 \ll 1
 \end{equation}
-which effectively requires that we consider timescales much smaller than the natural timescale of the Hamiltonian.\footnote{A much more detailed overview regarding convergence can be found in \cite{Blanes_2009}.} This is also written more succintly as $||H||t \ll 1$.
+which effectively requires that we consider timescales much smaller than the natural timescale of the Hamiltonian.\footnote{A much more detailed overview regarding convergence can be found in \cite{Blanes_2009}.} This is also written more succinctly as $||H||t \ll 1$.
 
 Because convergence requires the norm of the Hamiltonian to be small, there are cases when working in the interaction frame of a strong interaction is desirable. In NMR, going from the rotating frame (of the Zeeman interaction) to the interaction frame of the rf field removes the strong $H_\text{rf}$ term from the nuclear spin Hamiltonian. This interaction frame is commonly called the ``toggling frame.''
 \[
@@ -271,7 +271,7 @@ The AHT framework permits continuous control via the rf field, but we will focus
 where $t_p$ is the pulse duration. Pulses along the $y$-axis swap the $I_x$ operator with $I_y$, and reverse rotations negate the $\pi/2$ term. In the delta-pulse limit (i.e. $t_p = 0$), an $X$ pulse corresponds to the unitary operator $U_X = \exp\{-i \pi/2 \sum_j I_x^{(j)}\}$ and a $Y$ pulse similarly corresponds to $U_Y = \exp\{-i \pi/2 \sum_j I_y^{(j)}\}$.
 % note that I_x is the spin operator, so I_x = hbar/2 * sigma_x
 
-\subsection{WAHUHA-4 Pulse Seuqnce}\label{subsec:WHH-4}
+\subsection{WAHUHA-4 Pulse Sequence}\label{subsec:WHH-4}
 
 One of the first pulse sequences developed for Hamiltonian engineering in NMR was the WAHUHA-4 pulse sequence (WHH-4).\cite{PhysRevLett.20.180} The pulse sequence is defined as
 \begin{equation}
@@ -336,9 +336,9 @@ We see that WHH-4 is cyclic because $U_{\text{rf}}(6\tau) = \identity$, and the 
     \right] \\
     &= 1/3 \sum_j \delta_j \left(I_z^{(j)} + I_y^{(j)} + I_x^{(j)} \right)
 \end{align*}
-The WHH-4 sequence, to lowest order, refocuses (or ``cancels out'') the dipolar interaction between spins while retaining the chemical shift term. Instead of the principal axis being along z, however, the spin operator acts along the diagonal axis $(1,1,1)$.
+The WHH-4 sequence, to lowest order, refocuses or ``cancels out'' the dipolar interaction between spins while retaining the chemical shift term. Instead of the principal axis being along z, however, the spin operator acts along the diagonal axis $(1,1,1)$.
 
-\subsection{CORY-48 Pulse Seuqnce}\label{subsec:CORY48}
+\subsection{CORY-48 Pulse Sequence}\label{subsec:CORY48}
 
 AHT can be taken even further than the WHH-4 sequence by considering higher-order terms in the Magnus Expansion. The CORY48 sequence is a 72$\tau$, 48-pulse sequence that was designed to decouple all interactions so that $H_{\text{eff}} = 0$ \cite{CORY1990205}. Furthermore, the CORY48 sequence decouples the dipolar interactions to \emph{second order}, and is robust to errors including pulse rotation errors and resonance offset errors. The full sequence is presented in equation~\ref{eq:CORY48}.
 

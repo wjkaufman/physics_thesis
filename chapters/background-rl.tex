@@ -19,7 +19,7 @@ The environment is the quantum system we are trying to control, the actions are 
 % the state of the system is the propagator,
 and the reward is how ``close'' the dynamics are to the desired dynamics under the target Hamiltonian. Each of these are developed in more detail in section~\ref{sec:methods-RL}.
 
-In the language of RL, an \emph{agent} is responsible for performing \emph{actions} on the \emph{environment} to maximize a \emph{reward signal} (or reward). The agent can see the \emph{state} of the environment which informs what actions to take. See figure~\ref{fig:RL} for a diagram of the agent-environment interactions. In turn, the agent's actions affect the environment's state. The agent must then balance exploration of the environment for learning about novel, possibly better policies, and exploitation of its prior knowledge to maximize rewards.\footnote{
+In the language of RL, an \emph{agent} is responsible for performing \emph{actions} on the \emph{environment} to maximize a \emph{reward signal} (or reward). The agent can see the \emph{state} of the environment which informs what actions to take. See figure~\ref{fig:RL} for a diagram of the agent-environment interactions. In turn, the agent's actions affect the environment's state. The agent must then balance exploration of the environment for learning about novel, possibly better policies, with exploitation of its prior knowledge to maximize rewards.\footnote{
 For a more detailed description of the RL framework, see \cite{sutton2018reinforcement}.
 }
 
@@ -38,7 +38,7 @@ The \emph{return} at timestep $t$ is defined as
 \begin{equation}\label{eq:return}
     G_t \defeq \sum_{k=t}^T \gamma^{k-t} R_k, \quad \gamma \in [0,1)
 \end{equation}
-or the total discounted rewards until the end of the episode at timestep $T$. If the episode has a finite number of timesteps the discount factor is often ignored. The \emph{state-value function} (or simply value function) is the expected return from a particular state while following a policy $\pi$
+or the total discounted rewards until the end of the episode at timestep $T$. If the episode has a finite number of timesteps the discount factor is often ignored. The \emph{state-value function} (or value function) is the expected return from a particular state while following a policy $\pi$
 \begin{equation}\label{eq:state_value}
     v_\pi(s) \defeq \E[G_t | S_t = s]
 \end{equation}
@@ -73,7 +73,7 @@ Q-learning is a model-free, off-policy, temporal-difference (TD) control algorit
 \end{equation}
 To encourage exploration of the state and action spaces, the agent typically follows an $\epsilon$-greedy policy (with probability $1-\epsilon$ perform the action that maximizes $Q$, otherwise perform a random action), which makes this algorithm \emph{off-policy}.
 
-If the state and action spaces are small, then it is feasible for all the $Q$-values to be stored in memory. In general, though, the action-value function is approximated using a neural network, and the parameters are updated to minimize the loss given by \ref{eq:Q_learning_update}. This approach is called ``deep Q-network'' or DQN \cite{mnih2013playing}. DQN is suitable for large state spaces (as demonstrated through Atari games in \cite{mnih2013playing}), but still requires the action space to be discrete.
+If the state and action spaces are small, then it is feasible for all the $Q$-values to be stored in memory. In general, however, the action-value function is approximated using a neural network, and the parameters are updated to minimize the loss given by \ref{eq:Q_learning_update}. This approach is called ``deep Q-network'' or DQN \cite{mnih2013playing}. DQN is suitable for large state spaces (as demonstrated through Atari games in \cite{mnih2013playing}), but still requires the action space to be discrete.
 
 % TODO include DDPG??
 % \subsubsection{DDPG}
@@ -95,7 +95,7 @@ If the state and action spaces are small, then it is feasible for all the $Q$-va
 
 \subsubsection{PPO}
 
-Proximal-policy optimization (PPO) is a model-free, on-policy policy gradient algorithm that tried to improve data efficiency and robustness compared to existing algorithms (such as DQN or other policy gradient methods).
+Proximal-policy optimization (PPO) is a model-free, on-policy policy gradient algorithm that improves data efficiency and robustness compared to existing algorithms (such as DQN or other policy gradient methods).
 \cite{schulman2017proximal}.
 In contrast with other policy gradient methods, the PPO objective function is clipped according to a hyperparameter $\epsilon$.
 \begin{equation}\label{eq:ppo_loss}
@@ -117,7 +117,7 @@ PPO has been applied successfully to both continuous and discrete action spaces%
 
 \subsubsection{Evolutionary Reinforcement Learning}
 
-Evolutionary reinforcement learning (ERL) is a model-free, off-policy hybrid algorithm that uses both policy gradient and evolutionary algorithm methods \cite{khadka2018evolutionguided}. ERL addresses problems found in many  gradient-based RL algorithms, including temporal credit assignment (associating actions to rewards that may be separated by many time steps), exploration of the state and action spaces, and policy convergence sensitivity to hyperparameters. To do so, ERL maintains a population of actors with individual policies that interact with the environment. The population's experiences are recorded in a shared replay buffer, and a separate actor/critic pair learn from the replay buffer using policy gradient (such as DDPG or DQN). Periodically, the policy gradient-based actor is copied into the population, and evolutionary algorithms are used to iterate a new ``generation'' of actors (by preferentially selecting high-performing actors). By using both gradient-based and gradient-free methods, ERL attempts to achieve both efficiency and policy diversity, making it a candidate for a variety of RL problems.
+Evolutionary reinforcement learning (ERL) is a model-free, off-policy hybrid algorithm that uses both policy gradient and evolutionary algorithm methods \cite{khadka2018evolutionguided}. ERL addresses problems found in many  gradient-based RL algorithms, including temporal credit assignment (associating actions to rewards that may be separated by many time steps), exploration of the state and action spaces, and policy convergence sensitivity to hyperparameters. To do so, ERL maintains a population of actors with individual policies that interact with the environment. The population's experiences are recorded in a shared replay buffer, and a separate actor/critic pair learn from the replay buffer using policy gradient (such as DDPG or DQN). Periodically, the policy gradient-based actor is copied into the population and evolutionary algorithms are used to iterate a new ``generation'' of actors (by preferentially selecting high-performing actors). By using both gradient-based and gradient-free methods, ERL attempts to achieve both efficiency and policy diversity, making it a candidate for a variety of RL problems.
 
 Pulse sequence design for Hamiltonian engineering has also been approached using the ERL algorithm \cite{peng2021deep}, and achieved similar results to this RL implementation.
 
