@@ -19,9 +19,9 @@ Consequently, the dynamics are given by unitary time-evolution operators. In pri
 For each simulated $N$-spin system, the chemical shift strengths $\{\delta_j\}_j$ and the dipolar coupling strengths $\{d_{jk}\}_{j,k}$ are drawn from normal distributions
 \begin{align*}
     \delta_j &\sim \mathcal{N}(\mu=0, \sigma=1) \\
-    d_{jk} &\sim \mathcal{N}(\mu=0, \sigma=D)
+    d_{jk} &\sim \mathcal{N}(\mu=0, \sigma=d)
 \end{align*}
-so that the energy scale of the system is defined by the standard deviation of the chemical shifts. The parameter $D$ controls the regime of the spin system, where $D \gg 1$ is a ``strongly coupled'' spin system and $D \ll 1$ is ``weakly coupled.'' We focus on strongly coupled spin systems, and set $D = 100$ unless otherwise specified. With the chemical shift and dipolar coupling strengths, the internal Hamiltonian $H_{\text{int}}$ can be calculated (see equation~\ref{eq:nmr-ham}).
+so that the energy scale of the system is defined by the standard deviation of the chemical shifts. The parameter $d$ controls the regime of the spin system, where $d \gg 1$ is a ``strongly coupled'' spin system and $d \ll 1$ is ``weakly coupled.'' We focus on strongly coupled spin systems, and set $d = 100$ unless otherwise specified. With the chemical shift and dipolar coupling strengths, the internal Hamiltonian $H_{\text{int}}$ can be calculated (see equation~\ref{eq:nmr-ham}).
 
 % As an example, in a $3$-spin system, there will be three chemical shift terms, six dipolar coupling terms, and $H_{\text{int}}$ will be an $8
 % \times 8$ Hermitian matrix.
@@ -31,14 +31,15 @@ and
 the pulse operators $\{ U_X, U_{\overline{X}}, U_Y, U_{\overline{Y}} \}$ can be calculated using equation~\ref{eq:X-pulse}.
 
 Because the (random) choices of chemical shift and dipolar coupling strengths affect the dynamics of the spin system, an ensemble of spin systems was used both in the reinforcement learning algorithm and in evaluation of pulse sequences.
-Each spin system used different random chemical shift and dipolar coupling strengths drawn from the same distributions (i.e. the dipolar strength parameter $D$ was the same for all systems). If experimental imperfections were also included, then each system also used different random errors.
+Each spin system used different random chemical shift and dipolar coupling strengths drawn from the same distributions (i.e. the dipolar strength parameter $d$ was the same for all systems). If experimental imperfections were also included, then each system also used different random errors.
 It was found that using ensembles of 50 spin systems reduced the variance in fidelity enough while keeping runtimes relatively short, so
 the reinforcement learning algorithm used 50 spin systems and evaluation used 100 spin systems.
 
 To assess the performance of a pulse sequence for a Hamiltonian engineering problem, the pulse sequence propagator is compared to the target propagator given by
 \[
-U_{\text{target}} = \exp\left\{ -i H_{\text{eff}} T \right\}
+U_{\text{target}} = \exp\left\{ -i H_{\text{target}} T \right\}
 \]
+For this work, $H_{\text{target}} = 0$, so $U_{\text{target}} = \identity$.
 Under ideal conditions, the two propagators should be ``close'' in some way. One measure of ``closeness'' is the following fidelity function for two unitary operators
 \begin{equation}
     \text{fidelity}(U, U_\text{target}) = \left| \frac{\Tr{
@@ -78,8 +79,7 @@ And the other pulse actions have corresponding propagators
     \overline{Y} &\longrightarrow U_{\tau} U_{\overline{Y}}
 \end{align*}
 Where $U_X$ is defined in equation~\ref{eq:X-pulse}. In the simulations, $\tau = 10^{-4}$ and the pulse width $t_p = 10^{-5}$ unless otherwise specified.
-% TODO give any more justification to this?
-% TODO mention Clifford gates/group?
+These are in the short $\tau$, short pulse width regimes ($d\tau \ll 1, d t_p \ll 1$).
 See figure~\ref{fig:actions} for the relationship between rf field amplitudes, unitary operators, and the actions.
 
 \begin{figure}[H]
@@ -107,6 +107,8 @@ This is more ``realistic'' in the sense that the agent only knows what the exper
 %This also simplifies the state representation with ensembles of spin systems.
 % TODO what did I mean by this^???
 
+Furthermore, Hamiltonian engineering (and unitary gate engineering more generally) should be independent of the state of the system. That is, the engineered Hamiltonian (or gate) should have high fidelity for a complete basis of states, not for any one state in particular. This further justifies the state representation as a sequence of actions.
+
 \subsection{Reward Function}
 
 % The fidelity approaches $1$ as the unitaries get ``closer'' and the average Hamiltonian approaches the target Hamiltonian, and approaches $0$ as the unitaries get further apart.
@@ -122,7 +124,7 @@ where $\epsilon>0$ ensures the reward isn't infinite.
 As mentioned in the introduction, the AlphaZero algorithm has two main components: self-play and neural network training. The original publication and its supplementary materials have a complete description of the algorithm \cite{Silver1140}, but pseudocode is presented below as well.
 
 During self-play, the agent iteratively constructs a pulse sequence by performing Monte Carlo Tree Search (MCTS) from the current state. From state $s_i$ (which is represented by the sequence of actions performed so far, $s_i = (a_0, \dots, a_i)$), the agent stochastically samples actions based on the prior probability from the policy $\pi$, the number of times the agent has already ``visited'' that action, and the average estimated reward (or value) of that branch of the tree. The agent is more likely to select actions that have a higher prior probability, a lower visit count, and a higher average reward. The exact formula for selection is given in algorithm~\ref{al:mcts},
-and is a variant of the PUCT algorithm from \cite{Rosin:2011uu}.
+and is a variant of the predictor upper confidence tree (PUCT) algorithm from \cite{Rosin:2011uu}.
 
 The agent performs many rollouts of selecting actions, estimating the rewards, and updating visit counts and reward estimates along the particular sequence of actions. After a certain number of rollouts, the agent finally picks a particular action to perform by sampling from the empirical distribution of visit counts.
 See figure~\ref{fig:mcts} for a visual depiction of the MCTS process.
@@ -244,13 +246,12 @@ Both GRUs and LSTMs are capable of mapping variable-length input to a fixed-leng
 
 \section{AHT-Constrained Search}\label{sec:AHT-constraints}
 
-% \smash{
 Because actions are explored and selected via tree search, additional constraints can be added to prune branches of the tree that are unlikely to yield high rewards.
 This is akin to adding ``rules of the game'' that determine which actions can or cannot be applied.
 Thankfully, AHT gives us a straightforward constraint so that pulse sequences have the desired lowest-order average Hamiltonian $\overline{H}^{(0)}$.
-% }
 
-When the target effective Hamiltonian $H_\text{eff} = 0$, all interactions must be decoupled. If the toggling frame is defined so that $\widetilde{I}_z(t) = I_z$ and $\widetilde{I}_z(t) = -I_z$ for equal durations, then the lowest-order average $\overline{I}_z^{(0)} = 1/2(I_z - I_z) = 0$. In general, any term containing $I_z$ will average to zero to lowest order when $\widetilde{I}_z$ is toggled for equal time along opposite axes (i.e. equal time on $+x$ and $-x$, $+y$ and $-y$, and $+z$ and $-z$-axes).
+
+When the target Hamiltonian $H_\text{target} = 0$, all interactions must be decoupled. If the toggling frame is defined so that $\widetilde{I}_z(t) = I_z$ and $\widetilde{I}_z(t) = -I_z$ for equal durations, then the lowest-order average $\overline{I}_z^{(0)} = 1/2(I_z - I_z) = 0$. In general, any term containing $I_z$ will average to zero to lowest order when $\widetilde{I}_z$ is toggled for equal time along opposite axes (i.e. equal time on $+x$ and $-x$, $+y$ and $-y$, and $+z$ and $-z$-axes).
 Doing so would decouple the chemical shift term $H_\text{CS}$ to lowest order.
 
 We saw in section~\ref{subsec:WHH-4} that the dipolar interaction term is decoupled when $I_z^{(j)}I_z^{(k)}$ is toggled to $I_z^{(j)}I_z^{(k)}, I_y^{(j)}I_y^{(k)}$, and $I_x^{(j)}I_x^{(k)}$ for equal times.
@@ -260,6 +261,7 @@ Therefore the dipolar interaction is decoupled to lowest order when $I_z^{(j)}I_
 To decouple all interactions, both constraints above must be satisfied, which is achieved when $I_z$ is toggled along each of the six axes for equal time ($\pm x, \pm y, \pm z$). By keeping track of the toggled operator $\widetilde{I}_z$ while constructing the pulse sequence, it is possible to prune branches of the tree that would violate this constraint%
 % (see figure~\ref{fig:tree-prune})%
 .
+\cite{Choi_2020} introduces a formal matrix representation for the $\widetilde{I}_z$ transformation and derives a set of constraints on pulse sequences for Hamiltonian engineering, some of which are mentioned above.
 
 % TODO include if I have time...
 % \begin{figure}[H]

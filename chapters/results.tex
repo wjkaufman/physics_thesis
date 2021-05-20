@@ -10,7 +10,7 @@ As a preliminary consistency check, the AlphaZero algorithm was run with identic
 \begin{figure}[H]
     \centering
     \includegraphics[width=.7\textwidth]{az-consistency.pdf}
-    \caption{The mean reward ($-\log(1-\text{fidelity})$) seen during training for 10 identical runs of the AlphaZero algorithm searching for $24\tau$ sequences. Most runs converge to similar mean fidelities, but a few runs have orders of magnitude better performance.}
+    \caption{The mean reward ($-\log(1-\text{fidelity})$) seen during training for 10 identical runs of the AlphaZero algorithm searching for $24\tau$ sequences. The simulations included finite pulse width with no experimental errors. Most runs converge to similar mean fidelities, but a few runs have orders of magnitude better performance.}
     \label{fig:az-consistency}
 \end{figure}
 
@@ -38,7 +38,7 @@ policy only for the 12-pulse sequence (figure~\ref{fig:reward_hist-no_errors-no_
         \caption{$48\tau$ sequence}
         \label{fig:reward_hist-no_errors-no_constraints-48}
     \end{subfigure}
-    \caption{Distribution of ``rewards'' ($-\log(1 - \text{fidelity})$) during AlphaZero training. No constraints were applied to the tree search, and the simulated spin systems were idealized.}
+    \caption{Distribution of rewards ($-\log(1 - \text{fidelity})$) during AlphaZero training. No constraints were applied to the tree search, and the simulated spin systems were idealized.}
     \label{fig:reward_hist-no_errors-no_constraints}
 \end{figure}
 
@@ -87,7 +87,7 @@ Figure~\ref{fig:reward_hist-no_errors-AHT0} shows the distributions of pulse seq
         \caption{$48\tau$ sequence}
         \label{fig:reward_hist-no_errors-AHT0-48}
     \end{subfigure}
-    \caption{Distribution of ``rewards'' ($-\log(1 - \text{fidelity})$) during AlphaZero training. Lowest-order AHT constraints were applied to the tree search, and the simulated spin systems were idealized.}
+    \caption{Distribution of rewards ($-\log(1 - \text{fidelity})$) during AlphaZero training. Lowest-order AHT constraints were applied to the tree search, and the simulated spin systems were idealized.}
     \label{fig:reward_hist-no_errors-AHT0}
 \end{figure}
 
@@ -115,7 +115,7 @@ There are $200$ sequences of length $6\tau$ that will decouple all interactions 
         \caption{$48\tau$ sequence}
         \label{fig:reward_hist-no_errors-6tau-48}
     \end{subfigure}
-    \caption{Distribution of ``rewards'' ($-\log(1 - \text{fidelity})$) during AlphaZero training. Lowest-order AHT constraints and refocusing all interactions every $6\tau$ were applied to the tree search, and the simulated spin systems were idealized.}
+    \caption{Distribution of rewards ($-\log(1 - \text{fidelity})$) during AlphaZero training. Lowest-order AHT constraints and refocusing all interactions every $6\tau$ were applied to the tree search, and the simulated spin systems were idealized.}
     \label{fig:reward_hist-no_errors-6tau}
 \end{figure}
 
@@ -135,7 +135,7 @@ Although it is straightforward to simulate spin systems under ideal conditions w
 The errors considered below include pulse rotation errors, phase transient errors, and resonant offset errors.
 % TODO include delay time too???
 
-Pulse rotation errors, either under- or over-rotating the spins, are common in NMR systems due to limited precision in both the rf-field strength and the pulse width $t_p$. If the pulse strength or duration is too high (or too low), then the toggling frame will be rotated greater (or less) than $\pi/2$ and the average Hamiltonian will not necessarily match the target Hamiltonian. See figure~\ref{fig:rotation-error} for a visual depiction of rotation errors for a single spin.
+Pulse rotation errors, either under- or over-rotating the spins, are common in NMR and electron spin resonance (ESR) systems due to limited precision in both the rf-field strength and the pulse width $t_p$. If the pulse strength or duration is too high (or too low), then the toggling frame will be rotated greater (or less) than $\pi/2$ and the average Hamiltonian will not necessarily match the target Hamiltonian. See figure~\ref{fig:rotation-error} for a visual depiction of rotation errors for a single spin.
 
 \begin{figure}[H]
     \centering
@@ -157,9 +157,9 @@ Phase transient errors are another pulse-related error that are present in exper
 
 Finally, resonance offset errors occur when the rf field is not matched to the Larmor frequency of the spins. The rotating frame therefore does not rotate \emph{precisely} with the spins, but at an offset frequency.
 
-The highest-fidelity pulse sequences from the $12\tau, 24\tau$, and $48\tau$ searches\footnote{
+The highest-fidelity pulse sequences from the $12\tau, 24\tau$, and $48\tau$ sequence searches\footnote{
 See the appendix for an explicit presentation of these pulse sequences.
-} were evaluated for robustness against the experimental imperfections introduced above. To compare each of the different-length sequences on the same footing, each pulse sequence was repeated over a total duration of $288\tau$. That is, the $12\tau$ sequence was repeated $24$ times, the $24\tau$ sequence was repeated $12$ times, the $48\tau$ repeated $6$ times, and CORY48 (a $72\tau$ sequence) repeated $4$ times.
+} with AHT and $6\tau$ refocusing constraints were evaluated for robustness against the experimental imperfections introduced above. To compare each of the different-length sequences on the same footing, each pulse sequence was repeated over a total duration of $288\tau$. That is, the $12\tau$ sequence was repeated $24$ times, the $24\tau$ sequence was repeated $12$ times, the $48\tau$ repeated $6$ times, and CORY48 (a $72\tau$ sequence) repeated $4$ times.
 % TODO actually put pulse sequences in appendix!!!
 % TODO explain evaluation, the whole 288tau thing...
 
@@ -175,7 +175,8 @@ This is not entirely unexpected however: the spin systems during training were i
 \begin{figure}[H]
     \centering
     \includegraphics[width=.7\textwidth]{robustness/rot_errors-no_errors.pdf}
-    \caption{Robustness against rotation errors, relative to a $\pi/2$-pulse. The pulse sequences identified using AlphaZero have very poor robustness to rotation errors, while the CORY48 sequence (which was designed using AHT to be robust to such errors) has high fidelity for a much broader range of rotation errors.
+    \caption{Robustness against rotation errors, relative to a $\pi/2$-pulse. Training simulations included no errors, and evaluation simulations included only rotation errors.
+    The pulse sequences identified using AlphaZero have very poor robustness to rotation errors, while the CORY48 sequence (which was designed using AHT to be robust to such errors) has high fidelity for a much broader range of rotation errors.
     }
     \label{fig:rot_errors-no_errors}
 \end{figure}
@@ -189,6 +190,7 @@ resonance offset error (figure~\ref{fig:offset_errors-no_errors}). Interestingly
     \centering
     \includegraphics[width=.7\textwidth]{robustness/phase_transients-no_errors.pdf}
     \caption{Robustness against phase transient errors, where the quadrature rotations are relative to a $\pi/2$-pulse.
+    Training simulations included no errors, and evaluation simulations included only rotation errors.
     }
     \label{fig:phase_transients-no_errors}
 \end{figure}
@@ -198,6 +200,7 @@ resonance offset error (figure~\ref{fig:offset_errors-no_errors}). Interestingly
     \centering
     \includegraphics[width=.7\textwidth]{robustness/offset_errors-no_errors.pdf}
     \caption{Robustness against resonant offset error, relative to the chemical shift strength.
+    Training simulations included no errors, and evaluation simulations included only rotation errors.
     }
     \label{fig:offset_errors-no_errors}
 \end{figure}
@@ -216,8 +219,10 @@ compared to training without any errors (figure~\ref{fig:rot_errors-no_errors}).
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=.7\textwidth]{robustness/rot_errors-rot_errs.pdf}
-    \caption{Robustness against rotation errors, relative to a $\pi/2$-pulse. The pulse sequences identified using AlphaZero have very poor robustness to rotation errors, while the CORY48 sequence (which was designed using AHT to be robust to such errors) has high fidelity for a much broader range of rotation errors.
+    \includegraphics[width=.7\textwidth]{robustness/rot_errors-rot_errors.pdf}
+    \caption{Robustness against rotation errors, relative to a $\pi/2$-pulse.
+    Training simulations included only rotation errors, and evaluation simulations included only rotation errors.
+    The pulse sequences identified from training with rotation errors have improved robustness to rotation errors, as compared with training in the absence of rotation errors.
     }
     \label{fig:rot_errors-rot_errors}
 \end{figure}
@@ -230,7 +235,9 @@ The policy function was rewarded for high-fidelity pulse sequences in the presen
     \centering
     \includegraphics[width=.7\textwidth]{robustness/rot_errors-all_errors.pdf}
     \caption{
-    Robustness against pulse rotation errors. The $12\tau, 24\tau$, and $48\tau$ pulse sequences were identified during training with rotation, phase transient, and resonance offset errors.
+    Robustness against pulse rotation errors.
+    Training simulations included rotation, phase transient, and resonance offset errors (``all errors''), and evaluation simulations included all errors.
+    % The $12\tau, 24\tau$, and $48\tau$ pulse sequences were identified during training with rotation, phase transient, and resonance offset errors.
     }
     \label{fig:rot_errors-all_errors}
 \end{figure}
@@ -239,7 +246,9 @@ The policy function was rewarded for high-fidelity pulse sequences in the presen
     \centering
     \includegraphics[width=.7\textwidth]{robustness/phase_transients-all_errors.pdf}
     \caption{
-    Robustness against phase transient errors, where the quadrature rotations are relative to a $\pi/2$-pulse. The $12\tau, 24\tau$, and $48\tau$ pulse sequences were identified during training with rotation, phase transient, and resonance offset errors.
+    Robustness against phase transient errors, where the quadrature rotations are relative to a $\pi/2$-pulse.
+    Training simulations included rotation, phase transient, and resonance offset errors (``all errors''), and evaluation simulations included all errors.
+    % The $12\tau, 24\tau$, and $48\tau$ pulse sequences were identified during training with rotation, phase transient, and resonance offset errors.
     }
     \label{fig:phase_transients-all_errors}
 \end{figure}
@@ -248,7 +257,9 @@ The policy function was rewarded for high-fidelity pulse sequences in the presen
     \centering
     \includegraphics[width=.7\textwidth]{robustness/offset_errors-all_errors.pdf}
     \caption{
-    Robustness against resonance offset errors, relative to chemical shift strength. The $12\tau, 24\tau$, and $48\tau$ pulse sequences were identified during training with rotation, phase transient, and resonance offset errors.
+    Robustness against resonance offset errors, relative to chemical shift strength.
+    Training simulations included rotation, phase transient, and resonance offset errors (``all errors''), and evaluation simulations included all errors.
+    % The $12\tau, 24\tau$, and $48\tau$ pulse sequences were identified during training with rotation, phase transient, and resonance offset errors.
     }
     \label{fig:offset_errors-all_errors}
 \end{figure}
@@ -269,7 +280,7 @@ An adamantane sample was used.
 
 While the fidelity of a unitary matrix is straightforward to calculate in simulation, measuring the fidelity in experiment is much more difficult, as it would require evaluation on a complete basis of states (i.e. quantum process tomography).
 % TODO cite above
-Instead, the fidelity is qualitatively approximated by the average correlation $C_\text{avg}$ \cite{peng2021deep}
+Instead, the fidelity is qualitatively approximated by the average correlation $C_\text{avg}$ (\cite{peng2021deep})
 \[
 C_\text{avg} = (C_{XX} C_{YY} C_{ZZ})^{1/3}
 \]
@@ -279,7 +290,7 @@ where the correlation function $C_{XX}(t)$ is the expected signal from initializ
 \begin{figure}[H]
     \centering
     \includegraphics[width=.7\textwidth]{decay_plot_2.pdf}
-    \caption{The average correlation in an adamantane sample for the $48\tau$-pulse sequence identified using AlphaZero, and for the CORY48 pulse sequence.}
+    \caption{The average correlation in an adamantane sample for the $48\tau$-pulse sequence identified using AlphaZero with all errors in training, and for the CORY48 pulse sequence.}
     \label{fig:decay_plot}
 \end{figure}
 
