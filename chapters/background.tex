@@ -3,7 +3,7 @@
 
 % \section{Motivation}
 
-Some physicists believe that quantum physics is on the cusp of a ``second quantum revolution'' \cite{quantum-rev}. The ability to probe quantum systems with finer precision and control them to a greater extent, as opposed to passively observing emergent phenomena that arise, has the potential to radically transform many different areas, from sensing to simulation to quantum computation.
+Some physicists believe that quantum physics is on the cusp of a ``second quantum revolution'' (\cite{quantum-rev}). The ability to probe quantum systems with finer precision and control them to a greater extent, as opposed to passively observing emergent phenomena that arise, has the potential to radically transform many different areas, from sensing to simulation to quantum computation.
 
 Hamiltonian engineering is an important problem in the effort to more finely control quantum systems.
 Every system has a Hamiltonian that characterizes its dynamics, and as the name suggests, Hamiltonian engineering seeks to ``engineer'' a different Hamiltonian so that the system's dynamics are altered. This has been applied to NMR spectroscopy by engineering Hamiltonians to remove interactions that cause noisier measurements. Engineering Hamiltonians can also be used for sensing (where certain interactions are sensitive to external fields while being robust to decoherence) and for quantum simulation (where novel Hamiltonians must be implemented in existing systems).
@@ -19,9 +19,9 @@ A spin-1/2 particle (such as an electron or proton) has two possible values for 
 % TODO make a figure showing a single spin and a B field?
 For a collection of $N$ spin-1/2 particles, the corresponding Hilbert Space has dimension $2^N$.
 For an ensemble of spins, the term $I_z^{(j)}$ is shorthand for a tensor product of operators, all identity except for the $j$th operator
-\[
-I_z^{(j)} = \identity \otimes \identity \otimes \dots \otimes I_z \otimes \dots \otimes \identity
-\]
+\begin{equation}
+    I_z^{(j)} = \identity \otimes \identity \otimes \dots \otimes I_z \otimes \dots \otimes \identity
+\end{equation}
 Similarly, the term $I_z^{(j)}I_z^{(k)}$ is shorthand for a product of identity operators except for the $j$th and $k$th operators.
 
 Nuclear magnetic resonance (NMR) encompasses the study of nuclear spins and the various interactions they have with external fields and with each other.
@@ -36,30 +36,34 @@ Figure~\ref{fig:spin-system} graphically depicts a spin system in a lattice and 
     \label{fig:spin-system}
 \end{figure}
 
-The internal Hamiltonian of the system can be decomposed into several parts, as shown in equations~\ref{eq:nmr-ham} to~\ref{eq:nmr-ham-dipolar}.
-
+The system Hamiltonian can be decomposed into several parts, as shown in equations~\ref{eq:nmr-ham} to~\ref{eq:nmr-ham-dipolar}.
 \begin{align}\label{eq:nmr-ham}
-    H_{\text{int}} &= H_Z + H_\text{CS} + H_D \\
+    H_{\text{sys}} &= H_Z + H_\text{CS} + H_D \\
     H_Z &= \omega_0 \sum_j I_z^{(j)} & \text{(Zeeman)} \\
     H_\text{CS} &= \sum_j \delta_i I_z^{(j)} & \text{(chemical shift)} \\
     \label{eq:nmr-ham-dipolar}
     H_D &= \sum_{j,k} d_{jk} \left( 3I_z^{(j)}I_z^{(k)} - \mathbf{I^{(j)}} \cdot \mathbf{I^{(k)}} \right)& \text{(dipolar)}
 \end{align}
+The chemical shift and dipolar terms are collectively called the internal Hamiltonian
+\begin{equation}
+    H_{\text{int}} = H_\text{CS} + H_D
+\end{equation}
+because those interactions are internal to the sample.
+
 The Zeeman interaction $H_Z$ captures the coupling of spins to the main external magnetic field along the z-axis. The oscillation frequency associated with the Zeeman interaction is called the Larmor frequency $\omega_0 = \gamma_i B_0$, and only differs between spins if the gyromagnetic ratio differs (e.g. between $H^1$ and $C^{13}$). We assume going forward that all spins are of the same species.%
 \footnote{The external magnetic field $B_0$ varies slightly from spin to spin due to experimental imperfections, but those field inhomogeneities are ignored.}
 The chemical shift interaction $H_{\text{CS}}$ captures the local magnetic field differences for each spin due to the electronic structure surrounding the spin. The dipolar interaction between spins is represented by $H_D$.
 
 
-In addition, the system can also be externally manipulated by an additional control term, so that the total Hamiltonian $H(t) = H_{\text{int}} + H_\text{ctrl}(t)$.
+In addition, the system can also be externally manipulated by an additional control term, so that the total Hamiltonian $H(t) = H_{\text{sys}} + H_\text{ctrl}(t)$.
 The control term, commonly written in NMR as $H_\text{rf}(t)$, is the interaction between the spins and a time-varying transverse magnetic field along the x-axis.%
 \footnote{The reason it is labeled as $H_\text{rf}$ is because the field's oscillation frequency is matched to the Larmor frequency $\omega_0$ which is in the radiofrequency range.}
 In the lab frame, the rf term is given by equation~\ref{eq:nmr-ham-rf}.
-
 \begin{equation}
     \label{eq:nmr-ham-rf}
-    H_{\text{rf}}(t) =  u_1(t) \omega_1 \sum_j I_x^{(j)}
+    H_{\text{rf}}(t) =  u(t) \omega_1 \sum_j I_x^{(j)}
 \end{equation}
-
+where $u \in [-1,1]$ parameterizes the strength of the $B_1$ field.
 % % TODO include this if I have time?
 % \begin{figure}[H]
 %     \centering
@@ -72,44 +76,47 @@ In an NMR spectrometer, a sample is placed into an external magnetic field $B_0$
 % TODO elaborate on this if I need to
 The spins in the sample reach thermal equilibrium and are characterized by the density operator
 \begin{equation}\label{eq:thermal-density-operator}
-    \rho_{\text{eq}} = \frac{
+    \rho_{\text{th}} = \frac{
         \exp\{-\beta H_{\text{int}}\}
         }{Z}
 \end{equation}
 where $Z$ is the partition function $Z=\Tr\{\exp\{-\beta H_{\text{int}}\}\}$.
-The dominant term in the internal Hamiltonian is $H_Z$, so the first-order approximation for $\rho_{\text{eq}}$ is given by
-\[
-\rho_{\text{eq}} \approx \identity - \delta \sum_j I_z^{(j)}
-\]
-The identity term does not contribute to the system's dynamics ($U \identity U^\dagger = \identity$) so we can focus on the collective spin term $\sum_j I_z^{(j)}$.
-If we only consider the time-independent Zeeman term $H_Z$, then the propagator $U_Z(t)$ is given by
-\[
-U_Z(t) = \exp \left( -i \omega_0 t \sum_j I_z^{(j)} \right)
-\]
-which corresponds to rotation about the z-axis with angular velocity $\omega_0$. An intuitive understanding of this time evolution is that the spins collectively precess about the magnetic field. The interaction frame of the Zeeman term, also known as the ``rotating frame,'' is a helpful frame to work in for many cases.%
+The dominant term in the internal Hamiltonian is $H_Z$, so the first-order approximation for $\rho_{\text{th}}$ is given by
+\begin{equation}
+    \rho_{\text{th}} \approx \identity - \delta \sum_j I_z^{(j)}
+\end{equation}
+The identity term does not contribute to the system's dynamics ($U \identity U^\dagger = \identity$) so the collective spin term $\sum_j I_z^{(j)}$ is the lowest-order term that captures the dynamics and measurement outcomes in the spin system. The collective spin determines the net magnetization of the sample, so the thermal equilibrium state corresponds to initial net magnetization along $z$.
+
+The Zeeman term dominates the system Hamiltonian (and the dynamics it generates are not very interesting), so it is oftentimes useful to work in the interaction frame of the Zeeman term, also known as the ``rotating frame.''
+The rotating frame transformation operator is given by
+\begin{equation}
+    U_Z(t) = \exp \left( -i \omega_0 t \sum_j I_z^{(j)} \right)
+\end{equation}
+which corresponds to rotation about the z-axis with angular velocity $\omega_0$.%
+% An intuitive understanding of this time evolution is that the spins collectively precess about the magnetic field. The interaction frame of the Zeeman term, also known as the ``rotating frame,'' is a helpful frame to work in for many cases.%
 \footnote{
 Refer to the appendix for additional information on interaction frames.
 }
-The interaction propagator
-% (equation~\ref{eq:interaction-propagator})
-is given by $U_Z(t)$ above, and so the interaction frame Hamiltonian is
-\begin{align*}
-    \widetilde{H}(t) &= {U_Z(t)}^{\dagger} \left[ H_\text{CS} + H_D + H_\text{rf}(t) \right] U_Z(t) \\
-        &= H_\text{CS} + H_D + \widetilde{H}_\text{rf}(t)
-\end{align*}
+The interaction frame Hamiltonian is then given by
+\begin{equation}
+\begin{aligned}
+    H^{(R)}(t) &= {U_Z(t)}^{\dagger} \left[ H_\text{CS} + H_D + H_\text{rf}(t) \right] U_Z(t) \\
+        &= H_\text{CS} + H_D + H^{(R)}_\text{rf}(t)
+\end{aligned}
+\end{equation}
 Both $H_\text{CS}$ and $H_D$ commute with $H_Z$ and therefore commute with $U_Z(t)$. The rf field $H_\text{rf}(t)$ does not commute with $H_Z$ ($[I_x, I_z] \ne 0$), so we need to consider how the rf field interaction transforms in the rotating frame.
 
 If the transverse magnetic field oscillates at the Larmor frequency of the spins with phase offset $\phi$
-\[
-u_1(t) = \cos(\omega_0 t + \phi)
-\]
+\begin{equation}
+    u(t) = \cos(\omega_0 t + \phi)
+\end{equation}
 then this field can be thought of as two counter-rotating magnetic fields whose net effect is the transverse field $\mathbf{B_1}(t)$
-\[
-\mathbf{B_1}(t) = \frac{1}{2} \left[
-    B_1 (\cos(\omega_0 t + \phi) \mathbf{\hat{x}} + \sin(\omega_0 t + \phi) \mathbf{\hat{y}}) +
-    B_1 (\cos(\omega_0 t + \phi) \mathbf{\hat{x}} - \sin(\omega_0 t + \phi) \mathbf{\hat{y}})
-\right]
-\]
+\begin{equation}
+    \mathbf{B_1}(t) = \frac{1}{2} \left[
+        B_1 (\cos(\omega_0 t + \phi) \mathbf{\hat{x}} + \sin(\omega_0 t + \phi) \mathbf{\hat{y}}) +
+        B_1 (\cos(\omega_0 t + \phi) \mathbf{\hat{x}} - \sin(\omega_0 t + \phi) \mathbf{\hat{y}})
+    \right]
+\end{equation}
 % TODO do formal math for this?
 % TODO work on this section, really make it clear
 %
@@ -119,33 +126,33 @@ then this field can be thought of as two counter-rotating magnetic fields whose 
 In a frame rotating about the z-axis with frequency $\omega_0$, it looks like there is a fixed magnetic field from one of the rotating fields and a counter-rotating field with frequency $2\omega_0$. If we ignore the high-frequency field (i.e. the rotating wave approximation), the spins in the rotating frame see a fixed magnetic field at an azimuthal angle $\phi$ in the xy-plane, and begin to precess about the new field.
 In the rotating frame, the rf Hamiltonian effectively becomes
 \begin{equation}\label{eq:nmr-ham-rf-rotating}
-    \widetilde{H}_\text{rf}(t) = u_1(t) \omega_1 \sum_j I_x^{(j)} + u_2(t) \omega_1 \sum_j I_y^{(j)}
+    H^{(R)}_\text{rf}(t) = u_1(t) \omega_1 \sum_j I_x^{(j)} + u_2(t) \omega_1 \sum_j I_y^{(j)}
 \end{equation}
 This rf field in the rotating frame can therefore rotate the spins about the $x$ or the $y$ axis by controlling $u_1$ and $u_2$ respectively.
 By applying this transverse $B_1$ field for a specific duration $t$ with phase $\phi$, the system in the rotating frame is transformed according to the unitary operator
-\[
-U = \exp\{-i \omega_1 t (\cos(\phi) I_x + \sin(\phi) I_y)\}
-\]
+\begin{equation}
+    U = \exp\{-i \omega_1 t (\cos(\phi) I_x + \sin(\phi) I_y)\}
+\end{equation}
 In particular, if $t = \frac{\pi}{2 \omega_1}$, the spins can be rotated from the initial equilibrium state to a state with net magnetization in the xy-plane. This is called a $\pi/2$-pulse (because it rotates the spins $\pi/2$ radians or $90^\circ$). Increasing the strength of the $B_1$ field or the duration of the pulse increases the rotation angle, and adjusting the phase of the pulse adjusts the rotation axis.
-From this point forward, we will work in the rotating frame unless otherwise specified.
+From this point forward, we will work in the rotating frame unless otherwise specified, which amounts to neglecting $H_Z$ in the system Hamiltonian and using equation~\ref{eq:nmr-ham-rf-rotating} instead of~\ref{eq:nmr-ham-rf} for $H_{\text{rf}}$.
 % TODO mention the pulse frequency to rotate about z?
 
 In NMR experiments, the general procedure is the following:
 \begin{enumerate}
-    \item Place the sample in the main magnetic field and wait for the sample to reach thermal equilibrium $\rho_\text{eq}$ (equation~\ref{eq:thermal-density-operator}). The net magnetization of the sample is along the $z$ axis.
+    \item Place the sample in the main magnetic field and wait for the sample to reach thermal equilibrium $\rho_\text{th}$ (equation~\ref{eq:thermal-density-operator}). The net magnetization of the sample is along the $z$ axis.
     \item Apply a $\pi/2$-pulse to rotate the spins and the net magnetization vector into the xy-plane.
-    \item Apply a pulse sequence repeatedly so the system evolves under an engineered Hamiltonian. The density operator then evolves according to the propagator $U$ determined by the pulse sequence, so at multiples of the cycle time of the pulse sequence the density operator is given by
-    \[
-    \rho(NT) = U^N \rho_\text{eq} {U^\dagger}^N
-    \]
+    \item Apply a pulse sequence repeatedly so the system evolves under an engineered Hamiltonian. The density operator then evolves according to the propagator $U$ determined by the pulse sequence, so at multiples of the cycle time $T$ of the pulse sequence the density operator is given by
+    \begin{equation}
+        \rho(NT) = U^N \rho_\text{th} {U^\dagger}^N
+    \end{equation}
     \item Measure the oscillating induced emf due to the precessing spins. This measurement corresponds to the complex signal given by
-    \begin{equation*}
+    \begin{equation}
     \begin{aligned}
         \langle I_+(t) \rangle &= \langle I_x(t) \rangle + i \langle I_y(t) \rangle \\
             &= \Tr(I_x \rho(t)) + i\Tr(I_y \rho(t))
         % TODO check this...!!!
     \end{aligned}
-    \end{equation*}
+    \end{equation}
     % This signal is called the free induction decay (FID).
 \end{enumerate}
 % TODO explain FID better here...
@@ -170,7 +177,7 @@ The Fourier transform of the signal gives a spectrum of the sample, including ch
 
 If the NMR sample is a liquid, then the sample's molecules are constantly tumbling past each other. As a result, dipolar interactions between spins from different molecules are not constant over the course of the experiment, and in aggregate the dipolar interactions are averaged to zero. This is called ``motional averaging'' of the dipolar interactions
 \[
-H_{\text{int}} \longrightarrow H_\text{CS}
+H_{\text{int}} = H_\text{CS} + H_D  \longrightarrow H_\text{CS}
 \]
 The chemical shifts for each spin do stay constant (because the local magnetic field due to molecular structure stays the same), so the resulting spectrum clearly resolves chemical shift peaks. Recall that $H_Z$ is not present in the rotating frame.
 
@@ -216,38 +223,38 @@ If we are able to engineer an effective Hamiltonian, then we have also created a
 Average Hamiltonian theory (AHT) provides a framework with which the Hamiltonian engineering problem can be approached. The following presentation of AHT is inspired by \cite{brinkmann_2016, gerstein-dybowski, 1976ii}.
 
 For a particular Hamiltonian $H(t)$, the propagator $U(t)$ is defined by equation~\ref{eq:propagator-de}
-\[
-i \ddt{U(t)} = H(t) U(t), U(0) = \identity
-\]
+\begin{equation}
+    i \ddt{U(t)} = H(t) U(t), U(0) = \identity
+\end{equation}
 As the name suggests, average Hamiltonian theory lets us express the propagator $U(t)$ at each time $t$ in terms of an \emph{average} time-independent Hamiltonian $\overline{H}$
-\[
-U(t) = \exp\left\{-i \overline{H}(t) t \right\}
-\]
+\begin{equation}
+    U(t) = \exp\left\{-i \overline{H}(t) t \right\}
+\end{equation}
 The above equation seems to suggest that $\overline{H}(t)$ is not time-independent--it is explicitly dependent on time! It is true that $\overline{H}(t)$ itself is not time-independent, but \emph{given} a time $T$, we can find $\overline{H}(T)$ so that the propagator $U(T)$ can be expressed \emph{as though} the Hamiltonian were $\overline{H}(T)$ for the time interval $t \in [0, T]$.
 
-How then do we determine the average Hamiltonian? One approach is to use the Magnus Expansion \cite{Blanes_2009,2010EJPh...31..907B}.
+How then do we determine the average Hamiltonian? One approach is to use the Magnus Expansion (\cite{Blanes_2009,2010EJPh...31..907B}).
 % Given the propagator differential equation (equation~\ref{eq:propagator-de}), t
 The Magnus Expansion begins with the ansatz that an exponential solution for the propagator exists
-\[
-U(t) = \exp\{\Omega(t)\}, \Omega(0) = 0
-\]
+\begin{equation}
+    U(t) = \exp\{\Omega(t)\}, \Omega(0) = 0
+\end{equation}
 and proceeds by finding a series expansion for $\Omega(t)$
-\[
-\Omega(t) = \sum_k \Omega_k(t)
-\]
+\begin{equation}
+    \Omega(t) = \sum_k \Omega_k(t)
+\end{equation}
 The first few terms are presented below
-\begin{align*}
+\begin{align}
     \Omega_1(t) &= -i \int_0^t dt_1 H(t_1) \\
     \Omega_2(t) &= -\frac{1}{2} \int_0^t dt_1 \int_0^{t_1} dt_2 [H(t_1), H(t_2)] \\
-    \vdots
-\end{align*}
+    \vdots \nonumber
+\end{align}
 Derivations of the Magnus Expansion can be found in
 \cite{gerstein-dybowski,Blanes_2009,2010EJPh...31..907B}.
 
 From $\Omega(t)$, an expression for the average Hamiltonian can be derived by making the comparison
-\[
-\Omega(t) = -i \overline{H}(t) t \implies \overline{H}(t) = \frac{i}{t} \Omega(t)
-\]
+\begin{equation}
+    \Omega(t) = -i \overline{H}(t) t \implies \overline{H}(t) = \frac{i}{t} \Omega(t)
+\end{equation}
 This then gives us a series expansion for the average Hamiltonian $\overline{H}(t) = \sum_k \overline{H}^{(k)}(t)$, with the first few terms given below.
 \begin{align}
     \label{eq:AHT-term-0}
@@ -260,6 +267,7 @@ This then gives us a series expansion for the average Hamiltonian $\overline{H}(
     \int_0^{t} dt_1 \int_0^{t_1} dt_2 \int_0^{t_2} dt_3
     \left\{
     \left[H(t_1), \left[H(t_2), H(t_3)\right]\right] \right. \\
+    \nonumber
     & \hspace{12em} + \left.
     \left[\left[H(t_1), H(t_2)\right], H(t_3)\right]
     \right\}
@@ -273,9 +281,9 @@ The Magnus Expansion converges when
 which effectively requires that we consider timescales much smaller than the natural timescale of the Hamiltonian.\footnote{A much more detailed overview regarding convergence can be found in \cite{Blanes_2009}.} This is also written more succinctly as $||H||t \ll 1$.
 
 Because convergence requires the norm of the Hamiltonian to be small, there are cases when working in the interaction frame of a strong interaction is desirable. In NMR, going from the rotating frame (of the Zeeman interaction) to the interaction frame of the rf field removes the strong $H_\text{rf}$ term from the nuclear spin Hamiltonian. This interaction frame is commonly called the ``toggling frame.''
-\[
-H(t) = H_{\text{int}} + H_{\text{rf}}(t) \implies \widetilde{H}(t) = \widetilde{H}_{\text{int}}(t)
-\]
+\begin{equation}
+    H(t) = H_{\text{int}} + H_{\text{rf}}(t) \implies \widetilde{H}(t) = \widetilde{H}_{\text{int}}(t)
+\end{equation}
 In the toggling frame, the Magnus Expansion can again be used to determine the average Hamiltonian $\overline{\widetilde{H}}(t)$, but using $\widetilde{H}_{\text{int}}(t)$ in place of $H(t)$ in equation~\ref{eq:AHT-term-0}. The upshot is that by going into the toggling frame, the smaller-norm average Hamiltonian converges for longer time values.
 
 At this point, the identification of an ``average Hamiltonian'' is of little benefit: $\overline{H}(t)$ might be different at different times, and it may be the average Hamiltonian in the \emph{toggling} frame instead of the lab frame. To address these concerns, we can require that $H_\text{rf}(t)$ be ``cyclic'' and ``periodic.'' For a fixed time $T>0$,
@@ -301,7 +309,7 @@ where $t_p$ is the pulse duration. Pulses along the $y$-axis swap the $I_x$ oper
 
 \subsection{WAHUHA-4 Pulse Sequence}\label{subsec:WHH-4}
 
-One of the first pulse sequences developed for Hamiltonian engineering in NMR was the WAHUHA-4 pulse sequence (WHH-4).\cite{PhysRevLett.20.180} The pulse sequence is defined as
+One of the first pulse sequences developed for Hamiltonian engineering in NMR was the WAHUHA-4 pulse sequence (WHH-4) from \cite{PhysRevLett.20.180}. The pulse sequence is defined as
 \begin{equation}
     \tau, X, \tau, \overline{Y}, \tau, \tau, Y, \tau, \overline{X}, \tau
 \end{equation}
@@ -315,14 +323,14 @@ where the sequence should be read from left to right (an $X$ pulse is applied fi
 \end{figure}
 
 The propagator for a single cycle of the WHH-4 sequence is
-\[
-U_{\text{WHH-4}} =
-    \exp\{-i H_{\text{int}} \tau\} U_{\overline{X}}
-    \exp\{-i H_{\text{int}} \tau\} U_Y
-    \exp\{-i H_{\text{int}} 2\tau\} U_{\overline{Y}}
-    \exp\{-i H_{\text{int}} \tau\} U_X
-    \exp\{-i H_{\text{int}} \tau\}
-\]
+\begin{equation}
+    U_{\text{WHH-4}} =
+        \exp\{-i H_{\text{int}} \tau\} U_{\overline{X}}
+        \exp\{-i H_{\text{int}} \tau\} U_Y
+        \exp\{-i H_{\text{int}} 2\tau\} U_{\overline{Y}}
+        \exp\{-i H_{\text{int}} \tau\} U_X
+        \exp\{-i H_{\text{int}} \tau\}
+\end{equation}
 
 Now, using AHT, we express $U_{\text{WHH-4}} = \exp\{-i \overline{H}_{\text{WHH-4}} 6\tau\}$ and find an approximation for the average Hamiltonian $\overline{H}_{\text{WHH-4}}$. The toggling frame propagator as well as the toggled $I_z^{(j)}$ and $I_z^{(j)}I_z^{(k)}$ terms are determined by the four pulses in the sequence. For $t \in [0, \tau]$, the toggling frame corresponds to the lab frame.
 But after the $X$ pulse, the toggling frame propagator is now $U_X$, so the toggled spin terms are $\widetilde{I_z}^{(j)} = U_X^\dagger I_z^{(j)} U_X = I_y^{(j)}$
@@ -355,7 +363,7 @@ We see that WHH-4 is cyclic because $U_{\text{rf}}(6\tau) = \identity$, and the 
     &= \frac{1}{6\tau} \left[
         \sum_j \delta_j \left(2\tau I_z^{(j)} + 2\tau I_y^{(j)} + 2\tau I_x^{(j)} \right) + \right. \\
         % TODO CONTINUE add break line here...
-        & \hspace{4em} \left. \sum_{jk} d_{jk} \left(3(
+        & \hspace{3em} \left. \sum_{jk} d_{jk} \left(3(
             2\tau I_z^{(j)}I_z^{(k)} + 2\tau I_y^{(j)}I_y^{(k)} + 2\tau I_x^{(j)}I_x^{(k)}
         ) - 6\tau \mathbf{I^{(j)}} \cdot \mathbf{I^{(k)}} \right)
     \right] \\
@@ -390,9 +398,9 @@ AHT can be taken even further than the WHH-4 sequence by considering higher-orde
 \end{equation}
 
 
-The full AHT analysis is not presented here, but one can imagine evaluating the three lowest-order terms from equations~\ref{eq:AHT-term-0} to~\ref{eq:AHT-term-2} using each of the $48$ time intervals. The lowest-order term is not difficult to calculate, but the higher-order terms quickly become intractable as the integrals include more and more nested commutators.
+The full AHT analysis is not presented here, but one can imagine evaluating the three lowest-order terms from equations~\ref{eq:AHT-term-0} to~\ref{eq:AHT-term-2} using each of the 48 time intervals. The lowest-order term is not difficult to calculate, but the higher-order terms quickly become intractable as the integrals include more and more nested commutators.
 
-The free evolution of a spin system under $H_{\text{int}}$ can be compared to the engineered Hamiltonians from the WHH-4 and CORY48 sequences by running three sets of experiments. The state is initialized to $\rho_\text{eq}$, rotated by a $\pi/2$-pulse so the net magnetization is along $x$, and propagated using one of the pulse sequences (i.e. no pulse sequence for free evolution, the WHH-4 sequence, and the CORY48 sequence). Measuring the net magnetization along $x$ gives the correlation function $C_{XX}(t)$ (initialize state along $x$ and measure signal along $x$). Similarly, $C_{YY}$ can be measured by initializing the state along $y$ and measuring along $y$.
+The free evolution of a spin system under $H_{\text{int}}$ can be compared to the engineered Hamiltonians from the WHH-4 and CORY48 sequences by running three sets of experiments. The state is initialized to $\rho_\text{th}$, rotated by a $\pi/2$-pulse so the net magnetization is along $x$, and propagated using one of the pulse sequences (i.e. no pulse sequence for free evolution, the WHH-4 sequence, and the CORY48 sequence). Measuring the net magnetization along $x$ gives the correlation function $C_{XX}(t)$ (initialize state along $x$ and measure signal along $x$). Similarly, $C_{YY}$ can be measured by initializing the state along $y$ and measuring along $y$.
 If the engineered Hamiltonian is close to zero, the correlation functions decay slowly.
 
 By comparing the average correlation ($C_{\text{avg}} = (C_{XX}C_{YY}C_{ZZ})^{1/3}$) for free evolution (FID), the WHH-4 sequence, and the CORY48 sequence in adamantane, it is clear that the longer CORY48 sequence outperforms the shorter WHH-4 sequence in decoupling interactions and extending the coherence time (see figure~\ref{fig:decay_plot_AHT}).

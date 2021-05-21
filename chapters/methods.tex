@@ -11,19 +11,19 @@ This section describes the simulation methods and RL algorithm used in this work
 
 \section{Simulated Spin Systems}
 
-Isolated spin systems composed of a small number of spins can be easily simulated on a classical computer. Because the Hilbert space grows exponentially as the spins increase ($2^N$ basis states for $N$ spins and $2^{2N}$ matrix elements for operators), it quickly becomes impractical to simulate large numbers of spins. To balance the need to capture dipole interactions and to decrease simulation time, $N=3$ spin-1/2 systems were used in the reinforcement learning algorithm, and $N=4$ spin-1/2 systems were used to evaluate pulse sequences. The QuTiP Python package was used for all simulations \cite{Johansson_2013}.
+Isolated spin systems composed of a small number of spins can be easily simulated on a classical computer. Because the Hilbert space grows exponentially as the spins increase ($2^N$ basis states for $N$ spins and $2^{2N}$ matrix elements for operators), it quickly becomes impractical to simulate large numbers of spins. To balance the need to capture dipole interactions and to decrease simulation time, $N=3$ spin-1/2 systems were used in the reinforcement learning algorithm, and $N=4$ spin-1/2 systems were used to evaluate pulse sequences. The QuTiP Python package was used for all simulations (\cite{Johansson_2013}).
 
 In any real physical system, system-environment interactions are present and the spin system must be treated as open, but for simulation purposes the system is assumed to be isolated.
 Consequently, the dynamics are given by unitary time-evolution operators. In principle, simulations of open quantum systems could be used with reinforcement learning algorithms, and may in fact lead to better control by accounting for non-unitary system dynamics.
 
 For each simulated $N$-spin system, the chemical shift strengths $\{\delta_j\}_j$ and the dipolar coupling strengths $\{d_{jk}\}_{j,k}$ are drawn from normal distributions
-\begin{align*}
+\begin{align}
     \delta_j &\sim \mathcal{N}(\mu=0, \sigma=1) \\
     d_{jk} &\sim \mathcal{N}(\mu=0, \sigma=d)
-\end{align*}
+\end{align}
 so that the energy scale of the system is defined by the standard deviation of the chemical shifts. The parameter $d$ controls the regime of the spin system, where $d \gg 1$ is a ``strongly coupled'' spin system and $d \ll 1$ is ``weakly coupled.'' We focus on strongly coupled spin systems, and set $d = 100$ unless otherwise specified. With the chemical shift and dipolar coupling strengths, the internal Hamiltonian $H_{\text{int}}$ can be calculated (see equation~\ref{eq:nmr-ham}).
 
-% As an example, in a $3$-spin system, there will be three chemical shift terms, six dipolar coupling terms, and $H_{\text{int}}$ will be an $8
+% As an example, in a 3-spin system, there will be three chemical shift terms, six dipolar coupling terms, and $H_{\text{int}}$ will be an $8
 % \times 8$ Hermitian matrix.
 
 Once $H_{\text{int}}$ has been calculated, the free evolution propagator $U(\tau) \defeq U_\tau$ can be calculated via matrix exponentiation (see equation~\ref{eq:propagator-ti})
@@ -36,9 +36,9 @@ It was found that using ensembles of 50 spin systems reduced the variance in fid
 the reinforcement learning algorithm used 50 spin systems and evaluation used 100 spin systems.
 
 To assess the performance of a pulse sequence for a Hamiltonian engineering problem, the pulse sequence propagator is compared to the target propagator given by
-\[
-U_{\text{target}} = \exp\left\{ -i H_{\text{target}} T \right\}
-\]
+\begin{equation}
+    U_{\text{target}} = \exp\left\{ -i H_{\text{target}} T \right\}
+\end{equation}
 For this work, $H_{\text{target}} = 0$, so $U_{\text{target}} = \identity$.
 Under ideal conditions, the two propagators should be ``close'' in some way. One measure of ``closeness'' is the following fidelity function for two unitary operators
 \begin{equation}
@@ -46,7 +46,7 @@ Under ideal conditions, the two propagators should be ``close'' in some way. One
         U^\dagger U_\text{target}
     }}{\Tr{\identity}} \right|
 \end{equation}
-The fidelity approaches $1$ as the unitaries get ``closer'' and the average Hamiltonian approaches the target Hamiltonian, and approaches $0$ as the unitaries get further apart.
+The fidelity approaches 1 as the unitaries get ``closer'' and the average Hamiltonian approaches the target Hamiltonian, and approaches 0 as the unitaries get further apart.
 
 \section{Reinforcement Learning Implementation}\label{sec:methods-RL}
 
@@ -61,7 +61,7 @@ In an NMR spectrometer, the actions we can perform, or the ``knobs'' we can turn
 The spectrometer's electronics limit the strength and the granularity of the rf field,
 but this still allows for a staggeringly large \emph{continuous} action space. Instead of allowing for continuous control of the rf field%
 \footnote{
-Which is precisely the action space used in gradient ascent pulse engineering (GRAPE) algorithms \cite{Khaneja-2005}, although it does not use RL.
+Which is precisely the action space used in gradient ascent pulse engineering (GRAPE) algorithms from \cite{Khaneja-2005}, although it does not use RL.
 }%
 , we only consider a finite set of pulses, each with an interval of free evolution after the pulse. The set of pulses we use is the set of $\pi/2$ rotations about the x- or y-axis along with a ``null pulse'' or delay. The action set is represented as $\{ D, X, \overline{X}, Y, \overline{Y} \}$.
 
@@ -101,7 +101,7 @@ The ``physical'' state space is comprised of every reachable state $\rho(t)$ of 
 In an RL context, however, the agent does not observe the complete state of the system at each point in time. Instead, the agent only knows the sequence of actions that have been performed on the system and any measurements that have been made on the system.
 Therefore, a more representative state space for the RL problem is all possible sequences of actions performed on the system.%
 \footnote{
-Making measurements on the system could also be considered an action (measurement affects the physical state), and the resulting measurement outcome could be included in the state \cite{porotti2019coherent}. This possibility, however, is not explored here.
+Making measurements on the system could also be considered an action (measurement affects the physical state), and the resulting measurement outcome could be included in the state (\cite{porotti2019coherent}). This possibility, however, is not explored here.
 }
 This is more ``realistic'' in the sense that the agent only knows what the experimenter would know, without getting any additional information ``for free.''
 %This also simplifies the state representation with ensembles of spin systems.
@@ -111,8 +111,8 @@ Furthermore, Hamiltonian engineering (and unitary gate engineering more generall
 
 \subsection{Reward Function}
 
-% The fidelity approaches $1$ as the unitaries get ``closer'' and the average Hamiltonian approaches the target Hamiltonian, and approaches $0$ as the unitaries get further apart.
-As mentioned above, the fidelity function takes on values between $0$ and $1$, where values close to $1$ are desirable.
+% The fidelity approaches 1 as the unitaries get ``closer'' and the average Hamiltonian approaches the target Hamiltonian, and approaches 0 as the unitaries get further apart.
+As mentioned above, the fidelity function takes on values between 0 and 1, where values close to 1 are desirable.
 However, a tenfold improvement in performance doesn't correspond to a tenfold increase in fidelity (for instance a fidelity of 0.9 compared to 0.99). A suitable reward function is then calculated by
 \begin{equation}
     r = -\log(1-\text{fidelity}(U_\text{actual}, U_\text{target}) + \epsilon)
@@ -121,7 +121,7 @@ where $\epsilon>0$ ensures the reward isn't infinite.
 
 \subsection{AlphaZero Algorithm}
 
-As mentioned in the introduction, the AlphaZero algorithm has two main components: self-play and neural network training. The original publication and its supplementary materials have a complete description of the algorithm \cite{Silver1140}, but pseudocode is presented below as well.
+As mentioned in the introduction, the AlphaZero algorithm has two main components: self-play and neural network training. The original publication and its supplementary materials have a complete description of the algorithm (\cite{Silver1140}), but pseudocode is presented below as well.
 
 During self-play, the agent iteratively constructs a pulse sequence by performing Monte Carlo Tree Search (MCTS) from the current state. From state $s_i$ (which is represented by the sequence of actions performed so far, $s_i = (a_0, \dots, a_i)$), the agent stochastically samples actions based on the prior probability from the policy $\pi$, the number of times the agent has already ``visited'' that action, and the average estimated reward (or value) of that branch of the tree. The agent is more likely to select actions that have a higher prior probability, a lower visit count, and a higher average reward. The exact formula for selection is given in algorithm~\ref{al:mcts},
 and is a variant of the predictor upper confidence tree (PUCT) algorithm from \cite{Rosin:2011uu}.
@@ -240,7 +240,7 @@ A one-hot vector has a single entry equal to one, and all other entries are zero
 Because the state is represented by a sequence of actions, the size of the state depends on the length of the pulse sequence.
 The policy head outputs a $1 \times 5$ vector of probabilities associated with each of the possible actions. The value head outputs a single scalar for the estimated reward of the pulse sequence so far.
 
-The state representation--as a sequence of actions--lends itself to using a recurrent neural network architecture. A gated recurrent unit (GRU) was used, though a long-short term memory (LSTM) layer performed similarly \cite{cho2014learning, lstm}.
+The state representation--as a sequence of actions--lends itself to using a recurrent neural network architecture. A gated recurrent unit (GRU) was used, though a long-short term memory (LSTM) layer performed similarly (\cite{cho2014learning, lstm}).
 Both GRUs and LSTMs are capable of mapping variable-length input to a fixed-length output space, which is precisely what is needed when mapping the actions we have performed so far to the estimated policy and value of that state.
 
 

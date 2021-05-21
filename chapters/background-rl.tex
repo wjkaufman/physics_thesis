@@ -7,9 +7,9 @@
 % TODO think about what I want to put in here vs what I want to put into the methods section. Just put high-level introduction, and possible relevant to ham engineering?
 
 \begin{quote}
-    Reinforcement learning is learning what to do--how to map situations to actions--so as to maximize a numerical reward signal. \cite{sutton2018reinforcement}
+    Reinforcement learning is learning what to do--how to map situations to actions--so as to maximize a numerical reward signal. (\cite{sutton2018reinforcement})
 \end{quote}
-Reinforcement learning  (RL) has been applied to a variety of different problems, including interacting with physical environments such as robotic manipulation using visual input \cite{lillicrap2015continuous} or playing chess \cite{Silver1140}. A significant attraction of RL is its generality: any problem that can be formulated as a Markov decision process (MDP) can be approached with RL, and in most cases no prior knowledge of the problem is assumed.
+Reinforcement learning  (RL) has been applied to a variety of different problems, including interacting with physical environments such as robotic manipulation using visual input (\cite{lillicrap2015continuous}) or playing chess (\cite{Silver1140}). A significant attraction of RL is its generality: any problem that can be formulated as a Markov decision process (MDP) can be approached with RL, and in most cases no prior knowledge of the problem is assumed.
 % potential application to Ham engineering
 Hamiltonian engineering
 fits into
@@ -66,14 +66,14 @@ The RL algorithms listed below were each tested as potential options for Hamilto
 
 \subsubsection{Q-learning and DQN}
 
-Q-learning is a model-free, off-policy, temporal-difference (TD) control algorithm applicable to discrete action spaces \cite{watkins1989learning}. As the name suggests, the action-value function $Q(s,a)$ is learned from experiences with the environment according to the following update rule
+Q-learning is a model-free, off-policy, temporal-difference (TD) control algorithm applicable to discrete action spaces (\cite{watkins1989learning}). As the name suggests, the action-value function $Q(s,a)$ is learned from experiences with the environment according to the following update rule
 \begin{equation}\label{eq:Q_learning_update}
     Q(S_t, A_t) \leftarrow Q(S_t, A_t) +
         \alpha \left[ R_{t+1} + \gamma \max_a Q(S_{t+1}, a) - Q(S_t, A_t) \right]
 \end{equation}
 To encourage exploration of the state and action spaces, the agent typically follows an $\epsilon$-greedy policy (with probability $1-\epsilon$ perform the action that maximizes $Q$, otherwise perform a random action), which makes this algorithm \emph{off-policy}.
 
-If the state and action spaces are small, then it is feasible for all the $Q$-values to be stored in memory. In general, however, the action-value function is approximated using a neural network, and the parameters are updated to minimize the loss given by \ref{eq:Q_learning_update}. This approach is called ``deep Q-network'' or DQN \cite{mnih2013playing}. DQN is suitable for large state spaces (as demonstrated through Atari games in \cite{mnih2013playing}), but still requires the action space to be discrete.
+If the state and action spaces are small, then it is feasible for all the $Q$-values to be stored in memory. In general, however, the action-value function is approximated using a neural network, and the parameters are updated to minimize the loss given by \ref{eq:Q_learning_update}. This approach is called ``deep Q-network'' or DQN (\cite{mnih2013playing}). DQN is suitable for large state spaces (as demonstrated through Atari games in \cite{mnih2013playing}), but still requires the action space to be discrete.
 
 % TODO include DDPG??
 % \subsubsection{DDPG}
@@ -95,8 +95,8 @@ If the state and action spaces are small, then it is feasible for all the $Q$-va
 
 \subsubsection{PPO}
 
-Proximal-policy optimization (PPO) is a model-free, on-policy policy gradient algorithm that improves data efficiency and robustness compared to existing algorithms (such as DQN or other policy gradient methods).
-\cite{schulman2017proximal}.
+Proximal-policy optimization (PPO) is a model-free, on-policy policy gradient algorithm that improves data efficiency and robustness compared to existing algorithms (such as DQN or other policy gradient methods)
+(\cite{schulman2017proximal}).
 In contrast with other policy gradient methods, the PPO objective function is clipped according to a hyperparameter $\epsilon$.
 \begin{equation}\label{eq:ppo_loss}
     % eq 7 in PPO paper
@@ -107,9 +107,9 @@ In contrast with other policy gradient methods, the PPO objective function is cl
 \end{equation}
 where
 $r_t(\theta) = \frac{\pi_\theta(a_t|s_t)}{\pi_{\theta'}(a_t|s_t)}$ is the probability ratio of actions under the new and old policies, and $\hat{A}_t$ is an estimator of the \emph{advantage function} at time $t$, or the excess return above what was expected by the value function
-\[
-\hat{A}_t \defeq G_t - v_\pi(S_t)
-\]
+\begin{equation}
+    \hat{A}_t \defeq G_t - v_\pi(S_t)
+\end{equation}
 By clipping the objective, the gradient updates are non-zero only for a region close to the previous policy, thus preventing policy changes that move too far away from the old policy.
 PPO has been applied successfully to both continuous and discrete action spaces%
 % TODO check above, I think that's right but not sure...
@@ -117,10 +117,10 @@ PPO has been applied successfully to both continuous and discrete action spaces%
 
 \subsubsection{Evolutionary Reinforcement Learning}
 
-Evolutionary reinforcement learning (ERL) is a model-free, off-policy hybrid algorithm that uses both policy gradient and evolutionary algorithm methods \cite{khadka2018evolutionguided}. ERL addresses problems found in many  gradient-based RL algorithms, including temporal credit assignment (associating actions to rewards that may be separated by many time steps), exploration of the state and action spaces, and policy convergence sensitivity to hyperparameters. To do so, ERL maintains a population of actors with individual policies that interact with the environment. The population's experiences are recorded in a shared replay buffer, and a separate actor/critic pair learn from the replay buffer using policy gradient (such as DDPG or DQN). Periodically, the policy gradient-based actor is copied into the population and evolutionary algorithms are used to iterate a new ``generation'' of actors (by preferentially selecting high-performing actors). By using both gradient-based and gradient-free methods, ERL attempts to achieve both efficiency and policy diversity, making it a candidate for a variety of RL problems.
+Evolutionary reinforcement learning (ERL) is a model-free, off-policy hybrid algorithm that uses both policy gradient and evolutionary algorithm methods (\cite{khadka2018evolutionguided}). ERL addresses problems found in many  gradient-based RL algorithms, including temporal credit assignment (associating actions to rewards that may be separated by many time steps), exploration of the state and action spaces, and policy convergence sensitivity to hyperparameters. To do so, ERL maintains a population of actors with individual policies that interact with the environment. The population's experiences are recorded in a shared replay buffer, and a separate actor/critic pair learn from the replay buffer using policy gradient (such as DDPG or DQN). Periodically, the policy gradient-based actor is copied into the population and evolutionary algorithms are used to iterate a new ``generation'' of actors (by preferentially selecting high-performing actors). By using both gradient-based and gradient-free methods, ERL attempts to achieve both efficiency and policy diversity, making it a candidate for a variety of RL problems.
 
-Pulse sequence design for Hamiltonian engineering has also been approached using the ERL algorithm \cite{peng2021deep}, and achieved similar results to this RL implementation.
+Pulse sequence design for Hamiltonian engineering has also been approached using the ERL algorithm in \cite{peng2021deep}, and achieved similar results to this RL implementation.
 
 \subsubsection{AlphaZero}
 
-AlphaZero is a model-based, off-policy, actor-critic algorithm that was originally developed to play chess, shogi, and Go \cite{Silver1140}. There are two major components to the algorithm: self-play and neural network training. Because AlphaZero is a model-based algorithm, the agent is able to consider the state space without necessarily interacting with the environment. The agent plays many episodes against itself, using a neural network to estimate a policy $\pi(s)$ and a value function $v_\pi(s)$. During self-play, the agent rolls out many possible state-action trajectories, chooses an action that maximizes the expected reward, and collects data on the state, which actions it considered, and the final reward at the end of the episode. The collected data in turn is used to train the policy and value neural networks $\{ \pi, v_\pi \}$.
+AlphaZero is a model-based, off-policy, actor-critic algorithm that was originally developed to play chess, shogi, and Go (\cite{Silver1140}). There are two major components to the algorithm: self-play and neural network training. Because AlphaZero is a model-based algorithm, the agent is able to consider the state space without necessarily interacting with the environment. The agent plays many episodes against itself, using a neural network to estimate a policy $\pi(s)$ and a value function $v_\pi(s)$. During self-play, the agent rolls out many possible state-action trajectories, chooses an action that maximizes the expected reward, and collects data on the state, which actions it considered, and the final reward at the end of the episode. The collected data in turn is used to train the policy and value neural networks $\{ \pi, v_\pi \}$.

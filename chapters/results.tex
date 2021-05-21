@@ -54,7 +54,7 @@ But for $n=24$, then the number of pulse sequences jumps to $6 \times 10^{16}$, 
 Furthermore, rewards are only received once an \emph{entire pulse sequence} has been constructed. The sparse reward signal (which is the sole driver of learning in RL algorithms) therefore makes it difficult for the agent to associate actions with rewards and learn an effective policy.
 This is known as the ``credit assignment problem'' and is an active area of research both in theoretical and applied RL (\cite{arumugam2021informationtheoretic}).
 
-For example, suppose you needed to pass a test with $100$ questions, and could re-take the test as many times as you want. It would take many more tries to pass if the only feedback you received was your overall score on the test, as opposed to your score on each question.
+For example, suppose you needed to pass a test with 100 questions, and could re-take the test as many times as you want. It would take many more tries to pass if the only feedback you received was your overall score on the test, as opposed to your score on each question.
 
 There is not an immediately obvious way to provide additional rewards to the agent during training\footnote{
 From an experimental perspective, we only care about the fidelity of the pulse sequence overall, not at intermediate times.
@@ -93,7 +93,7 @@ Figure~\ref{fig:reward_hist-no_errors-AHT0} shows the distributions of pulse seq
 
 
 Because the lowest-order average Hamiltonian constraint didn't clearly improve performance, an even stronger constraint was added to the tree search to further restrict the state space: to decouple interactions to lowest order every $6\tau$, instead of decoupling interactions for the pulse sequence overall.
-There are $200$ sequences of length $6\tau$ that will decouple all interactions to lowest order, significantly fewer than $5^6 = 15625$ possible sequences without any constraints. The resulting fidelities (figure~\ref{fig:reward_hist-no_errors-6tau}) are significantly higher for the $24\tau$ and $48\tau$ sequences during training, comparable to the shorter $12\tau$ sequence.
+There are 200 sequences of length $6\tau$ that will decouple all interactions to lowest order, significantly fewer than $5^6 = 15625$ possible sequences without any constraints. The resulting fidelities (figure~\ref{fig:reward_hist-no_errors-6tau}) are significantly higher for the $24\tau$ and $48\tau$ sequences during training, comparable to the shorter $12\tau$ sequence.
 
 \begin{figure}[H]
     \centering
@@ -159,7 +159,7 @@ Finally, resonance offset errors occur when the rf field is not matched to the L
 
 The highest-fidelity pulse sequences from the $12\tau, 24\tau$, and $48\tau$ sequence searches\footnote{
 See the appendix for an explicit presentation of these pulse sequences.
-} with AHT and $6\tau$ refocusing constraints were evaluated for robustness against the experimental imperfections introduced above. To compare each of the different-length sequences on the same footing, each pulse sequence was repeated over a total duration of $288\tau$. That is, the $12\tau$ sequence was repeated $24$ times, the $24\tau$ sequence was repeated $12$ times, the $48\tau$ repeated $6$ times, and CORY48 (a $72\tau$ sequence) repeated $4$ times.
+} with AHT and $6\tau$ refocusing constraints were evaluated for robustness against the experimental imperfections introduced above. To compare each of the different-length sequences on the same footing, each pulse sequence was repeated over a total duration of $288\tau$. That is, the $12\tau$ sequence was repeated 24 times, the $24\tau$ sequence was repeated 12 times, the $48\tau$ repeated 6 times, and CORY48 (a $72\tau$ sequence) repeated 4 times.
 % TODO actually put pulse sequences in appendix!!!
 % TODO explain evaluation, the whole 288tau thing...
 
@@ -281,9 +281,9 @@ An adamantane sample was used.
 While the fidelity of a unitary matrix is straightforward to calculate in simulation, measuring the fidelity in experiment is much more difficult, as it would require evaluation on a complete basis of states (i.e. quantum process tomography).
 % TODO cite above
 Instead, the fidelity is qualitatively approximated by the average correlation $C_\text{avg}$ (\cite{peng2021deep})
-\[
-C_\text{avg} = (C_{XX} C_{YY} C_{ZZ})^{1/3}
-\]
+\begin{equation}
+    C_\text{avg} = (C_{XX} C_{YY} C_{ZZ})^{1/3}
+\end{equation}
 where the correlation function $C_{XX}(t)$ is the expected signal from initializing the state along $X$ and measuring magnetization along $X$.
 % $C_{YY}(t)$ and $C_{ZZ}(t)$ are defined similarly.
 
