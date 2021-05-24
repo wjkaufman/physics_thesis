@@ -39,7 +39,7 @@ $$H(t) = H_{\text{sys}} + H_{\text{ctrl}}(t)$$
 Goal: engineer a Hamiltonian $H_{\text{target}}$ different from
 $H_{\text{sys}}$ using $H_{\text{ctrl}}(t)$
 
-![From [@quadcopter]](../graphics/quadcopter.jpg){width=40%}
+![From @quadcopter.](../graphics/quadcopter.jpg){width=40%}
 
 
 ::: notes
@@ -272,7 +272,7 @@ Pulse sequence design with AHT has been effective, but may be approaching its li
 
 <p style="margin-bottom: 200px"></p>
 
-![From [@sutton2018reinforcement]](../graphics/rl.png){width=90%}
+![From @sutton2018reinforcement.](../graphics/rl.png){width=90%}
 </div>
 <div style="width: 35%; float: left;">
 ![](../graphics/tetris.png){width=90%}
@@ -284,9 +284,9 @@ Pulse sequence design with AHT has been effective, but may be approaching its li
 
 ## Applications of RL
 
-![](../graphics/chess.jpg){height=400px}\ ![](../graphics/space-invaders.jpg){height=400px}\
+![](../graphics/chess.jpg){height=500px}\ ![](../graphics/space-invaders.jpg){height=500px}\
 
-![From [@gu2016deep]](../graphics/robot.png){height=400px}
+![From @gu2016deep.](../graphics/robot.png){height=300px}
 
 
 ## RL for Hamiltonian engineering
@@ -513,7 +513,7 @@ In reality, there are imperfections...
 ![Rotation errors.](../tikz/Rotation-Error.png){width=50%}
 </div>
 <div style="width: 33%; float: left;">
-![Phase transients, (a) is ideal pulse, (b) is actual pulse with phase transients. From [@1976ii].](../graphics/phase_transients_viz.png){width=100%}
+![Phase transients, (a) is ideal pulse, (b) is actual pulse with phase transients. From @1976ii.](../graphics/phase_transients_viz.png){width=100%}
 </div>
 <div style="clear: both;"></div>
 
