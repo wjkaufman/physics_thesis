@@ -21,7 +21,7 @@ Will Kaufman
 
 May 24, 2021
 
-![image](../graphics/qisD.png){ height=150px }\ <span style="padding-left:20px"></span> ![image](../graphics/Dartmouth.png){ height=140px }\
+![image](../graphics/qisD.png){ height=120px }\ <span style="padding-left:20px"></span> ![image](../graphics/Dartmouth.png){ height=100px }\
 
 <style>
 .reveal h1, .reveal h2, .reveal h3, .reveal h4, .reveal h5 {
@@ -39,7 +39,8 @@ $$H(t) = H_{\text{sys}} + H_{\text{ctrl}}(t)$$
 Goal: engineer a Hamiltonian $H_{\text{target}}$ different from
 $H_{\text{sys}}$ using $H_{\text{ctrl}}(t)$
 
-![From @quadcopter.](../graphics/quadcopter.jpg){width=40%}
+<!-- ![From @quadcopter.](../graphics/quadcopter.jpg){width=40%} -->
+![From @quadcopter_gif.](../graphics/quadcopter-1.gif){width=40%}
 
 
 ::: notes
@@ -58,7 +59,17 @@ Hamiltonian engineering used for:
 
 ## System: spin-1/2 particles and spin systems
 
-![](../tikz/Spin-System.png){width=60%}\
+<!-- ![](../tikz/Spin-System.png){width=60%}\ -->
+
+
+<div style="width: 50%; float: left;">
+![](../graphics/precession.gif){width=60%}\
+</div>
+<div style="width: 50%; float: left;">
+![](../tikz/Spin-Lattice.png){width=80%}\
+</div>
+<div style="clear: both;"></div>
+
 
 $$
 H_{\text{sys}} =\sum _{i}\delta_{i} I^{i}_{z}
@@ -75,7 +86,18 @@ not addressed individually).
 
 ## Control: collective rotation of spins
 
-![](../tikz/Single-Spin-Control.png){width=25%}\
+
+<div style="width: 50%; float: left;">
+![From @rotating_frame.](../graphics/Rotating-Frame.gif){width=50%}
+</div>
+<div style="width: 50%; float: left;">
+![](../tikz/Single-Spin-Control.png){width=50%}\
+</div>
+<div style="clear: both;"></div>
+
+
+
+
 
 $B_x$ and $B_y$ are the "knobs" we can turn to interact with the spin
 system
@@ -172,7 +194,11 @@ while keeping chemical shifts [@PhysRevLett.20.180]
 
 $$H_{\text{CS}} + H_D \longrightarrow H_{\text{CS}}'$$
 
-![](../tikz/AHT-Diagram.png){width=70%}
+$$
+\tau, X, \tau, \overline{Y}, 2\tau, Y, \tau, \overline{X}, \tau
+$$
+
+![](../graphics/WHH-4.gif){width=30%}
 
 ::: notes
 
@@ -275,7 +301,7 @@ Pulse sequence design with AHT has been effective, but may be approaching its li
 ![From @sutton2018reinforcement.](../graphics/rl.png){width=90%}
 </div>
 <div style="width: 35%; float: left;">
-![](../graphics/tetris.png){width=90%}
+![](../graphics/tetris.png){width=75%}
 </div>
 <div style="clear: both;"></div>
 
@@ -427,7 +453,9 @@ AHT constraint for $\overline{H}^{(0)}$: toggle $I_z$ to
 $I_x, I_y, I_z, -I_x, -I_y, -I_z$ for equal times for the entire pulse
 sequence
 
-![](../tikz/AHT-Diagram.png){height=450px}
+<!-- ![](../tikz/AHT-Diagram.png){height=450px} -->
+
+![](../graphics/yxx.gif){width=30%}
 
 
 Additional constraint: toggle $I_z$ to $I_x, I_y, I_z, -I_x, -I_y, -I_z$
@@ -509,11 +537,11 @@ $48\tau$ $$\begin{aligned}
 
 In reality, there are imperfections...
 
-<div style="width: 50%; float: left;">
-![Rotation errors.](../tikz/Rotation-Error.png){width=50%}
+<div style="width: 30%; float: left;">
+![Rotation errors.](../tikz/Rotation-Error.png){width=80%}
 </div>
-<div style="width: 33%; float: left;">
-![Phase transients, (a) is ideal pulse, (b) is actual pulse with phase transients. From @1976ii.](../graphics/phase_transients_viz.png){width=100%}
+<div style="width: 60%; float: left;">
+![Phase transients, (a) is ideal pulse, (b) is actual pulse with phase transients. From @1976ii.](../graphics/phase_transients_viz.png){width=80%}
 </div>
 <div style="clear: both;"></div>
 
@@ -643,19 +671,14 @@ $$\widetilde{H}(t) = \widetilde{H}_{\text{sys}}(t) = U_{\text{ctrl}}(t)^\dagger 
 
 -   $N=3$ spin-1/2 system, $\delta_i \sim \mathcal{N}(0, 1)$,
     $d_{ij} \sim \mathcal{N}(0, 100)$
-
 -   Delay $\tau = 10^{-4}$, pulse length $t_p = 10^{-5}$
-
 -   Ensemble of 50 spin systems with different chemical shifts and
     dipolar interactions
 
-```{=html}
-<!-- -->
-```
+
+
 -   Replay buffer size: $10^6$ "experiences" ($(s, a, r)$)
-
 -   Batch size: $2048$
-
 -   Training duration: $10^4$ training steps
 
 $$\text{fidelity}(U, U_\text{target}) = \operatorname{Re}{
@@ -666,6 +689,8 @@ $$r = -\log \left( 1 - \text{fidelity} \right)$$
 $$r = 4 \iff \text{fidelity} = 0.\underline{9999}$$
 
 ## AlphaZero: neural network structure
+
+![](../tikz/Neural-Network.png){width=80%}
 
 ## Computational results: AlphaZero algorithm learns
 
@@ -722,7 +747,7 @@ Train neural networks on collected data
 
 -   L2 regularization: prevent overfitting to data
 
--   $l(\theta) = -\mathbf{p} \cdot \log\pi_\theta + (z - v)^2 + c||\theta||^2$
+-   $L(\theta) = -\mathbf{p} \cdot \log\pi_\theta + (z - v)^2 + c||\theta||^2$
 
 ## Neural network training
 
@@ -749,20 +774,16 @@ $-Y, \tau, -X, \tau, -X, \tau, -Y, \tau, -X, \tau, -X, \tau$
 ## RL advantages and disadvantages
 
 -   Generalized approach to learning problem: no assumed prior knowledge
+-   Can tailor problem to specific system of interest (e.g. strongly coupled system, timing precision constraints)
+-   Robustness against known errors by including them in simulation of spin system
 
--   Can tailor problem to specific system of interest (e.g. strongly
-    coupled system, timing precision constraints)
+<!-- <div class="fragment"> -->
 
--   Robustness against known errors by including them in simulation of
-    spin system
-
-```{=html}
-<!-- -->
-```
 -   Computationally expensive
-
 -   Poor accuracy of many-body spin simulations
-
 -   No guarantees for convergence to optimal (or good) solution
+
+<!-- </div> -->
+
 
 ## References
