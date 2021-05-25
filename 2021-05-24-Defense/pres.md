@@ -108,7 +108,7 @@ Can apply **$\pi/2$-pulses** that collectively rotate spins $90^\circ$
 
 ## State, dynamics, measurement
 
-![](../tikz/NMR-Experiment.png){width=80%}\
+![](../tikz/NMR-Experiment-1.png){width=80%}\
 
 ## Hamiltonian engineering application: magnetic dipolar interactions
 
@@ -346,6 +346,14 @@ reward function $$r = -\log(1 - \text{F})$$
 An order of magnitude improvement...
 $$F=0.99 \to F=0.999, \quad r=2 \to r=3$$
 
+
+::: notes
+
+Higher fidelity is better
+
+Also higher reward is better
+
+:::
 ## AlphaZero Algorithm
 
 Tried *many* different RL algorithms for pulse sequence design,
@@ -366,9 +374,25 @@ With tree structure, can optionally add AHT constraints to search.
 
 ![](../tikz/MCTS/MCTS-1-1.png){width=70%}\
 
+::: notes
+
+MCTS starts at a certain state, which is some sequence of pulses
+
+:::
+
 ## AlphaZero: tree search
 
 ![](../tikz/MCTS/MCTS-2-1.png){width=70%}\
+
+::: notes
+
+MCTS balances exploration of actions and exploitation to maximize reward
+
+Policy function acts as "intuition" for which actions will lead to high rewards
+
+Value function estimates what final reward will be, if you continue following policy
+
+:::
 
 ## AlphaZero: tree search
 
@@ -395,6 +419,14 @@ $$L(\theta) = (r_i - v_\theta(s_i))^2 - \pi_\theta(s_i) \cdot \log \mathbf{p_i} 
 
 And updated parameters $\theta'$ are used in tree search...
 
+::: notes
+
+Loss function is how "bad" the neural network does, so want to minimize how bad it's doing
+
+Done with gradient descent
+
+:::
+
 ## Computational results
 
 Goal: decouple all interactions ($H_{\text{target}} = 0$) in strongly
@@ -406,6 +438,12 @@ coupled spin systems.
 -   Add errors to simulations during training
 
 Each job runs for 12 hours using 16 CPUs
+
+::: notes
+
+Ran number of different tests to evaluate RL algorithm
+
+:::
 
 ## Consistency check
 
@@ -449,7 +487,7 @@ the simulated spin systems were idealized.
 
 ## Constraints to tree search
 
-AHT constraint for $\overline{H}^{(0)}$: toggle $I_z$ to
+AHT constraint for $\overline{H}^{(0)}$: transform $I_z$ to
 $I_x, I_y, I_z, -I_x, -I_y, -I_z$ for equal times for the entire pulse
 sequence
 
@@ -533,6 +571,14 @@ $48\tau$ $$\begin{aligned}
     \overline{Y}, \tau, \overline{X}, \tau, \overline{Y}, \tau, \overline{Y}, \tau, X, \tau, Y, \tau, \overline{X}, \tau, Y, \tau, \overline{X}, \tau, Y, \tau
 \end{aligned}$$
 
+::: notes
+
+These pulse sequences were trained *without* any errors.
+
+But what happens if there are errors?
+
+:::
+
 ## Experimental errors
 
 In reality, there are imperfections...
@@ -545,7 +591,11 @@ In reality, there are imperfections...
 </div>
 <div style="clear: both;"></div>
 
+::: notes
 
+Phase transient errors are due to complex impedance of electronics
+
+:::
 
 ## Robustness to rotation errors (no errors in training)
 
@@ -572,6 +622,12 @@ of rotation errors.
 Evaluated in simulations with no errors except for phase transient
 error.
 
+::: notes
+
+Interestingly, $12\tau$ sequence is highly robust, but the reward is lower until unrealistically large phase transients.
+
+:::
+
 ## Robustness to resonance offset errors (no errors in training)
 
 Robust to resonance offset errors (trained with chemical shifts of
@@ -581,6 +637,12 @@ similar magnitude), but fidelity is still worse than CORY48.
 
 Evaluated in simulations with no errors except for resonance offset
 error.
+
+::: notes
+
+We can introduce errors in training, and RL algorithm *should* learn to construct robust pulse sequences
+
+:::
 
 ## Robustness to rotation errors (errors in training)
 
@@ -599,6 +661,12 @@ Evaluated in simulations with all errors.
 ![](../graphics/robustness/offset_errors-all_errors.png){width=50%}
 
 Evaluated in simulations with all errors.
+
+::: notes
+
+Transition: experimental results
+
+:::
 
 ## Experimental results
 
@@ -620,19 +688,15 @@ Evaluated in simulations with all errors.
 
 Special thanks to...
 
--   Benjamin Alford
--   Linta Joseph, Ethan Williams
+-   Benjamin Alford, Linta Joseph, Ethan Williams
 -   Paola Cappellaro, Xiaoyang Huang, Pai Peng
 -   Chandrasekhar Ramanathan
 
 ::: notes
 
-Ben: evaluating pulse sequences,
+Ben, Linta, Ethan: thinking about Hamiltonian engineering, evaluating pulse sequences, making lab meetings fun
 
-Linta, Ethan: getting me up to speed in lab group, teaching a lot with
-AHT, experiments, lots of feedback
-
-Paola, Xiaoyang, Pai: collaborators on RL-based Hamiltonian engineering,
+Paola, Xiaoyang, Pai: collaborators at MIT on RL-based Hamiltonian engineering,
 their work motivated my own interest in the problem, answering lots of
 early questions
 
