@@ -120,7 +120,7 @@ Can apply **$\pi/2$-pulses** that collectively rotate spins $90^\circ$
 </div>
 <div style="clear: both;"></div>
 
-Magentic dipolar interactions ($H_D$) are not wanted...
+Magnetic dipolar interactions ($H_D$) are not wanted...
 
 -   Broaden spectral lines in NMR
 
